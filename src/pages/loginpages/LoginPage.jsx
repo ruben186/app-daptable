@@ -129,9 +129,8 @@ function LoginPage() {
 
   return (
     <div className="login-bg">
-      <h2 className="login-title">Iniciar Sesión</h2>
       <div className="login-container">
-        
+        <h2 className="login-title">Iniciar Sesión</h2>
         <div className="login-logo-box">
           <img src={logo} alt="Logo" className="login-logo" />
         </div>
@@ -153,43 +152,37 @@ function LoginPage() {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+            />
+            <input
+              type="password"
+              className="form-control"
+              id="password"
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <span
-              className="login-eye"
-              onClick={() => setShowPassword(!showPassword)}
-              title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-            >
-              <svg width="24" height="24" fill="#42bb97" viewBox="0 0 24 24">
-                <path d={showPassword
-                  ? "M12 4.5C7.305 4.5 3.135 7.364 1.5 12c1.635 4.636 5.805 7.5 10.5 7.5s8.865-2.864 10.5-7.5C20.865 7.364 16.695 4.5 12 4.5zm0 13c-3.038 0-5.5-2.462-5.5-5.5s2.462-5.5 5.5-5.5 5.5 2.462 5.5 5.5-2.462 5.5-5.5 5.5z"
-                  : "M12 4.5C7.305 4.5 3.135 7.364 1.5 12c1.635 4.636 5.805 7.5 10.5 7.5s8.865-2.864 10.5-7.5C20.865 7.364 16.695 4.5 12 4.5zm0 13c-3.038 0-5.5-2.462-5.5-5.5s2.462-5.5 5.5-5.5 5.5 2.462 5.5 5.5-2.462 5.5-5.5 5.5z"
-                } />
-              </svg>
-            </span>
           </div>
-          <div className="login-links">
-            <a href="/forgot" className="login-forgot">¿olvidaste tu contraseña?</a>
+          <div className="d-grid">
+            <button type="submit" className="btn btn-primary">Entrar</button>
           </div>
-          <button type="submit" className="login-btn">Iniciar Sesión</button>
         </form>
-        <button
-          type="button"
-          onClick={handleGoogleLogin}
-          className="login-google-btn"
-        >
-          <span>Continuar con Google</span>
-          <img
-            src="https://img.icons8.com/color/48/google-logo.png"
-            alt="Google logo"
-            className="login-google-icon"
-          />
-        </button>
-        <div className="login-register">
-          <a href="/register">No tienes Cuenta? Registrate aqui</a>
-        </div>
-        <div className="login-invited">
-          <a href="/guest">Entrar como invitado</a>
+
+        <div className="text-center mt-3">
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            className="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2 mb-2"
+          >
+            <img
+              src="https://img.icons8.com/color/48/google-logo.png"
+              alt="Google logo"
+              style={{ width: '20px', height: '20px' }}
+            />
+            Iniciar sesión con Google
+          </button>
+          <a href="/register">¿No tienes cuenta? Regístrate</a><br />
+          <a href="/forgot">¿Olvidaste tu contraseña?</a>
         </div>
       </div>
     </div>

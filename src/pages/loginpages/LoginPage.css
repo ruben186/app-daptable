@@ -74,6 +74,7 @@ a:hover {
     color: rgba(33, 199, 69, 0.5);
 }
 
+
 .login-bg {
     background: #111818;
     min-height: 100vh;
@@ -324,5 +325,3 @@ a:hover {
         width: 120px;
     }
 }
-
-
