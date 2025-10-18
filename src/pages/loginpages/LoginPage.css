@@ -1,7 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+:root{
+    --container-max-width: 552px;
+    --form-max-width: 531px;
+    --card-max-width: 400px;
+}
+
 body {
     background: linear-gradient(135deg, #111111, #111111);
     min-height: 100vh;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
     color: #363434;
 }
 
@@ -15,7 +23,8 @@ body {
     box-shadow: 0 10px 25px rgba(30, 240, 11, 0.66);
     padding: 2rem;
     width: 100%;
-    max-width: 400px;
+    max-width: var(--card-max-width);
+    box-sizing: border-box;
 }
 
 .form-card h3 {
@@ -66,6 +75,7 @@ a:hover {
     display: block;
     margin: 0 auto 1.5rem auto;
     width: 220px;
+    max-width: 45%;
     height: auto;
     filter: drop-shadow(0 0 10px rgba(0, 255, 128, 0.66));
 }
@@ -76,28 +86,30 @@ a:hover {
 
 
 .login-bg {
-    background: #111818;
     min-height: 100vh;
     width: 100vw;
     display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    font-family: 'Segoe UI', sans-serif;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif !important;
+    background: #070D11;
     color: #42bb97;
 }
 
 .login-container {
-    margin-top: 40px;
-    margin-left: 60px;
-    width: 552px;
+    margin: 0;
+    width: 100%;
+    max-width: var(--container-max-width);
     display: flex;
     flex-direction: column;
     align-items: center;
     background: none;
+    box-sizing: border-box;
+    padding: 0 16px;
 }
 
 .login-title {
-    color: #42bb97;
+    color: #42F1DD;
     font-size: 1.5rem;
     font-weight: 500;
     margin-bottom: 18px;
@@ -108,7 +120,8 @@ a:hover {
 .login-logo-box {
     border: 4px solid #07433E;
     border-radius: 0px;
-    width: 552px;
+    width: 100%;
+    max-width: var(--container-max-width);
     height: 220px;
     display: flex;
     justify-content: center;
@@ -116,33 +129,38 @@ a:hover {
     margin-bottom: 22px;
     background: #020911;
     padding: 0;
+    box-sizing: border-box;
 }
 
 .login-logo {
     width: 198px;
+    max-width: 40%;
     height: auto;
     display: block;
 }
 
 .login-form {
     width: 100%;
+    max-width: var(--form-max-width);
     display: flex;
     flex-direction: column;
     gap: 10px;
+    box-sizing: border-box;
 }
 
+
 .login-label {
-    color: #42bb97;
+    color: #42F1DD;
     font-size: 1.05rem;
     margin-bottom: 2px;
     margin-left: 2px;
 }
 
 .login-input {
-    background: #07433E;
+    background: #082E2D;
     border: none;
     border-radius: 0px;
-    color: #42bb97;
+    color: #42F1DD;
     font-size: 1rem;
     padding: 7px 10px;
     margin-bottom: 8px;
@@ -164,11 +182,18 @@ a:hover {
 .login-eye {
     position: absolute;
     right: 10px;
-    top: 7px;
+    top: 5px;
     cursor: pointer;
     background: none;
     border: none;
     padding: 0;
+}
+.login-invited-btn{
+    background: none;
+    border: none;
+    color: #42F1DD;
+    cursor: pointer;
+    font-size: 1rem;
 }
 
 .login-links {
@@ -179,7 +204,7 @@ a:hover {
 }
 
 .login-forgot {
-    color: #42bb97;
+    color: #42F1DD;
     font-size: 0.95rem;
     text-decoration: none;
 }
@@ -189,15 +214,15 @@ a:hover {
 }
 
 .login-btn {
-    background: #42bb97;
-    color: #07433E;
+    background: #09665E;
+    color: #42F1DD;
     border: none;
     border-radius: 0px;
     font-size: 1.1rem;
     font-weight: 500;
     padding: 8px 0;
     width: 100%;
-    margin-bottom: 12px;
+    margin-bottom: 23px;
     cursor: pointer;
     transition: background 0.2s;
 }
@@ -208,41 +233,96 @@ a:hover {
 }
 
 .login-google-btn {
-    background: #07433E;
-    color: #42bb97;
+    background: #084642;
+    color: #42F1DD;
     border: none;
+   
     border-radius: 0px;
     font-size: 1.1rem;
-    font-weight: 500;
-    padding: 8px 0;
-    width: 100%;
-    margin-bottom: 10px;
-    cursor: pointer;
+    width: 300px;
+    max-width: 100%;
+    height: 50px;
+    margin-bottom: 23px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 1px;
+    cursor: pointer;
     transition: background 0.2s;
+    box-sizing: border-box;
 }
 
 .login-google-btn:hover {
-    background: #42bb97;
-    color: #07433E;
+    background: #2b867f;
+    color: #fff;
+}
+
+.login-google-btn label{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+    white-space: nowrap; /* force single line */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70%;
+}
+
+.login-google-btn{
+    position: relative; /* position context for icon/label */
+    padding-right: 46px; /* reserve space for icon + small margin */
 }
 
 .login-google-icon {
-    width: 28px;
-    height: 28px;
+    position: absolute;
+    right: 10px;
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    margin-left: 8px; /* small margin separation as requested */
+}
+
+/* Media queries: tablets and mobile */
+@media (max-width: 768px) {
+    :root{
+        --container-max-width: 720px; /* allow more fluidity */
+        --form-max-width: 95%;
+    }
+    .login-title{ font-size: 1.35rem; }
+    .logo{ max-width: 35%; }
+    .login-logo{ max-width: 35%; }
+    .login-logo-box{ height: 200px; }
+    .login-google-btn{ font-size: 1.1rem;}
+    .login-google-btn label{ left: 50%; transform: translateX(-50%); }
+}
+
+@media (max-width: 420px) {
+    :root{
+        --container-max-width: 100%;
+        --form-max-width: 100%;
+        --card-max-width: 360px;
+    }
+    .login-title{ font-size: 1.15rem; }
+    .logo{ width: 160px; max-width: 45%; }
+    .login-logo-box{ height: 160px; padding: 8px; }
+    .login-logo{ width: 140px; max-width: 50%; }
+    .login-form{ gap: 8px; }
+    .login-input{ padding: 10px 8px; font-size: 0.98rem; }
+    .login-btn{ font-size: 1rem; padding: 10px 0; }
+    .login-google-btn{ font-size: 1rem; }
+    .login-google-btn label{ left: 50%; transform: translateX(-50%); max-width: 75%; font-size: 0.95rem; }
+    .login-container{ padding: 0 12px; }
 }
 
 .login-register {
     width: 100%;
     text-align: center;
     margin-bottom: 8px;
+    color: #11c2b3;
 }
 
 .login-register a {
-    color: #42bb97;
+    color: #42F1DD;
     font-size: 1rem;
     text-decoration: none;
 }
@@ -258,70 +338,11 @@ a:hover {
 }
 
 .login-invited a {
-    color: #42bb97;
+    color: #42F1DD;
     font-size: 1rem;
     text-decoration: none;
 }
 
 .login-invited a:hover {
     text-decoration: underline;
-}
-
-/* --- RESPONSIVE DESIGN --- */
-@media (max-width: 900px) {
-    .login-container,
-    .login-logo-box {
-        width: 350px;
-        min-width: 0;
-        max-width: 95vw;
-    }
-    .login-logo {
-        width: 220px;
-    }
-}
-
-@media (max-width: 600px) {
-    .login-bg {
-        align-items: flex-start;
-        justify-content: center;
-        padding: 0;
-    }
-    .login-container,
-    .login-logo-box {
-        margin: 30px auto 0 auto;
-        width: 95vw;
-        min-width: 0;
-        max-width: 350px;
-        align-items: center;
-    }
-    .login-logo {
-        width: 160px;
-    }
-    .login-title {
-        font-size: 1.2rem;
-        margin-bottom: 12px;
-    }
-    .login-form {
-        gap: 8px;
-    }
-    .login-btn,
-    .login-google-btn {
-        font-size: 1rem;
-        padding: 7px 0;
-    }
-    .login-register,
-    .login-invited {
-        font-size: 0.95rem;
-    }
-}
-
-@media (max-width: 400px) {
-    .login-container,
-    .login-logo-box {
-        max-width: 98vw;
-        padding: 0 2vw;
-    }
-    .login-logo {
-        width: 120px;
-    }
 }

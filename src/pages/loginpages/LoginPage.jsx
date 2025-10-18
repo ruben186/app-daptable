@@ -5,6 +5,9 @@ import { signInWithEmailAndPassword, fetchSignInMethodsForEmail, linkWithCredent
 import { doc, getDoc , setDoc } from 'firebase/firestore';
 import './LoginPage.css';
 import logo from '../../assets/logos/logoapp-daptable.jpeg';
+import ojoAbierto from '../../assets/Iconos/ojo_abierto_contraseña.png';
+import ojoCerrado from '../../assets/Iconos/ojo_cerrado_contraseña.png';
+import iconoGoogle from '../../assets/Iconos/IconoGoogle.png';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
@@ -135,7 +138,7 @@ function LoginPage() {
           <img src={logo} alt="Logo" className="login-logo" />
         </div>
         <form onSubmit={handleSubmit} className="login-form">
-          <label htmlFor="email" className="login-label">Correo electronico:</label>
+          <label htmlFor="email" className="login-label">Celular ó Correo electronico:</label>
           <input
             type="email"
             className="login-input"
@@ -152,37 +155,40 @@ function LoginPage() {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-            />
-            <input
-              type="password"
-              className="form-control"
-              id="password"
-              placeholder="Contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               required
             />
+            <button
+              type="button"
+              className={`login-eye`}
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+            >
+              <img
+                src={showPassword ? ojoCerrado : ojoAbierto}
+                width={'32'}
+                height={'28'}
+                alt={showPassword ? "Icono ojo cerrado" : "Icono ojo abierto"}
+              />
+            </button>
           </div>
-          <div className="d-grid">
-            <button type="submit" className="btn btn-primary">Entrar</button>
+          <div className="login-links">
+            <a href="/forgot" className="login-forgot">olvidaste tu contraseña?</a>
           </div>
+          <button type="submit" className="login-btn">Iniciar Sesión</button>
         </form>
-
-        <div className="text-center mt-3">
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            className="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2 mb-2"
-          >
-            <img
-              src="https://img.icons8.com/color/48/google-logo.png"
-              alt="Google logo"
-              style={{ width: '20px', height: '20px' }}
-            />
-            Iniciar sesión con Google
-          </button>
-          <a href="/register">¿No tienes cuenta? Regístrate</a><br />
-          <a href="/forgot">¿Olvidaste tu contraseña?</a>
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className="login-google-btn"
+        >
+          <label>Continuar con Google</label>
+          <img src={iconoGoogle} alt="Google logo" className="login-google-icon" />
+        </button>
+        <div className="login-register">
+          <span>No tienes Cuenta? <a href="/register">Registrate aqui</a></span>
+        </div>
+        <div className="login-invited">
+          <button type="button" className="login-invited-btn">Entrar como invitado</button>
         </div>
       </div>
     </div>
