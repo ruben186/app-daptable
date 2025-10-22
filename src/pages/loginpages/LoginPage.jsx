@@ -4,7 +4,7 @@ import { auth, googleProvider, db } from '../../firebase';
 import { signInWithEmailAndPassword, fetchSignInMethodsForEmail, linkWithCredential, EmailAuthProvider, signInWithPopup } from 'firebase/auth';
 import { doc, getDoc , setDoc } from 'firebase/firestore';
 import './LoginPage.css';
-import logo from '../../assets/logos/logoapp-daptable.jpeg';
+import logo from '../../assets/logos/App-Daptable-Cel.png';
 import ojoAbierto from '../../assets/Iconos/ojo_abierto_contraseña.png';
 import ojoCerrado from '../../assets/Iconos/ojo_cerrado_contraseña.png';
 import iconoGoogle from '../../assets/Iconos/IconoGoogle.png';

@@ -20,7 +20,6 @@ body {
 .form-card {
     background: #4de4e4;
     border-radius: 50px;
-    box-shadow: 0 10px 25px rgba(30, 240, 11, 0.66);
     padding: 2rem;
     width: 100%;
     max-width: var(--card-max-width);
@@ -73,11 +72,9 @@ a:hover {
 
 .logo {
     display: block;
-    margin: 0 auto 1.5rem auto;
     width: 220px;
     max-width: 45%;
     height: auto;
-    filter: drop-shadow(0 0 10px rgba(0, 255, 128, 0.66));
 }
 
 .form-control::placeholder {

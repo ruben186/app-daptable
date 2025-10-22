@@ -1,20 +1,128 @@
-/* .bg-gradient {
-    background: linear-gradient(135deg, #E0C370, #B8860B);
+/* Register page - estilo basado en mockup oscuro/teal */
+
+.bg-gradient2 {
+    background: #070D11;
+    min-height: 100vh;
+    color: #42F1DD;
+    position: relative;
+    padding: 40px 24px;
 }
 
-.form-card {
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    padding: 2rem;
-    width: 100%;
-    max-width: 500px;
+/* Volver */
+.btn-outline-secondary {
+    position: absolute;
+    left: 24px;
+    top: 20px;
+    border: none;
+    color: #42F1DD;
+    background: transparent;
+    font-size: 20px;
 }
 
-.form-card form {
-    max-width: 400px;
-    margin: 0 auto;
-} */
-.form-check-label{
-    color: azure;
+.btn-outline-secondary:hover { color: #9af3df; }
+
+.form-left { width: 45%; }
+.form-right { width: 44%; display:flex; justify-content:center; align-items:center; }
+
+.form-left h3 {
+    color: #42F1DD;
+    font-size: 28px;
+    margin-bottom: 18px;
+    text-align: left;
 }
+
+.logo-box {
+    width: 552px;
+    height: 552px;
+    background: #020911;
+    border: 8px solid rgba(6,115,103,0.6);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-sizing: border-box;
+}
+
+.logo-box .logo2,
+.form-right .logo2 {
+    /* Tamaño del logo dentro del recuadro derecho */
+    width: 316px;
+    height: 316px;
+    object-fit: contain;
+}
+
+/* Etiquetas de los campos */
+.form-label {
+    color: #42F1DD;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+/* Estilo base de inputs/selects/textarea que usan .form-control */
+.form-control {
+    background: #073532;
+    border: none;
+    color: #42F1DD;
+    padding: 10px 12px;
+    border-radius: 4px;
+}
+.form-control::placeholder {
+    color: rgba(66,241,221,0.25);
+}
+.form-control:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(11,189,165,0.12);
+}
+
+/* Inputs tipo date y selects comparten fondo/colores */
+input[type="date"], select, .form-control {
+    background: #073532;
+    color: #42F1DD;
+}
+
+/* Checkboxes/radios */
+.form-check-label {
+    color: #42F1DD;
+}
+.form-check-input:checked {
+    background-color: #0d7f73;
+    border-color: #0d7f73;
+}
+
+/* Espaciado por campo */
+.mb-3 { margin-bottom: 16px !important; }
+
+/* Contenedores de botones */
+.d-grid.gap-2 { display: flex; gap: 12px; align-items: center; }
+
+/* Botón principal */
+.btn-primary {
+   background: #09665E;
+    border: none;
+    color: #42F1DD;
+    padding: 12px 32px;
+    margin-top: 18px;
+    width: 212px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+.btn-primary:hover {   background: #2b867f;
+    color: #fff;}
+
+@media (max-width: 900px) {
+    .form-card { flex-direction: column-reverse; padding:36px 28px; border-radius:40px; }
+    .form-left, .form-right { width:100%; }
+    .logo-box { width:220px; height:220px; margin:0 auto 12px; border-width:6px; }
+    .btn-outline-secondary { left:12px; top:12px; font-size:18px; }
+}
+
+/* small tweaks */
+a.btn-outline-secondary:focus, .btn-primary:focus { box-shadow:0 0 0 4px rgba(11,189,165,0.12); outline:none; }
+
+select.form-control { appearance:none; -webkit-appearance:none; -moz-appearance:none; }
+
+/* fallback if logo is used directly as img inside form-card */
+.form-card > img.logo { width:120px; margin:0 auto 12px; }
+

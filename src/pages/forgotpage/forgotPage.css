@@ -1,3 +1,97 @@
-.form-control::placeholder {
-    color: rgba(0, 195, 255, 0.5);
+.form-email::placeholder {
+    color: #115f59;
+}
+
+/* Fondo principal */
+body, .bg-page {
+    background: #070D11; /* tono muy oscuro */
+    min-height: 100vh;
+    color: #42F1DD;
+}
+
+/* Botón volver en esquina */
+.btn-outline-secondary {
+    position: absolute;
+    left: 24px;
+    top: 20px;
+    border: none;
+    color: #42F1DD;
+    background: transparent;
+    font-size: 20px;
+}
+
+/* Tarjeta del formulario */
+.form-card {
+    width: 720px;
+    max-width: calc(100% - 80px);
+    background: #05211F; /* verde oscuro translúcido */
+    padding: 56px 64px;
+    border-radius: 80px; /* esquinas grandes redondeadas */
+    text-align: center;
+}
+
+.form-card h3 {
+    font-size: 28px;
+    color: #42F1DD;
+    margin-bottom: 8px;
+}
+
+.form-card p.subtitle {
+    color: #2CA699;
+    margin-top: 0;
+    margin-bottom: 28px;
+}
+
+.form-label {
+    color: #42F1DD;
+    display: block;
+    text-align: left;
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.form-email {
+    background: #073532;
+    border: none;
+    color: #42F1DD;
+    padding: 12px 14px;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.form-email:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(11, 189, 165, 0.473);
+}
+
+.d-grid .btn-primary {
+    background: #09665E;
+    border: none;
+    color: #42F1DD;
+    padding: 12px 32px;
+    margin-top: 18px;
+    width: 260px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+     background: #2b867f;
+    color: #fff;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 700px) {
+    .form-card {
+        padding: 36px 28px;
+        border-radius: 40px;
+    }
+    .d-flex .btn-outline-secondary {
+        left: 12px;
+        top: 12px;
+        font-size: 18px;
+    }
 }

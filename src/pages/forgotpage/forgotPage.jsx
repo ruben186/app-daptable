@@ -43,28 +43,28 @@ function ForgotPasswordPage() {
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center min-vh-100 bg-gradient">
+    <div className="d-flex justify-content-center align-items-center min-vh-100 bg-page" style={{position: 'relative'}}>
+      <button type="button" className="btn-outline-secondary" onClick={handleGoBack}>
+          &lt; Volver
+      </button>
       <div className="form-card">
-        <img src={logo} alt="Logo" className="logo mb-3" style={{ width: '250px' }} />
-        <h3 className="mb-4 text-center">Recuperar Contraseña</h3>
+        <h3 className="mb-2">Recupera tu Cuenta</h3>
+        <p className="subtitle">Para recuperar tu contraseña escribe tu correo</p>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label htmlFor="email" className="form-label">Correo electrónico</label>
+            <label htmlFor="email" className="form-label">Correo Electronico:</label>
             <input
               type="email"
-              className="form-control"
+              className="form-email"
               id="email"
-              placeholder="tucorreo@ejemplo.com"
+              placeholder="ejemplo@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
           <div className="d-grid gap-2">
-            <button type="submit" className="btn btn-primary">Enviar instrucciones</button>
-            <button type="button" className="btn btn-outline-secondary" onClick={handleGoBack}>
-              Volver al inicio de sesión
-            </button>
+            <button type="submit" className="btn-primary">Enviar Instrucciones</button>
           </div>
         </form>
       </div>
