@@ -89,22 +89,22 @@ function RegisterPage() {
 
           <div className="mb-3">
             <label className="form-label">Nombre y Apellido</label>
-            <input type="text" className="form-control" name="nombreCompleto" value={formData.nombreCompleto} onChange={handleChange}/>
+            <input type="text" className="form-control2" name="nombreCompleto" value={formData.nombreCompleto} onChange={handleChange}/>
           </div>
 
           <div className="mb-3">
             <label className="form-label">Fecha de Nacimiento</label>
-            <input type="date" className="form-control" name="fechaNacimiento" value={formData.fechaNacimiento} onChange={handleChange} />
+            <input type="date" className="form-control2" name="fechaNacimiento" value={formData.fechaNacimiento} onChange={handleChange} />
           </div>
 
           <div className="mb-3">
             <label className="form-label">Teléfono</label>
-            <input type="tel" className="form-control" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Ej: 3001234567" />
+            <input type="tel" className="form-control2" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Ej: 3001234567" />
           </div>
 
           <div className="mb-3">
             <label className="form-label">Sexo</label>
-            <select className="form-control" name="sexo" value={formData.sexo} onChange={handleChange}>
+            <select className="form-control2" name="sexo" value={formData.sexo} onChange={handleChange}>
               <option value="">Seleccionar</option>
               <option value="Masculino">Masculino</option>
               <option value="Femenino">Femenino</option>
@@ -113,17 +113,17 @@ function RegisterPage() {
 
           <div className="mb-3">
             <label className="form-label">Correo Electrónico</label>
-            <input type="email" className="form-control" name="email" value={formData.email} onChange={handleChange} placeholder="tucorreo@ejemplo.com" />
+            <input type="email" className="form-control2" name="email" value={formData.email} onChange={handleChange} placeholder="tucorreo@ejemplo.com" />
           </div>
 
           <div className="mb-3">
             <label className="form-label">Contraseña</label>
-            <input type="password" className="form-control" name="password" value={formData.password} onChange={handleChange} placeholder="Escribe tu contraseña" />
+            <input type="password" className="form-control2" name="password" value={formData.password} onChange={handleChange} placeholder="Escribe tu contraseña" />
           </div>
 
           <div className="mb-3">
             <label className="form-label">Repetir Contraseña</label>
-            <input type="password" className="form-control" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Confirma tu contraseña" />
+            <input type="password" className="form-control2" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Confirma tu contraseña" />
           </div>
 
           <div className="d-grid gap-2">

@@ -59,19 +59,27 @@
 }
 
 /* Estilo base de inputs/selects/textarea que usan .form-control */
-.form-control {
+.form-control2 {
     background: #073532;
     border: none;
     color: #42F1DD;
     padding: 10px 12px;
-    border-radius: 4px;
+    border-radius: 4px;    
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    appearance: none;
+    background-clip: padding-box;
 }
-.form-control::placeholder {
+.form-control2::placeholder {
     color: rgba(66,241,221,0.25);
 }
-.form-control:focus {
-    outline: none;
-    box-shadow: 0 0 0 4px rgba(11,189,165,0.12);
+.form-control2:focus {
+     outline: none;
+    box-shadow: 0 0 0 3px rgba(11, 189, 165, 0.473);
 }
 
 /* Inputs tipo date y selects comparten fondo/colores */
