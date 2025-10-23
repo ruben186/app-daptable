@@ -17,6 +17,7 @@ import ProtectedRoute from './pages/components/protecterRoute';
 import DashboardPage from './pages/dashBoardPage/dashBoardPage';
 import ResetPasswordPage from './pages/resetPasswordPage/resetPasswordPage';
 import AuxiliaresPage from './pages/auxiliaresPage/auxiliaresPage';
+import GeneradorTabla from './pages/GeneradorTabla/GeneradorTabla.jsx';
 
 
 import ClientePage from './pages/clientePage/ClientePage';
@@ -51,7 +52,11 @@ function App() {
           </ProtectedRoute>
         } />
 
-       
+        <Route path="/TablaCel" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <GeneradorTabla/>
+          </ProtectedRoute>
+        } />
         
 
        

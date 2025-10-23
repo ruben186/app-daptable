@@ -72,79 +72,85 @@ function NavBar() {
     }
   };
 
-
   return (
     <div>
       {/* NAVBAR */}
       <Navbar expand="lg" variant="dark" className="dashboard-navbar fixed-top">
-        <Container>
-          <Navbar.Brand onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>
-            <img src={logo} alt="Logo" height="40" className="d-inline-block align-top" />
-          </Navbar.Brand>
+        <Container className="navbarContainer">
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto">
+            {/* contenedor de pills y búsqueda */}
+            <div className="navbar-center d-flex align-items-center">
+              <Nav className="pills-container d-flex align-items-center">
 
-              {/* ✅ Mostrar el menú "Personas" solo si el rol es ADMIN */}
-              {userRole === 'admin' && (
-                <NavDropdown title="Personas" id="basic-nav-dropdown">
-                  <NavDropdown.Item onClick={() => navigate('/clientes')}>
-                    Clientes
-                  </NavDropdown.Item>
-                  <NavDropdown.Item onClick={() => navigate('/auxiliares')}>
-                    Auxiliares
-                  </NavDropdown.Item>
-                </NavDropdown>
-              )}
+                {/* Mostrar el menú "Personas" solo si el rol es ADMIN */}
+                {userRole === 'admin' && (
+                  <NavDropdown title="Personas" id="basic-nav-dropdown">
+                    <NavDropdown.Item onClick={() => navigate('/TablaCel')}>
+                      Clientes
+                    </NavDropdown.Item>
+                    <NavDropdown.Item onClick={() => navigate('/auxiliares')}>
+                      Auxiliares
+                    </NavDropdown.Item>
+                  </NavDropdown>
+                )}
 
+                {/* Menú accesible por todos - pills con icono y label */}
+                <Nav.Link onClick={() => navigate('/xiaomi')} className="pill-link">
+                  <div className="pill">
+                    <img src={logoxiami} alt="Xiaomi" className="pill-icon" />
+                    <small>Xiaomi</small>
+                  </div>
+                </Nav.Link>
 
-              
+                <Nav.Link onClick={() => navigate('/samgsumg')} className="pill-link">
+                  <div className="pill">
+                    <img src={logosamgsumg} alt="Samsung" className="pill-icon" />
+                  </div>
+                </Nav.Link>
 
-              {/* Menú accesible por todos */}
-              <Nav.Link onClick={() => navigate('/xiaomi')}>Xiaomi
-                  <img
-                    src={logoxiami}
-                    alt="Foto de usuario"
-                    className="user-photo-nav"
-                  />    
-              </Nav.Link>
+                <Nav.Link onClick={() => navigate('/huawei')} className="pill-link">
+                  <div className="pill">
+                    <img src={logohuawei} alt="Huawei" className="pill-icon" />
+                    <small>Huawei</small>
+                  </div>
+                </Nav.Link>
 
-              <Nav.Link onClick={() => navigate('/samgsumg')}>Samgsumg
-               <img
-                    src={logosamgsumg}
-                    alt="Foto de usuario"
-                    className="user-photo-nav"
-                  />
-              </Nav.Link>
-              
-              <Nav.Link onClick={() => navigate('/huawei')}>Huawei
-                <img
-                    src={logohuawei}
-                    alt="Foto de usuario"
-                    className="user-photo-nav"
-                  />
-              </Nav.Link>
+                <Nav.Link onClick={() => navigate('/motorola')} className="pill-link">
+                  <div className="pill">
+                    <img src={logomotorola} alt="Motorola" className="pill-icon" />
+                    <small>Motorola</small>
+                  </div>
+                </Nav.Link>
 
-              <Nav.Link onClick={() => navigate('/motorola')}>Motorola
-                 <img
-                    src={logomotorola}
-                    alt="Foto de usuario"
-                    className="user-photo-nav"
-                  />
-              </Nav.Link>
+                <Nav.Link onClick={() => navigate('/otros')} className="pill-link">
+                  <div className="pill">
+                    <small>Otros..</small>
+                  </div>
+                </Nav.Link>
 
-              <Nav.Link onClick={() => navigate('/otros')}>Otros..</Nav.Link>
-              <Nav.Item className="logout-container" onClick={handleLogout}>
+              </Nav>
+
+              {/* caja de búsqueda */}
+              <div className="search-wrapper ms-3">
+                <input className="search-input" placeholder="Buscar..." />
+              </div>
+            </div>
+
+            {/* brand a la derecha y logout */}
+            <div className="d-flex align-items-center ms-auto">
+              <Nav.Item className="logout-container me-3" onClick={handleLogout}>
                 <Nav.Link className="logout-link d-flex align-items-center gap-2">
                   <FaSignOutAlt /> Cerrar Sesión
-                  <img
-                    src={userPhoto}
-                    alt="Foto de usuario"
-                    className="user-photo-nav"
-                  />
+                  <img src={userPhoto} alt="Foto de usuario" className="user-photo-nav" />
                 </Nav.Link>
               </Nav.Item>
-            </Nav>
+              <div className="brand-right">
+                <Navbar.Brand onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>
+                  <img src={logo} alt="Logo" height="44" className="d-inline-block align-top brand-logo" />
+                </Navbar.Brand>
+              </div>
+            </div>
           </Navbar.Collapse>
         </Container>
       </Navbar>
@@ -153,3 +159,4 @@ function NavBar() {
 }
 
 export default NavBar;
+                 

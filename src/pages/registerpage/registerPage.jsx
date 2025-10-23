@@ -9,8 +9,7 @@ import logo from '../../assets/logos/App-Daptable-Cel.png';
 
 function RegisterPage() {
   const [formData, setFormData] = useState({
-    cedula: '',
-  nombreCompleto: '',
+    nombreCompleto: '',
     fechaNacimiento: '',
     sexo: '',
     telefono: '',
@@ -34,8 +33,8 @@ function RegisterPage() {
         return;
       }
     }
-    if(formData.telefono.length > 10 || formData.cedula.length > 10){
-      Swal.fire('Error', 'Los campos de cedula y telefono debe tener como maximo 10 caracteres.', 'error');
+    if(formData.telefono.length > 10 ){
+      Swal.fire('Error', 'El numero de telefono debe tener como maximo 10 caracteres.', 'error');
       return;
   }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -55,7 +54,6 @@ function RegisterPage() {
 
       // Guardar datos adicionales en Firestore
       await setDoc(doc(db, 'usuarios', user.uid), {
-        cedula: formData.cedula,
         nombreCompleto: formData.nombreCompleto,
         fechaNacimiento: formData.fechaNacimiento,
         sexo: formData.sexo,

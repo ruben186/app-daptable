@@ -30,11 +30,11 @@ function DashboardPage() {
       
   return (
     <>
-      <div>
+      <div className="page-offset">
         <NavBar/>
          
           <div className='mt-5'> 
-            <div>
+            <div className="carousel-outer">
               <Carousel>
                 <Carousel.Item>
                   <img 
