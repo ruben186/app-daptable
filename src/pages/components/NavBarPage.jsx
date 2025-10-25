@@ -1,26 +1,23 @@
 import { useNavigate } from 'react-router-dom';
-import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
-import { FaSignOutAlt } from 'react-icons/fa';
-import { signOut } from 'firebase/auth';
+import { Navbar, Nav, Container } from 'react-bootstrap';
 import { auth, db } from '../../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import logo from '../../assets/logos/logoapp-daptable.jpeg';
-import userDefault from '../../assets/logos/user.png'; 
+// ...existing assets imports...
 import logoxiami from '../../assets/logos/logoxiami.png'; 
 import logosamgsumg from '../../assets/logos/logosamgsumg.png'; 
 import logohuawei from '../../assets/logos/logohuawei.png'; 
 import logomotorola from '../../assets/logos/logomotorola.png';
-import Swal from 'sweetalert2';
+import PersonasMenu from './MenuNavBar';
+// SweetAlert se usa en otras partes; eliminado aquí para evitar warnings si no se usa.
 
 function NavBar() {
   const navigate = useNavigate();
   const [user] = useAuthState(auth);
   const [userRole, setUserRole] = useState(null);
 
-  // Obtener la foto del usuario
-  const userPhoto = user?.photoURL || userDefault;
 
   // Obtener rol desde Firestore
   useEffect(() => {
@@ -38,39 +35,8 @@ function NavBar() {
     fetchUserRole();
   }, [user]);
 
-  const handleLogout = async () => {
-    const result = await Swal.fire({
-      title: '¿Estás seguro?',
-      text: 'Vas a cerrar sesión.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, cerrar sesión',
-      cancelButtonText: 'No, quedarme',
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await signOut(auth);
-        sessionStorage.setItem("logout", "true"); 
-        Swal.fire({
-          icon: 'success',
-          title: 'Sesión cerrada',
-          text: '¡Has cerrado sesión exitosamente!',
-          timer: 2000,
-          showConfirmButton: false,
-        }).then(() => {
-          navigate('/');
-        });
-      } catch (error) {
-        console.error("Error al cerrar sesión:", error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Hubo un problema al cerrar sesión.',
-        });
-      }
-    }
-  };
+  // Nota: la acción de logout está disponible en otro lugar; si se quiere activar aquí,
+  // se puede reañadir la función handleLogout.
 
   return (
     <div>
@@ -82,24 +48,16 @@ function NavBar() {
             {/* contenedor de pills y búsqueda */}
             <div className="navbar-center d-flex align-items-center">
               <Nav className="pills-container d-flex align-items-center">
-
-                {/* Mostrar el menú "Personas" solo si el rol es ADMIN */}
-                {userRole === 'admin' && (
-                  <NavDropdown title="Personas" id="basic-nav-dropdown">
-                    <NavDropdown.Item onClick={() => navigate('/TablaCel')}>
-                      Clientes
-                    </NavDropdown.Item>
-                    <NavDropdown.Item onClick={() => navigate('/auxiliares')}>
-                      Auxiliares
-                    </NavDropdown.Item>
-                  </NavDropdown>
-                )}
+e
+                  <div className="personas-wrapper" ref={null}>
+                    <PersonasMenu navigate={navigate} />
+                  </div>
+            
 
                 {/* Menú accesible por todos - pills con icono y label */}
                 <Nav.Link onClick={() => navigate('/xiaomi')} className="pill-link">
                   <div className="pill">
-                    <img src={logoxiami} alt="Xiaomi" className="pill-icon" />
-                    <small>Xiaomi</small>
+                    <img src={logoxiami} alt="Xiaomi" className="pill-icon" width="45px" height="42px"/>
                   </div>
                 </Nav.Link>
 
@@ -112,14 +70,12 @@ function NavBar() {
                 <Nav.Link onClick={() => navigate('/huawei')} className="pill-link">
                   <div className="pill">
                     <img src={logohuawei} alt="Huawei" className="pill-icon" />
-                    <small>Huawei</small>
                   </div>
                 </Nav.Link>
 
                 <Nav.Link onClick={() => navigate('/motorola')} className="pill-link">
                   <div className="pill">
-                    <img src={logomotorola} alt="Motorola" className="pill-icon" />
-                    <small>Motorola</small>
+                    <img src={logomotorola} alt="Motorola" className="pill-icon" width="50px" height="50px"  />
                   </div>
                 </Nav.Link>
 
@@ -139,12 +95,12 @@ function NavBar() {
 
             {/* brand a la derecha y logout */}
             <div className="d-flex align-items-center ms-auto">
-              <Nav.Item className="logout-container me-3" onClick={handleLogout}>
+              {/* <Nav.Item className="logout-container me-3" onClick={handleLogout}>
                 <Nav.Link className="logout-link d-flex align-items-center gap-2">
                   <FaSignOutAlt /> Cerrar Sesión
                   <img src={userPhoto} alt="Foto de usuario" className="user-photo-nav" />
                 </Nav.Link>
-              </Nav.Item>
+              </Nav.Item> */}
               <div className="brand-right">
                 <Navbar.Brand onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>
                   <img src={logo} alt="Logo" height="44" className="d-inline-block align-top brand-logo" />
@@ -159,4 +115,7 @@ function NavBar() {
 }
 
 export default NavBar;
+ 
+
+
                  

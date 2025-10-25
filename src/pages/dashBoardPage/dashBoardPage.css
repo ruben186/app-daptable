@@ -8,7 +8,6 @@
 .navbarContainer {
   display: flex;
   align-items: center;
-  gap: 12px;
   padding: 0 8px;
 }   
 .pill {
@@ -16,26 +15,30 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  background: rgba(9,102,94,0.95);
+  background: #09665E;
   border-radius: 25px;
-  color: #e6fffe;
+  color: #3BD5C4;
   min-width: 64px;
   width: 147px;
   height: 50px;
   justify-content: center;
+  transition: all 0.18s ease;
+}
+
+.pill:hover{
+  background: #15CABB;
+  color: #001b19;
+  transform: translateY(-2px);
 }
 
 .pill-icon {
-  width: 45px;
-  height: 45px;
   object-fit: contain;
 }
 
 .pill small {
   display: block;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   line-height: 1;
-  color: #e6fffe;
 }
  
 /* NAVBAR internal */
@@ -76,6 +79,7 @@
   color: #eaffff;
   font-size: 0.95rem;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+  width: 425px;
 }
 
 .brand-right {
@@ -127,6 +131,138 @@
 .navbar-dark .dropdown-menu .dropdown-item:hover {
     background-color: rgba(70,203,255,0.12);
     color: #001b19;
+}
+
+/* PERSONAS CUSTOM MENU */
+.personas-toggle {
+ background: none;
+ position: relative;
+ right: 100px;
+ border: none;
+ border-radius: 10px;
+ width: 70px;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ transition: all 0.18s ease;
+}
+.personas-toggle img {
+ position: relative;
+ bottom: 2px;
+}
+.personas-toggle:hover {
+  background: #13d5c2; 
+  color: #00201d; 
+}
+.personas-panel {
+  position: absolute;
+  top: 52px;
+  left: 0;
+  background: linear-gradient(180deg, #054c47, #0b3f3a);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+  min-width: 200px;
+  overflow: hidden;
+  z-index: 1200;
+}
+.personas-item {
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  background: transparent;
+  color: #cffcf6;
+  border: none;
+  display: block;
+  cursor: pointer;
+  border-top: 1px solid rgba(255,255,255,0.03);
+}
+
+.personas-item:first-child { border-top: none; }
+.personas-item:hover { background: #15CABB; color: #001b19; }
+
+.chev {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #dffcf7;
+  border-bottom: 2px solid #dffcf7;
+  transform: rotate(45deg);
+  transition: transform 0.18s ease;
+}
+.chev.open { transform: rotate(-135deg); }
+
+/* DRAWER PERSONAS */
+.personas-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0);
+  visibility: hidden;
+  transition: background 0.22s ease, visibility 0.22s ease;
+  z-index: 1100;
+}
+.personas-overlay.visible { background: rgba(0,0,0,0.45); visibility: visible; }
+
+.personas-drawer {
+  position: fixed;
+  left: -320px; /* hidden */
+  top: 0;
+  height: 100vh;
+  width: 320px;
+  background: linear-gradient(180deg,#073833 0%, #0b3f3a 100%);
+  box-shadow: 4px 0 24px rgba(0,0,0,0.6);
+  transition: left 0.28s cubic-bezier(.2,.9,.2,1);
+  z-index: 1150;
+  display: flex;
+  flex-direction: column;
+}
+.personas-drawer.open { left: 0; }
+
+.personas-drawer-header { display:flex; justify-content:flex-end; padding: 12px 16px; }
+.drawer-close { background: transparent; border:none; color: #cffff8; font-size: 18px; cursor: pointer; }
+
+.personas-drawer-list { display:flex; flex-direction:column; gap:0; padding: 6px 0 40px 0; }
+.personas-drawer-item {
+  padding: 14px 18px;
+  text-align: left;
+  border-top: 1px solid rgba(255,255,255,0.03);
+  color: #e8fffb;
+  background: linear-gradient(90deg, rgba(0,0,0,0.04), rgba(0,0,0,0.02));
+  cursor: pointer;
+  font-size: 1rem;
+}
+.personas-drawer-item:nth-child(odd) { background: rgba(0,0,0,0.06); }
+.personas-drawer-item:hover {
+  background: #13d5c2; color: #001b19; transform: translateX(6px);
+}
+
+/* separadores destacados (aqua) para grupos, estilo de la captura */
+.personas-drawer-item.group-title {
+  background: #15f3de; color: #00221f; font-weight:700; text-align:center;
+}
+
+/* Títulos de grupo como barras aqua (full-width) */
+.personas-group-title {
+  background: #15f3de;
+  color: #00221f;
+  font-weight: 700;
+  text-align: center;
+  padding: 10px 12px;
+  margin-top: 8px;
+}
+
+/* Ajustar filas alternadas considerando los títulos (usar selector general) */
+.personas-drawer-list > .personas-drawer-item:nth-of-type(odd) { background: rgba(0,0,0,0.06); }
+.personas-drawer-list > .personas-drawer-item:nth-of-type(even) { background: rgba(0,0,0,0.03); }
+
+@media (max-width: 480px) {
+  .personas-drawer { width: 85%; left: -85%; }
+  .personas-drawer.open { left: 0; }
+}
+
+.personas-wrapper { 
+  display: flex; 
+  align-items: center; 
+  position: absolute;
+  left: 100px;
 }
 
 /* MAIN CONTENT */
@@ -189,7 +325,7 @@
 /* FOOTER */
 .footer {
     background: linear-gradient(180deg, rgba(10,10,10,0.6), rgba(20,20,20,0.8));
-    color: rgba(255,255,255,0.9);
+    color: #42F1DD;
     text-align: center;
     padding: 18px 12px;
     width: 100%;
@@ -199,7 +335,6 @@
   border-top: 10px solid #07433E;
   border-bottom: 10px solid #07433E;
   overflow: hidden;
-  border-radius: 6px;
 }
 .carousel-inner {
   min-height: 380px; 
