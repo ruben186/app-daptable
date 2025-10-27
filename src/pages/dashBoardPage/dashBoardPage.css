@@ -2,7 +2,6 @@
 .dashboard-navbar {
   background: linear-gradient(90deg,#003232 0%, #064e49 60%);
   padding: 0.4rem 0.8rem;
-  border-bottom: 4px solid rgba(0,0,0,0.25);
   height: 68px;
 }
 .navbarContainer {
