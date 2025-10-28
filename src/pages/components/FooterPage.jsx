@@ -6,7 +6,7 @@ function Footer(){
             {/* FOOTER */}
             <footer className="footer mt-auto align-bottom">
                 <div className="container">
-                <small>© 2025 Brilla. All rights reserved.</small>
+                <small>© 2025 RC Seguridad y Software. All rights reserved.</small>
                 </div>
             </footer>
         </div>

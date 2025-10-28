@@ -49,7 +49,7 @@ const GeneradorTabla = () => {
     'VIDRIO TEMPLADO',
     'BATERIA',
     'FLEX DE BOTONES',
-    'FLEX DESCARGA',
+    'FLEX DE CARGA',
     'PUERTO DE CARGA',
     'AURICULAR',
   ];

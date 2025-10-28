@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+     import { useEffect, useState, useRef } from 'react';
 import menuIcon from '../../assets/Iconos/IconoMenu.png';
 
 // Componente local: grupo expandible accesible
