@@ -94,7 +94,7 @@ e
             </div>
 
             {/* brand a la derecha y logout */}
-            <div className="d-flex align-items-center ms-auto">
+            <div className="wrapper-logo">
               {/* <Nav.Item className="logout-container me-3" onClick={handleLogout}>
                 <Nav.Link className="logout-link d-flex align-items-center gap-2">
                   <FaSignOutAlt /> Cerrar Sesión

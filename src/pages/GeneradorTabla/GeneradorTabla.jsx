@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 // ⬅️ Importamos doc y setDoc para el ID personalizado
-import { collection, doc, setDoc } from 'firebase/firestore'; 
+import { doc, setDoc, getDoc, collection, getDocs } from 'firebase/firestore'; 
 import { db } from '../../firebase'; // Asegúrate de que esta ruta sea correcta
 import './GeneradorTabla.css';
 
@@ -8,9 +8,16 @@ const GeneradorTabla = () => {
   const [nombre, setNombre] = useState('');
   const [modelo, setModelo] = useState('');
   const [marca, setMarca] = useState(''); // Estado para la marca
+  const [searchQuery, setSearchQuery] = useState('');
   const [tabla, setTabla] = useState([]);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [numCampos, setNumCampos] = useState(8);
+  const [remoteTablas, setRemoteTablas] = useState([]);
+  const [remoteLoading, setRemoteLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [aggregatedRows, setAggregatedRows] = useState([]);
+  const [aggregatedMode, setAggregatedMode] = useState(false);
 
   const marcasDisponibles = [
     'Samsung',
@@ -20,17 +27,19 @@ const GeneradorTabla = () => {
     'Otros',
   ];
 
+  // Genera el código para un campo usando la base: nombre (sin espacios, lowercase) + modelo
+  // Ahora el código NO incluye el nombre del campo, solo la base y el contador: ej. motog7powerXT1962-4-1
   const generarCodigo = (index) => {
-    // Es buena práctica incluir el modelo aquí si se usa como parte del ID del documento
-    return `${nombre.toUpperCase()}-${modelo.toUpperCase()}-${Date.now()}-${index}`;
+    const base = `${nombre.trim().replace(/\s+/g, '').toLowerCase()}${modelo.trim()}`; // ej: motog7powerXT1962-4
+    return `${base}-${index}`; // ej: 'motog7powerXT1962-4-1'
   };
 
   // Helper para generar el ID del documento basado en Nombre y Modelo
   const generarDocId = (nombre, modelo) => {
-    // Limpia y formatea (Ej: 'Samsung Galaxy S21' -> 'SAMSUNG_GALAXY_S21')
-    const nombreLimpio = nombre.trim().toUpperCase().replace(/[^A-Z0-9]/g, '_');
-    const modeloLimpio = modelo.trim().toUpperCase().replace(/[^A-Z0-9]/g, '_');
-    return `${nombreLimpio}-${modeloLimpio}`;
+    // Concatenar nombre (sin espacios, lowercase) y modelo tal cual (trimmed)
+    const nombreLimpio = nombre.trim().replace(/\s+/g, '').toLowerCase();
+    const modeloLimpio = modelo.trim();
+    return `${nombreLimpio}${modeloLimpio}`;
   };
 
   // Nombres por defecto de los campos
@@ -45,20 +54,249 @@ const GeneradorTabla = () => {
     'AURICULAR',
   ];
 
+  const parseNameModelFromQuery = (q) => {
+    const parts = (q || '').toString().trim().split(/\s+/);
+    if (parts.length === 0) return { name: '', model: '' };
+    if (parts.length === 1) return { name: parts[0], model: '' };
+    const model = parts[parts.length - 1];
+    const name = parts.slice(0, parts.length - 1).join(' ');
+    return { name, model };
+  };
+
   const generarTabla = () => {
-    if (!nombre.trim() || !modelo.trim() || !marca.trim()) {
-        alert("Por favor, selecciona una marca e ingresa el nombre y modelo antes de generar la tabla.");
-        return;
+    const q = (searchQuery || '').toString().trim();
+    if (!q) {
+      alert('Por favor escribe en la caja de búsqueda un nombre o nombre+modelo antes de generar la tabla.');
+      return;
     }
 
-    const nuevaTabla = Array.from({ length: numCampos }, (_, i) => ({
-      campo: nombresPorDefecto[i] || `Campo ${i + 1}`,
-      codigo: generarCodigo(i + 1),
-      codigoCompatibilidad: '',
-    }));
+    // Primero, intentar encontrar filas existentes que coincidan con la query
+    const found = tabla.filter((f) => {
+      const text = `${f.campo} ${f.codigo} ${f.codigoCompatibilidad}`.toLowerCase();
+      return text.includes(q.toLowerCase());
+    });
+
+    if (found.length > 0) {
+      // Si se encontraron coincidencias en la tabla actual, simplemente mostramos las filas filtradas (la búsqueda ya las muestra)
+      // No generamos una nueva tabla porque ya existen datos.
+      return;
+    }
+
+    // If no local match, also check remote DB for an exact doc match (by docId or by nombre+modelo)
+    const parsed = parseNameModelFromQuery(q);
+    const candidateId = `${parsed.name.trim().replace(/\s+/g, '').toLowerCase()}${parsed.model.trim()}`;
+    const remoteMatch = remoteTablas.find(d => d._id === candidateId || (d.nombre && d.nombre.toString().toLowerCase() === parsed.name.trim().toLowerCase() && d.modelo && d.modelo.toString().toLowerCase() === parsed.model.trim().toLowerCase()));
+    if (remoteMatch) {
+      // Load remote data into table
+      setNombre(remoteMatch.nombre || parsed.name);
+      setModelo(remoteMatch.modelo || parsed.model);
+      setMarca(remoteMatch.marca || '');
+      setTabla(remoteMatch.campos || []);
+      return;
+    }
+
+  // Si no hay coincidencias, interpretar la búsqueda como "nombre [modelo]" y generar la tabla
+  // 'parsed' ya fue calculado arriba para la comprobación remota
+    // Asignar nombre y modelo en estado
+    setNombre(parsed.name);
+    setModelo(parsed.model);
+
+    const nuevaTabla = Array.from({ length: numCampos }, (_, i) => {
+      const campoNombre = nombresPorDefecto[i] || `Campo ${i + 1}`;
+      return {
+        campo: campoNombre,
+        codigo: generarCodigo(i + 1),
+        codigoCompatibilidad: '',
+      };
+    });
 
     setTabla(nuevaTabla);
     setModoEdicion(false);
+  };
+
+  // Extrae todo el texto (strings/números/booleans) de un objeto o array de forma recursiva
+  // Devuelve una única cadena en minúsculas para búsquedas "contains"
+  const extractText = (value) => {
+    const parts = [];
+    const normalizeString = (s) => {
+      if (s === null || s === undefined) return '';
+      // quitar diacríticos, normalizar a ascii, reemplazar guiones/underscores por espacios y dejar solo caracteres legibles
+      try {
+        return String(s)
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/\p{Diacritic}/gu, '')
+          .replace(/[-_]+/g, ' ')
+          .replace(/[^\p{L}\p{N}]+/gu, ' ')
+          .trim()
+          .replace(/\s+/g, ' ');
+      } catch (e) {
+        // Fallback for environments without Unicode property escapes
+        return String(s)
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[-_]+/g, ' ')
+          .replace(/[^a-z0-9 ]+/g, ' ')
+          .trim()
+          .replace(/\s+/g, ' ');
+      }
+    };
+    const helper = (v) => {
+      if (v === null || v === undefined) return;
+      const t = typeof v;
+      if (t === 'string' || t === 'number' || t === 'boolean') {
+        parts.push(normalizeString(v));
+      } else if (Array.isArray(v)) {
+        v.forEach(helper);
+      } else if (t === 'object') {
+        Object.values(v).forEach(helper);
+      }
+    };
+    helper(value);
+    return parts.join(' ');
+  };
+
+  // Fetch remote tablas once the user focuses the search input
+  const fetchRemoteTablas = async () => {
+    if (remoteTablas.length > 0 || remoteLoading) return;
+    setRemoteLoading(true);
+    try {
+      const col = collection(db, 'tablas');
+      const snap = await getDocs(col);
+      const docs = [];
+      snap.forEach(d => {
+        docs.push({ _id: d.id, ...d.data() });
+      });
+      setRemoteTablas(docs);
+    } catch (err) {
+      console.error('Error fetching remote tablas:', err);
+    } finally {
+      setRemoteLoading(false);
+    }
+  };
+
+  // Filtrado en vivo de la tabla según searchQuery y la marca seleccionada
+  const matchesQuery = (fila) => {
+    const rawQ = (searchQuery || '').toString();
+    const q = rawQ ? rawQ.toLowerCase().trim() : '';
+    // normalize query same way we normalize doc text
+    const normalizeQuery = (s) => {
+      if (!s) return '';
+      try {
+        return s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/[-_]+/g, ' ').replace(/[^\p{L}\p{N}]+/gu, ' ').trim().replace(/\s+/g, ' ');
+      } catch (e) {
+        return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[-_]+/g, ' ').replace(/[^a-z0-9 ]+/g, ' ').trim().replace(/\s+/g, ' ');
+      }
+    };
+    const qNorm = normalizeQuery(q);
+    // Si no hay filtro, mostramos todo
+    if (!qNorm && !marca) return true;
+
+    // Construir un objeto combinando la fila con los metadatos globales para buscar en todos los campos
+    const combined = {
+      ...fila,
+      nombre: nombre || '',
+      modelo: modelo || '',
+      marca: marca || '',
+    };
+
+    // Extraer todo el texto disponible y comparar
+    const hayTexto = extractText(combined);
+    if (!qNorm) return true;
+    return hayTexto.includes(qNorm);
+  };
+
+  // Update suggestions from remoteTablas based on current searchQuery
+  const updateSuggestions = (q) => {
+    const qlRaw = (q || '').toString();
+    const ql = qlRaw ? qlRaw.toLowerCase().trim() : '';
+    // normalize query
+    const normalizeQuerySimple = (s) => {
+      if (!s) return '';
+      try {
+        return s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/[-_]+/g, ' ').replace(/[^\p{L}\p{N}]+/gu, ' ').trim().replace(/\s+/g, ' ');
+      } catch (e) {
+        return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[-_]+/g, ' ').replace(/[^a-z0-9 ]+/g, ' ').trim().replace(/\s+/g, ' ');
+      }
+    };
+    const qlNorm = normalizeQuerySimple(ql);
+    if (!qlNorm) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+    const found = [];
+    const agg = [];
+    remoteTablas.forEach((d) => {
+      // suggestions: add up to 6 matching documents
+      if (found.length < 6) {
+        const docText = (extractText(d) + ' ' + (d._id || '')).toString().toLowerCase();
+        if (docText.includes(qlNorm)) {
+          found.push(d);
+        }
+      }
+
+      // aggregated rows: for every campo in the document, if the combined row text matches, add to agg
+      const campos = Array.isArray(d.campos) ? d.campos : [];
+      campos.forEach((c) => {
+        const combinedRow = {
+          nombre: d.nombre || '',
+          modelo: d.modelo || '',
+          marca: d.marca || '',
+          _id: d._id || '',
+          ...c,
+        };
+        const rowText = extractText(combinedRow);
+        if (rowText.includes(qlNorm)) {
+          agg.push(combinedRow);
+        }
+      });
+    });
+
+    setSuggestions(found.slice(0,6));
+    setShowSuggestions(found.length > 0);
+    // If there are aggregated matches, enable aggregatedMode and store rows
+    if (agg.length > 0) {
+      setAggregatedRows(agg);
+      setAggregatedMode(true);
+    } else {
+      setAggregatedRows([]);
+      setAggregatedMode(false);
+    }
+  };
+
+  // Exportar filas (filtradas) a CSV
+  const exportToCSV = (rowsParam) => {
+    const rows = Array.isArray(rowsParam) ? rowsParam : tabla.filter((f) => matchesQuery(f));
+    if (!rows.length) {
+      alert('No hay filas para exportar');
+      return;
+    }
+
+    const headers = ['Nombre', 'Modelo', 'Marca', 'Campo', 'Código', 'Código compatibilidad'];
+    const csvLines = [];
+    csvLines.push(headers.join(','));
+    rows.forEach((r) => {
+      // Escape comas si es necesario
+      const safe = (s) => `"${(s || '').toString().replace(/"/g, '""')}"`;
+      const rowNombre = (r && r.nombre) ? r.nombre : nombre;
+      const rowModelo = (r && r.modelo) ? r.modelo : modelo;
+      const rowMarca = (r && r.marca) ? r.marca : marca;
+      csvLines.push([safe(rowNombre), safe(rowModelo), safe(rowMarca), safe(r.campo), safe(r.codigo), safe(r.codigoCompatibilidad || '')].join(','));
+    });
+
+    const csvContent = csvLines.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+  const baseName = (rowsParam && aggregatedMode) ? (searchQuery ? searchQuery.replace(/\s+/g, '_') : 'resultados') : (generarDocId(nombre, modelo) || 'tabla');
+  a.download = `${baseName}_export.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const editarCodigo = (index, nuevoCodigo) => {
@@ -99,11 +337,15 @@ const GeneradorTabla = () => {
     // ajustar tabla si ya existe
     if (tabla.length === 0) return;
     if (n > tabla.length) {
-      const adicionales = Array.from({ length: n - tabla.length }, (_, i) => ({
-        campo: nombresPorDefecto[tabla.length + i] || `Campo ${tabla.length + i + 1}`,
-        codigo: generarCodigo(tabla.length + i + 1),
-        codigoCompatibilidad: '',
-      }));
+      const adicionales = Array.from({ length: n - tabla.length }, (_, i) => {
+        const idx = tabla.length + i;
+        const campoNombre = nombresPorDefecto[idx] || `Campo ${idx + 1}`;
+        return {
+          campo: campoNombre,
+          codigo: generarCodigo(idx + 1),
+          codigoCompatibilidad: '',
+        };
+      });
       setTabla([...tabla, ...adicionales]);
     } else if (n < tabla.length) {
       setTabla(tabla.slice(0, n));
@@ -117,151 +359,227 @@ const GeneradorTabla = () => {
         return;
     }
 
-    try {
-        // 1. Generar el ID usando nombre y modelo
-        const docId = generarDocId(nombre, modelo);
-        
-        // 2. Usar 'doc' y 'setDoc' para guardar con el ID personalizado
-        const docRef = doc(db, 'tablas', docId); 
-        
-        await setDoc(docRef, {
-            nombre: nombre.trim().toUpperCase(), // Opcional: guardar en mayúsculas
-            modelo: modelo.trim().toUpperCase(),
-            marca,
-            campos: tabla,
-            fecha: new Date().toISOString(),
-        });
+  try {
+    // 1. Generar el ID usando nombre y modelo
+    const docId = generarDocId(nombre, modelo);
 
-        alert(`Tabla guardada en Firebase con ID: ${docId}. Campos limpiados.`);
-        
-        // 3. LIMPIAR TODOS LOS ESTADOS para una nueva tarea
-        setNombre('');
-        setModelo('');
-        setMarca(''); 
-        setTabla([]); 
-        setModoEdicion(false); 
-        setNumCampos(8);
-        
-    } catch (error) {
-        console.error('Error al guardar en Firebase:', error);
-        alert('Error al guardar en Firebase');
+    // 2. Referencia al documento
+    const docRef = doc(db, 'tablas', docId);
+
+    // 3. Comprobar si el documento ya existe para prevenir sobreescritura sin confirmación
+    const existing = await getDoc(docRef);
+    if (existing.exists()) {
+      const confirmar = window.confirm(`Ya existe una tabla con ID ${docId}. ¿Deseas sobrescribirla?`);
+      if (!confirmar) {
+        alert('Guardado cancelado. No se sobrescribió el documento existente.');
+        return;
+      }
     }
+
+    // 4. Guardar (sobrescribe si el usuario confirmó)
+    await setDoc(docRef, {
+      nombre: nombre.trim().toUpperCase(), // Opcional: guardar en mayúsculas
+      modelo: modelo.trim().toUpperCase(),
+      marca,
+      campos: tabla,
+      fecha: new Date().toISOString(),
+    });
+
+    alert(`Tabla guardada en Firebase con ID: ${docId}. Campos limpiados.`);
+
+    // 5. LIMPIAR TODOS LOS ESTADOS para una nueva tarea
+    setNombre('');
+    setModelo('');
+    setMarca('');
+    setTabla([]);
+    setModoEdicion(false);
+    setNumCampos(8);
+
+  } catch (error) {
+    console.error('Error al guardar en Firebase:', error);
+    alert('Error al guardar en Firebase');
+  }
   };
 
   return (
     <div className="generador-container">
       <h2>Ingresa Celular</h2>
+      {/* calcular filas filtradas para usar en botones y tabla */}
+      {/* filteredRows se usa en el render para habilitar/deshabilitar Exportar */}
+      {(() => {})()}
       <div className="generador-form">
-        {/* Campo de selección de marca */}
-        <select
-          value={marca}
-          onChange={(e) => setMarca(e.target.value)}
-          style={{ marginBottom: 8, padding: '10px', borderRadius: '4px', border: '1px solid #ccc', width: '100%' }}
-        >
-          <option value="" disabled>Selecciona una marca...</option>
-          {marcasDisponibles.map((m) => (
-            <option key={m} value={m}>
-              {m}
-            </option>
-          ))}
-        </select>
-        
-        <input
-          type="text"    
-          placeholder="Ingresa un nombre"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Ingresa el modelo"
-          value={modelo}
-          onChange={(e) => setModelo(e.target.value)}
-          style={{ marginTop: 8 }}
-        />
-        <button onClick={generarTabla}>Generar Tabla</button>
+        {/* Search input at the start of the form (replaces name/model inputs) */}
+        <div className="search-row" style={{ flex: 1 }}>
+          <input
+            type="text"
+            placeholder="Buscar o escribe 'nombre modelo' para generar (ej: moto g7 XT1962-4)"
+            value={searchQuery}
+            onFocus={() => { fetchRemoteTablas(); setShowSuggestions(true); updateSuggestions(searchQuery); }}
+            onChange={(e) => { setSearchQuery(e.target.value); updateSuggestions(e.target.value); }}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+            className="search-input"
+          />
+          {showSuggestions && suggestions && suggestions.length > 0 && (
+            <div className="suggestions">
+              {suggestions.map((s) => (
+                <div key={s._id} className="suggestion-item" onMouseDown={() => {
+                  // onMouseDown to capture click before input blur
+                  setNombre(s.nombre || '');
+                  setModelo(s.modelo || '');
+                  setMarca(s.marca || '');
+                  setTabla(s.campos || []);
+                  setSearchQuery(`${s.nombre || ''} ${s.modelo || ''}`.trim());
+                  setShowSuggestions(false);
+                  setAggregatedMode(false);
+                }}>
+                  <strong>{s.nombre}</strong> {s.modelo ? <span style={{ color: '#666' }}>{s.modelo}</span> : null}
+                  <div style={{ fontSize: 12, color: '#999' }}>{s._id}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <button className="btn btn-primary" onClick={generarTabla}>Generar Tabla</button>
       </div>
 
       {tabla.length > 0 && (
         <>
           <div className="generador-actions">
-            <button
-              onClick={() => setModoEdicion(!modoEdicion)}
-              style={{ backgroundColor: '#FFD700', color: '#000' }}
-            >
-              {modoEdicion ? 'Cancelar' : 'Editar'}
-            </button>
+            <button className="btn btn-gold" onClick={() => { setModoEdicion(!modoEdicion); setAggregatedMode(false); }}>{modoEdicion ? 'Cancelar' : 'Editar'}</button>
+            {/* Brand select shown after generating the table */}
+            <div style={{ display: 'inline-block', marginLeft: 12 }}>
+              <label style={{ marginRight: 8 }}>Marca:</label>
+              <select
+                value={marca}
+                onChange={(e) => setMarca(e.target.value)}
+                className="brand-select"
+              >
+                <option value="">-- Selecciona marca --</option>
+                {marcasDisponibles.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* search is in the main form now */}
             {/* Control para cambiar el número de campos */}
             {modoEdicion && (
-              <div style={{ display: 'inline-block', marginLeft: 12 }}>
-                <label style={{ marginRight: 8 }}>Número de campos:</label>
+              <div className="num-campos">
+                <label>Número de campos:</label>
                 <input
                   type="number"
                   min={1}
                   value={numCampos}
                   onChange={(e) => cambiarNumCampos(e.target.value)}
-                  style={{ width: 80 }}
+                  className="small-input number-input"
                 />
               </div>
             )}
-            <button onClick={guardarTabla}>Guardar</button>
-            <button
-              className="eliminar-btn"
-              onClick={eliminarTabla}
-              style={{ backgroundColor: '#d9534f', color: '#fff', marginLeft: 8 }}
-            >
-              Eliminar Tabla
-            </button>
+            <button className="btn btn-success" onClick={() => exportToCSV(aggregatedMode ? aggregatedRows : tabla.filter((f) => matchesQuery(f)))} disabled={(aggregatedMode ? aggregatedRows.length : tabla.filter((f) => matchesQuery(f)).length) === 0} style={{ marginLeft: 8 }}>Exportar CSV</button>
+            <button onClick={() => { guardarTabla(); setAggregatedMode(false); }}>Guardar</button>
+            <button className="btn btn-danger eliminar-btn" onClick={eliminarTabla}>Eliminar Tabla</button>
           </div>
 
-          <table className="generador-table">
-            <thead>
-              <tr>
-                <th>Campo</th>
-                <th>Código</th>
-                <th>Código compatibilidad</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tabla.map((fila, index) => (
-                <tr key={index}>
-                  <td>
-                    {modoEdicion ? (
-                      <input
-                        type="text"
-                        value={fila.campo}
-                        onChange={(e) => editarCampo(index, e.target.value)}
-                      />
-                    ) : (
-                      fila.campo
-                    )}
-                  </td>
-                  <td>
-                    {modoEdicion ? (
-                      <input
-                        type="text"
-                        value={fila.codigo}
-                        onChange={(e) => editarCodigo(index, e.target.value)}
-                      />
-                    ) : (
-                      fila.codigo
-                    )}
-                  </td>
-                  <td>
-                    {modoEdicion ? (
-                      <input
-                        type="text"
-                        value={fila.codigoCompatibilidad || ''}
-                        onChange={(e) => editarCompatibilidad(index, e.target.value)}
-                      />
-                    ) : (
-                      fila.codigoCompatibilidad || ''
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {/** Compute displayed rows applying search and marca filter **/}
+            { (() => {
+              if (aggregatedMode) {
+                const rowsAgg = aggregatedRows;
+                if (!rowsAgg.length) {
+                  return (
+                    <div style={{ padding: 20, textAlign: 'center', color: '#666' }}>
+                      No se encontraron resultados agregados.
+                    </div>
+                  );
+                }
+                return (
+                  <table className="generador-table">
+                    <thead>
+                      <tr>
+                        <th>Nombre</th>
+                        <th>Modelo</th>
+                        <th>Marca</th>
+                        <th>Campo</th>
+                        <th>Código</th>
+                        <th>Código compatibilidad</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rowsAgg.map((fila, index) => (
+                        <tr key={`${fila._id || 'r'}-${index}`}>
+                          <td>{fila.nombre}</td>
+                          <td>{fila.modelo}</td>
+                          <td>{fila.marca}</td>
+                          <td>{fila.campo}</td>
+                          <td>{fila.codigo}</td>
+                          <td>{fila.codigoCompatibilidad || ''}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                );
+              }
+
+              const rows = tabla.filter((f) => matchesQuery(f));
+              if (!rows.length) {
+                return (
+                  <div style={{ padding: 20, textAlign: 'center', color: '#666' }}>
+                    No se encontraron resultados.
+                  </div>
+                );
+              }
+
+              return (
+                <table className="generador-table">
+                  <thead>
+                    <tr>
+                      <th>Campo</th>
+                      <th>Código</th>
+                      <th>Código compatibilidad</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((fila, index) => (
+                      <tr key={index}>
+                        <td>
+                          {modoEdicion ? (
+                            <input
+                              type="text"
+                              value={fila.campo}
+                              onChange={(e) => editarCampo(index, e.target.value)}
+                            />
+                          ) : (
+                            fila.campo
+                          )}
+                        </td>
+                        <td>
+                          {modoEdicion ? (
+                            <input
+                              type="text"
+                              value={fila.codigo}
+                              onChange={(e) => editarCodigo(index, e.target.value)}
+                            />
+                          ) : (
+                            fila.codigo
+                          )}
+                        </td>
+                        <td>
+                          {modoEdicion ? (
+                            <input
+                              type="text"
+                              value={fila.codigoCompatibilidad || ''}
+                              onChange={(e) => editarCompatibilidad(index, e.target.value)}
+                            />
+                          ) : (
+                            fila.codigoCompatibilidad || ''
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              );
+            })() }
+          
         </>
       )}
     </div>
