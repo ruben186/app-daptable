@@ -6,8 +6,13 @@ import { db } from '../../firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import './registerPage.css';
 import logo from '../../assets/logos/App-Daptable-Cel.png';
+import ojoAbierto from '../../assets/Iconos/ojo_abierto_contraseña.png';
+import ojoCerrado from '../../assets/Iconos/ojo_cerrado_contraseña.png';
 
 function RegisterPage() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [sexoOpen, setSexoOpen] = useState(false);
   const [formData, setFormData] = useState({
     nombreCompleto: '',
     fechaNacimiento: '',
@@ -102,11 +107,22 @@ function RegisterPage() {
 
           <div className="mb-3">
             <label className="form-label">Sexo</label>
-            <select className="form-control2" name="sexo" value={formData.sexo} onChange={handleChange}>
-              <option value="">Seleccionar</option>
-              <option value="Masculino">Masculino</option>
-              <option value="Femenino">Femenino</option>
-            </select>
+            <div className={`select-wrapper ${sexoOpen ? 'open' : ''}`}>
+              <select
+                className="form-control2"
+                name="sexo"
+                value={formData.sexo}
+                onChange={handleChange}
+              
+                onClick={() => setSexoOpen(prev => !prev)}
+              >
+                <option value="">Seleccionar</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Indeciso">Prefiero no decirlo</option>
+              </select>
+              <span className="chev" aria-hidden="true" />
+            </div>
           </div>
 
           <div className="mb-3">
@@ -116,12 +132,56 @@ function RegisterPage() {
 
           <div className="mb-3">
             <label className="form-label">Contraseña</label>
-            <input type="password" className="form-control2" name="password" value={formData.password} onChange={handleChange} placeholder="Escribe tu contraseña" />
+              <div className="login-password-box">
+                <input type={showPassword ? "text" : "password"} 
+                className="form-control2" 
+                name="password" 
+                value={formData.password} 
+                onChange={handleChange} 
+                placeholder="Escribe tu contraseña" 
+                required
+                />
+                <button
+                  type="button"
+                  className={`login-eye`}
+                  onClick={() => setShowPassword(prev => !prev)}
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                >
+                  <img
+                    src={showPassword ? ojoCerrado : ojoAbierto}
+                    width={'32'}
+                    height={'28'}
+                    alt={showPassword ? "Icono ojo cerrado" : "Icono ojo abierto"}
+                  />
+                </button>
+              </div>
           </div>
 
           <div className="mb-3">
             <label className="form-label">Repetir Contraseña</label>
-            <input type="password" className="form-control2" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Confirma tu contraseña" />
+            <div className="login-password-box">
+              <input type={showConfirmPassword ? "text" : "password"}
+               className="form-control2" 
+               name="confirmPassword" 
+               value={formData.confirmPassword} 
+               onChange={handleChange} 
+               placeholder="Confirma tu contraseña" 
+               required
+               />
+              <button
+                type="button"
+                className={`login-eye`}
+                onClick={() => setShowConfirmPassword(prev => !prev)}
+                aria-label={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              >
+                <img
+                  src={showConfirmPassword ? ojoCerrado : ojoAbierto}
+                  width={'32'}
+                  height={'28'}
+                  alt={showConfirmPassword ? "Icono ojo cerrado" : "Icono ojo abierto"}
+                />
+              </button>
+            </div>
           </div>
 
           <div className="d-grid gap-2">

@@ -25,11 +25,10 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  position: relative;
 }
 
 .search-input {
-  padding: 6px;
+  padding: 8px;
   flex: 1;
   border: none;
   border-radius: 6px;
@@ -130,27 +129,4 @@
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 4px;
-}
-
-.suggestions {
-  position: absolute;
-  background: #fff;
-  border: 1px solid #ddd;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  width: calc(100% - 40px);
-  max-height: 260px;
-  overflow: auto;
-  z-index: 30;
-  margin-top: 6px;
-  border-radius: 8px;
-}
-
-.suggestion-item {
-  padding: 8px 12px;
-  cursor: pointer;
-  border-bottom: 1px solid #f1f1f1;
-}
-
-.suggestion-item:hover {
-  background: #f6f9ff;
 }

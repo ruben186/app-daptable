@@ -11,6 +11,7 @@ import logosamgsumg from '../../assets/logos/logosamgsumg.png';
 import logohuawei from '../../assets/logos/logohuawei.png'; 
 import logomotorola from '../../assets/logos/logomotorola.png';
 import PersonasMenu from './MenuNavBar';
+import IconoBuscar from '../../assets/Iconos/iconoLupa.png';
 // SweetAlert se usa en otras partes; eliminado aquí para evitar warnings si no se usa.
 
 function NavBar() {
@@ -89,7 +90,7 @@ e
 
               {/* caja de búsqueda */}
               <div className="search-wrapper ms-3">
-                <input className="search-input" placeholder="Buscar..." />
+                <input className="search-input" placeholder="Buscar..." /><img src={IconoBuscar} className="ImgLupa" alt="iconoBusqueda" />
               </div>
             </div>
 

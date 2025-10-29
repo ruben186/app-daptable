@@ -11,13 +11,16 @@ const GeneradorTabla = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [tabla, setTabla] = useState([]);
   const [modoEdicion, setModoEdicion] = useState(false);
-  const [numCampos, setNumCampos] = useState(8);
+  const [numCampos, setNumCampos] = useState(7);
   const [remoteTablas, setRemoteTablas] = useState([]);
   const [remoteLoading, setRemoteLoading] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [aggregatedRows, setAggregatedRows] = useState([]);
   const [aggregatedMode, setAggregatedMode] = useState(false);
+  const [tableGenerated, setTableGenerated] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [nuevoModeloInput, setNuevoModeloInput] = useState('');
 
   const marcasDisponibles = [
     'Samsung',
@@ -30,8 +33,49 @@ const GeneradorTabla = () => {
   // Genera el código para un campo usando la base: nombre (sin espacios, lowercase) + modelo
   // Ahora el código NO incluye el nombre del campo, solo la base y el contador: ej. motog7powerXT1962-4-1
   const generarCodigo = (index) => {
-    const base = `${nombre.trim().replace(/\s+/g, '').toLowerCase()}${modelo.trim()}`; // ej: motog7powerXT1962-4
-    return `${base}-${index}`; // ej: 'motog7powerXT1962-4-1'
+    // Formato: NOMBRE (tal como se ingresó, mayúsculas) - MODELO - índice
+    const nombreForCode = (nombre || '').toString().trim().toUpperCase();
+    const modeloForCode = (modelo || '').toString().trim();
+    return `${nombreForCode}-${modeloForCode}-${index}`;
+  };
+
+  // Generar tabla usando un modelo proporcionado manualmente (evita depender del setState asincrónico)
+  const generarTablaConModeloManual = (modeloManual) => {
+    const q = (searchQuery || '').toString().trim();
+    if (!q) {
+      alert('Por favor escribe en la caja de búsqueda un nombre antes de generar la tabla.');
+      return;
+    }
+    const parsed = parseNameModelFromQuery(q);
+    const nombreParsed = parsed.name || q;
+    const modeloUsed = (modeloManual || '').toString().trim();
+    if (!modeloUsed) {
+      alert('Por favor ingresa un modelo válido.');
+      return;
+    }
+
+    // Actualizar estados
+    setNombre(nombreParsed);
+    setModelo(modeloUsed);
+
+    // Crear la tabla con los códigos en el formato requerido
+    // Usar los nombres por defecto solicitados y actualizar numCampos
+    const camposToUse = nombresPorDefecto.slice(0); // los 7 campos solicitados
+    setNumCampos(camposToUse.length);
+    const nuevaTabla = camposToUse.map((campoNombre, i) => {
+      const codigo = `${nombreParsed.trim().toUpperCase()}-${modeloUsed}-${i + 1}`;
+      const codigoCompatibilidad = `${nombreParsed.trim().toUpperCase()}-${modeloUsed}-COMP-${i + 1}`;
+      return {
+        campo: campoNombre,
+        codigo,
+        codigoCompatibilidad,
+      };
+    });
+
+    setTabla(nuevaTabla);
+    setModoEdicion(false);
+    setTableGenerated(true);
+    setShowResults(true);
   };
 
   // Helper para generar el ID del documento basado en Nombre y Modelo
@@ -49,8 +93,7 @@ const GeneradorTabla = () => {
     'VIDRIO TEMPLADO',
     'BATERIA',
     'FLEX DE BOTONES',
-    'FLEX DESCARGA',
-    'PUERTO DE CARGA',
+    'FLEX DE CARGA',
     'AURICULAR',
   ];
 
@@ -63,56 +106,7 @@ const GeneradorTabla = () => {
     return { name, model };
   };
 
-  const generarTabla = () => {
-    const q = (searchQuery || '').toString().trim();
-    if (!q) {
-      alert('Por favor escribe en la caja de búsqueda un nombre o nombre+modelo antes de generar la tabla.');
-      return;
-    }
-
-    // Primero, intentar encontrar filas existentes que coincidan con la query
-    const found = tabla.filter((f) => {
-      const text = `${f.campo} ${f.codigo} ${f.codigoCompatibilidad}`.toLowerCase();
-      return text.includes(q.toLowerCase());
-    });
-
-    if (found.length > 0) {
-      // Si se encontraron coincidencias en la tabla actual, simplemente mostramos las filas filtradas (la búsqueda ya las muestra)
-      // No generamos una nueva tabla porque ya existen datos.
-      return;
-    }
-
-    // If no local match, also check remote DB for an exact doc match (by docId or by nombre+modelo)
-    const parsed = parseNameModelFromQuery(q);
-    const candidateId = `${parsed.name.trim().replace(/\s+/g, '').toLowerCase()}${parsed.model.trim()}`;
-    const remoteMatch = remoteTablas.find(d => d._id === candidateId || (d.nombre && d.nombre.toString().toLowerCase() === parsed.name.trim().toLowerCase() && d.modelo && d.modelo.toString().toLowerCase() === parsed.model.trim().toLowerCase()));
-    if (remoteMatch) {
-      // Load remote data into table
-      setNombre(remoteMatch.nombre || parsed.name);
-      setModelo(remoteMatch.modelo || parsed.model);
-      setMarca(remoteMatch.marca || '');
-      setTabla(remoteMatch.campos || []);
-      return;
-    }
-
-  // Si no hay coincidencias, interpretar la búsqueda como "nombre [modelo]" y generar la tabla
-  // 'parsed' ya fue calculado arriba para la comprobación remota
-    // Asignar nombre y modelo en estado
-    setNombre(parsed.name);
-    setModelo(parsed.model);
-
-    const nuevaTabla = Array.from({ length: numCampos }, (_, i) => {
-      const campoNombre = nombresPorDefecto[i] || `Campo ${i + 1}`;
-      return {
-        campo: campoNombre,
-        codigo: generarCodigo(i + 1),
-        codigoCompatibilidad: '',
-      };
-    });
-
-    setTabla(nuevaTabla);
-    setModoEdicion(false);
-  };
+  // Note: generation moved to generarTablaConModeloManual which handles both manual modelo and parsed modelo
 
   // Extrae todo el texto (strings/números/booleans) de un objeto o array de forma recursiva
   // Devuelve una única cadena en minúsculas para búsquedas "contains"
@@ -328,7 +322,7 @@ const GeneradorTabla = () => {
     setModelo('');
     setMarca('');
     setModoEdicion(false);
-    setNumCampos(8);
+    setNumCampos(7);
   };
 
   const cambiarNumCampos = (nuevoNum) => {
@@ -393,7 +387,7 @@ const GeneradorTabla = () => {
     setMarca('');
     setTabla([]);
     setModoEdicion(false);
-    setNumCampos(8);
+  setNumCampos(7);
 
   } catch (error) {
     console.error('Error al guardar en Firebase:', error);
@@ -412,10 +406,28 @@ const GeneradorTabla = () => {
         <div className="search-row" style={{ flex: 1 }}>
           <input
             type="text"
-            placeholder="Buscar o escribe 'nombre modelo' para generar (ej: moto g7 XT1962-4)"
+            placeholder="Buscar (ej: pantalla, moto g7, XT1962-4)"
             value={searchQuery}
             onFocus={() => { fetchRemoteTablas(); setShowSuggestions(true); updateSuggestions(searchQuery); }}
-            onChange={(e) => { setSearchQuery(e.target.value); updateSuggestions(e.target.value); }}
+            onChange={(e) => {
+              const v = e.target.value;
+              setSearchQuery(v);
+              if (!v || v.toString().trim() === '') {
+                // if cleared, hide suggestions and results
+                setSuggestions([]);
+                setShowSuggestions(false);
+                setAggregatedMode(false);
+                setShowResults(false);
+                setTableGenerated(false);
+                return;
+              }
+              // Ensure remote tablas are loaded when user types
+              if (remoteTablas.length === 0 && !remoteLoading) fetchRemoteTablas();
+              updateSuggestions(v);
+              // typing a new query should hide any previously generated table until user confirms
+              setTableGenerated(false);
+              setShowResults(true);
+            }}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
             className="search-input"
           />
@@ -431,6 +443,8 @@ const GeneradorTabla = () => {
                   setSearchQuery(`${s.nombre || ''} ${s.modelo || ''}`.trim());
                   setShowSuggestions(false);
                   setAggregatedMode(false);
+                  // selecting a suggestion should not show action buttons until the user explicitly presses Generar Tabla
+                  setTableGenerated(false);
                 }}>
                   <strong>{s.nombre}</strong> {s.modelo ? <span style={{ color: '#666' }}>{s.modelo}</span> : null}
                   <div style={{ fontSize: 12, color: '#999' }}>{s._id}</div>
@@ -438,12 +452,12 @@ const GeneradorTabla = () => {
               ))}
             </div>
           )}
-        </div>
-        <button className="btn btn-primary" onClick={generarTabla}>Generar Tabla</button>
+  </div>
       </div>
 
-      {tabla.length > 0 && (
+      {showResults && (
         <>
+          {tableGenerated && (
           <div className="generador-actions">
             <button className="btn btn-gold" onClick={() => { setModoEdicion(!modoEdicion); setAggregatedMode(false); }}>{modoEdicion ? 'Cancelar' : 'Editar'}</button>
             {/* Brand select shown after generating the table */}
@@ -479,6 +493,7 @@ const GeneradorTabla = () => {
             <button onClick={() => { guardarTabla(); setAggregatedMode(false); }}>Guardar</button>
             <button className="btn btn-danger eliminar-btn" onClick={eliminarTabla}>Eliminar Tabla</button>
           </div>
+          )}
 
           {/** Compute displayed rows applying search and marca filter **/}
             { (() => {
@@ -523,7 +538,22 @@ const GeneradorTabla = () => {
               if (!rows.length) {
                 return (
                   <div style={{ padding: 20, textAlign: 'center', color: '#666' }}>
-                    No se encontraron resultados.
+                    <div>No se encontraron resultados.</div>
+                    <div style={{ marginTop: 12 }}>
+                      <label style={{ display: 'block', marginBottom: 6 }}>Ingrese el modelo del celular para generarlo:</label>
+                      <input
+                        type="text"
+                        placeholder="Ej: XT1962-4"
+                        value={nuevoModeloInput}
+                        onChange={(e) => setNuevoModeloInput(e.target.value)}
+                        className="small-input"
+                      />
+                      <button
+                        className="btn btn-primary"
+                        style={{ marginLeft: 8 }}
+                        onClick={() => generarTablaConModeloManual(nuevoModeloInput)}
+                      >Generar ahora</button>
+                    </div>
                   </div>
                 );
               }

@@ -88,6 +88,52 @@ input[type="date"], select, .form-control {
     color: #42F1DD;
 }
 
+/* Select wrapper con indicador de estado abierto/cerrado */
+.select-wrapper { position: relative; display: inline-block; width: 100%; }
+.select-wrapper .chev {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%) rotate(0deg);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #42F1DD;
+    pointer-events: none;
+    transition: transform 0.18s ease;
+    opacity: 0.9;
+}
+.select-wrapper.open .chev {
+    transform: translateY(-50%) rotate(180deg);
+}
+.select-wrapper select.form-control2 { padding-right: 40px; }
+
+/* Usar imagen personalizada para el icono del calendario en inputs date */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: none; 
+    opacity: 1;
+    background: transparent;
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    width: 20px;
+    height: 20px;
+    background-image: url("../../assets/Iconos/imagen calendario.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 20px 20px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    cursor: pointer;
+    background-color: #2d978b;
+}
+
 /* Checkboxes/radios */
 .form-check-label {
     color: #42F1DD;
