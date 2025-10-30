@@ -83,6 +83,12 @@
 .search-input::placeholder {
   color: #25b9ad;
 }
+.ImgLupa {
+  width: 30px;
+  height: 30px;
+  margin-left: -35px;
+  cursor: pointer;
+}
 .brand-right {
   display:flex;
   align-items:center;
@@ -188,17 +194,20 @@
 .personas-item:first-child { border-top: none; }
 .personas-item:hover { background: #15CABB; color: #001b19; }
 
-.chev {
+.chevM {
   width: 10px;
   height: 10px;
+  position: relative;
+  bottom: 3px;
+  left: 80px;
   border-right: 2px solid #dffcf7;
   border-bottom: 2px solid #dffcf7;
   transform: rotate(45deg);
   transition: transform 0.18s ease;
   display: inline-block;
-  margin-left: 8px;
+  margin-left: 20px;
 }
-.chev.open { transform: rotate(-135deg); }
+.chevM.open { transform: rotate(-135deg); bottom: 0px;  }
 
 /* DRAWER PERSONAS */
 .personas-overlay {
@@ -348,10 +357,11 @@
   border-top: 10px solid #07433E;
   border-bottom: 10px solid #07433E;
   overflow: hidden;
+  background: #070D11;
 }
 .carousel-inner {
   min-height: 380px; 
-  height: 380px;     
+  height: 400px;     
 }
 .carousel-item {
   height: 100%;
@@ -362,10 +372,10 @@
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;             
+  object-fit: contain;             
   transition: transform 0.8s ease, opacity 0.6s ease; 
-  transform: scale(1.02);
 }
+.carousel-item:hover img {transform: scale(1.02); cursor: pointer;}
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
   filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));

@@ -21,7 +21,7 @@ function ExpandableGroup({ title, id, children, drawerOpen }) {
         onClick={() => setExpanded((s) => !s)}
       >
         {title}
-        <span className={`chev ${expanded ? 'open' : ''}`} aria-hidden="true" />
+        <span className={`chevM ${expanded ? 'open' : ''}`} aria-hidden="true" />
       </button>
 
       <div

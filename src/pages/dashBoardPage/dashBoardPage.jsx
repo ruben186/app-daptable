@@ -40,7 +40,6 @@ function DashboardPage() {
                   <img 
                     src={imagen1Ca}
                     alt="imagen 1" 
-                    className='d-block w-100'
                     loading='eager'
                   />
                 </Carousel.Item>
@@ -48,14 +47,12 @@ function DashboardPage() {
                   <img 
                     src={imagen2Ca}
                     alt="imagen 2" 
-                    className='d-block w-100'
                   />
                 </Carousel.Item>
                   <Carousel.Item>
                   <img 
                     src={imagen3Ca}
                     alt="imagen 3" 
-                    className='d-block w-100'
                   />
                 </Carousel.Item>
               </Carousel>
