@@ -506,7 +506,10 @@ const GeneradorTabla = () => {
                   );
                 }
                 return (
+
                   <>
+                  <button className="btn btn-gold" onClick={() => { setModoEdicion(!modoEdicion); }}>{modoEdicion ? 'Cancelar' : 'Editar'}</button>
+
                   <button className="btn btn-success" onClick={() => exportToCSV(aggregatedMode ? aggregatedRows : tabla.filter((f) => matchesQuery(f)))} style={{ marginLeft: 8 }}>Exportar CSV</button>
                   <button className="btn btn-danger eliminar-btn" onClick={eliminarTabla}>Eliminar Tabla</button>
 
@@ -525,13 +528,63 @@ const GeneradorTabla = () => {
                     <tbody>
                       {rowsAgg.map((fila, index) => (
                         <tr key={`${fila._id || 'r'}-${index}`}>
-                          <td>{fila.nombre}</td>
-                          <td>{fila.modelo}</td>
-                          <td>{fila.marca}</td>
-                          <td>{fila.campo}</td>
-                          <td>{fila.codigo}</td>
-                          <td>{fila.codigoCompatibilidad || ''}</td>
+                          <td>
+                           {modoEdicion ? (
+                            <input
+                              type="text"
+                              value={fila.nombre}
+                              onChange={(e) => editarCampo(index, e.target.value)}
+                            />
+                              )  
+                            
+                         : (fila.nombre)}</td>
+
+                          <td>
+                          {modoEdicion ? (
+                            <input
+                              type="text"
+                              value={fila.modelo}
+                              onChange={(e) => editarCampo(index, e.target.value)}
+                            />
+                          
+                           ) 
+                            : (fila.modelo)}</td>
+                          
+                              
+                          <td>
+                          {modoEdicion ? (
+                            <input
+                              type="text"
+                              value={fila.campo}
+                              onChange={(e) => editarCampo(index, e.target.value)}
+                            />
+                           ) 
+                            : (fila.campo)}</td>
+
+                          <td>{
+                            modoEdicion ? (
+                            <input
+                              type="text"
+                              value={fila.codigo}
+                              onChange={(e) => editarCampo(index, e.target.value)}
+                            />
+                           ) 
+                            : (fila.codigo)
+                            }</td>
+
+                          <td>{
+                          modoEdicion ? (
+                            <input
+                              type="text"
+                              value={fila.codigoCompatibilidad|| ''}
+                              onChange={(e) => editarCampo(index, e.target.value)}
+                            />
+                           ) 
+                            : (fila.codigoCompatibilidad || '')
+                          
+                            }</td>
                         </tr>
+
                       ))}
                     </tbody>
                   </table>
@@ -570,7 +623,7 @@ const GeneradorTabla = () => {
                 <table className="generador-table">
                   <thead>
                     <tr>
-                      <th>Campo</th>
+                      <th>pieza</th>
                       <th>Código</th>
                       <th>Código compatibilidad</th>
                     </tr>

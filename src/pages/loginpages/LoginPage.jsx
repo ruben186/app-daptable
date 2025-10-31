@@ -72,11 +72,9 @@ function LoginPage() {
       // 2. Si no existe, lo creamos como AUXILIAR por defecto
       if (!userSnap.exists()) {
         await setDoc(userDocRef, {
-          nombres: user.displayName?.split(' ')[0] || '',
-          apellidos: user.displayName?.split(' ').slice(1).join(' ') || '',
+          nombreCompleto: user.displayName || '',
           email: user.email,
           telefono: '', 
-          cedula: '',
           fechaNacimiento: '',
           edad: '',
           sexo: '',

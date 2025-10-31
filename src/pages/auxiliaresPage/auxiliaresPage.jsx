@@ -25,7 +25,7 @@ function AuxiliaresPage() {
             }))
             .filter(user => {
             const rol = user.rol?.toLowerCase();
-            return rol === 'admin' || rol === 'auxiliar' || rol === '' || rol === '-';
+            return rol === 'admin' || rol === 'Usuario' || rol === '' || rol === '-';
             });
 
         setAuxiliares(data);
@@ -72,31 +72,29 @@ function AuxiliaresPage() {
         try {
             const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
             const soloNumeros = /^[0-9]+$/;
-            if(selectedAux.nombres === '' || selectedAux.apellidos === '' || selectedAux.cedula === '' || selectedAux.telefono === '' 
+            if(selectedAux.nombreCompleto === '' || selectedAux.telefono === '' 
                 || selectedAux.email === '' || selectedAux.fechaNacimiento === '' || selectedAux.sexo === '' || selectedAux.estado === ''
                 || selectedAux.rol === ''){
                Swal.fire('Error', 'Todos los campos deben ser llenados', 'error');
                 return;
             }else{
-                if (!soloLetras.test(selectedAux.nombres) || !soloLetras.test(selectedAux.apellidos)) {
-                    Swal.fire('Error', 'Los campos de nombres y apellidos solo deben contener letras.', 'error');
+                if (!soloLetras.test(selectedAux.nombreCompleto)) {
+                    Swal.fire('Error', 'El campo de su nombre completo solo deben contener letras.', 'error');
                     return;
                 }
                 if (!soloNumeros.test(selectedAux.cedula) || !soloNumeros.test(selectedAux.telefono)) {
-                    Swal.fire('Error', 'Los campos de cedula y telefono solo deben contener numeros.', 'error');
+                    Swal.fire('Error', 'El telefono solo deben contener numeros.', 'error');
                     return;
                 }
                 if(selectedAux.cedula.length > 10 || selectedAux.telefono.length > 10){
-                    Swal.fire('Error', 'Los campos de cedula y telefono debe tener como maximo 10 caracteres.', 'error');
+                    Swal.fire('Error', 'El campo telefono debe tener como maximo 10 caracteres.', 'error');
                     return;
                 }
                 
             }
             const auxRef = doc(db, 'usuarios', selectedAux.id);
             await updateDoc(auxRef, {
-                nombres: selectedAux.nombres,
-                apellidos: selectedAux.apellidos,
-                cedula: selectedAux.cedula,
+                nombreCompleto: selectedAux.nombreCompleto,
                 telefono: selectedAux.telefono,
                 email: selectedAux.email,
                 fechaNacimiento: selectedAux.fechaNacimiento,
@@ -226,9 +224,7 @@ function AuxiliaresPage() {
                         <Table striped bordered hover responsive className="tabla-auxiliares">
                             <thead>
                                 <tr>
-                                    <th>Nombres</th>
-                                    <th>Apellidos</th>
-                                    <th>Cédula</th>
+                                    <th>Nombre Completo</th>
                                     <th>Teléfono</th>
                                     <th>Email</th>
                                     <th>Fecha Nacimiento</th>
@@ -242,9 +238,7 @@ function AuxiliaresPage() {
                             <tbody>
                                 {auxiliares.map(aux => (
                                     <tr key={aux.id}>
-                                        <td>{aux.nombres}</td>
-                                        <td>{aux.apellidos}</td>
-                                        <td>{aux.cedula}</td>
+                                        <td>{aux.nombreCompleto}</td>
                                         <td>{aux.telefono}</td>
                                         <td>{aux.email}</td>
                                         <td>{aux.fechaNacimiento || '-'}</td>
@@ -257,7 +251,7 @@ function AuxiliaresPage() {
                                         </td>
                                         <td>
                                             <span className={`badge estado-badge ${getRol(aux.rol)}`}>
-                                                {aux.rol || 'Cliente'}
+                                                {aux.rol || 'Usuario'}
                                             </span>
                                         </td>
                                         
@@ -287,12 +281,6 @@ function AuxiliaresPage() {
                 </Container>
             </main>
 
-            <footer className="footer mt-auto">
-                <Container className="text-center">
-                    <small>© 2025 Brilla. All rights reserved.</small>
-                </Container>
-            </footer>
-
             {/* MODAL EDICIÓN */}
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
@@ -302,29 +290,11 @@ function AuxiliaresPage() {
                     {selectedAux && (
                         <Form>
                             <Form.Group className="mb-2">
-                                <Form.Label>Nombres</Form.Label>
+                                <Form.Label>Nombres Completo</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="nombres"
-                                    value={selectedAux.nombres}
-                                    onChange={handleModalChange}
-                                />
-                            </Form.Group>
-                            <Form.Group className="mb-2">
-                                <Form.Label>Apellidos</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="apellidos"
-                                    value={selectedAux.apellidos}
-                                    onChange={handleModalChange}
-                                />
-                            </Form.Group>
-                            <Form.Group className="mb-2">
-                                <Form.Label>Cédula</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="cedula"
-                                    value={selectedAux.cedula}
+                                    value={selectedAux.nombreCompleto}
                                     onChange={handleModalChange}
                                 />
                             </Form.Group>
@@ -374,6 +344,7 @@ function AuxiliaresPage() {
                                     <option value="">Seleccionar</option>
                                     <option value="Masculino">Masculino</option>
                                     <option value="Femenino">Femenino</option>
+                                    <option value="Indeciso">Prefiero no decirlo</option>
                                 </Form.Select>
                             </Form.Group>
                             <Form.Group className="mb-2">
@@ -392,12 +363,12 @@ function AuxiliaresPage() {
                                 <Form.Label>Rol</Form.Label>
                                 <Form.Select
                                     name="rol"
-                                    value={selectedAux.rol || 'Cliente'}
+                                    value={selectedAux.rol || 'Usuario'}
                                     onChange={handleModalChange}
                                 >
                                     <option value="">Seleccionar</option>
-                                    <option>Auxiliar</option>
-                                    <option>Cliente</option>
+                                    <option>Usuario</option>
+                                    <option>Invitado</option>
                                     <option>Admin</option>
                                 </Form.Select>
                             </Form.Group>
