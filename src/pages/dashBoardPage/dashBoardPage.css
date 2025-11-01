@@ -345,8 +345,8 @@
 }
 
 /* FOOTER */
-.footer {
-    background: linear-gradient(180deg, rgba(10,10,10,0.6), rgba(20,20,20,0.8));
+.footer-content {
+    background:#012F2B;
     color: #42F1DD;
     text-align: center;
     padding: 18px 12px;
@@ -378,7 +378,7 @@
 .carousel-item:hover img {transform: scale(1.02); cursor: pointer;}
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+  filter: drop-shadow(0 2px 6px #29978a);
 }
 .carousel-control-prev,
 .carousel-control-next {

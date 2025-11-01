@@ -5,7 +5,6 @@ import LoginPage from './pages/loginpages/LoginPage';
 import RegisterPage from './pages/registerpage/registerPage';
 import ForgotPasswordPage from './pages/forgotpage/forgotPage';
 import NotFoundPage from  './pages/components/notFoundPage';
-import Protegida from './pages/protegida/protegida';
 
 // Rutas para hooks
 import UseStatePlay from './pages/playground/UseStatePlay';
@@ -19,9 +18,6 @@ import ResetPasswordPage from './pages/resetPasswordPage/resetPasswordPage';
 import AuxiliaresPage from './pages/auxiliaresPage/auxiliaresPage';
 import GeneradorTabla from './pages/GeneradorTabla/GeneradorTabla.jsx';
 
-
-import ClientePage from './pages/clientePage/ClientePage';
-
 function App() {
   return (
     <BrowserRouter>
@@ -31,11 +27,10 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/protegida" element={<Protegida />} />
 
         {/* Rutas protegidas con Firebase Auth */}
         <Route path="/dashboard" element={
-          <ProtectedRoute allowedRoles={['admin', 'auxiliar', 'cliente']}>
+          <ProtectedRoute allowedRoles={['admin', '', 'usuario']}>
             <DashboardPage />
           </ProtectedRoute>
         } />
@@ -43,12 +38,6 @@ function App() {
         <Route path="/auxiliares" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <AuxiliaresPage />
-          </ProtectedRoute>
-        } />
-
-         <Route path="/clientes" element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <ClientePage />
           </ProtectedRoute>
         } />
 

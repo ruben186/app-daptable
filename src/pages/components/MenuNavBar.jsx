@@ -127,7 +127,7 @@ function PersonasMenu({ navigate }) {
           {/* Admin quick links (original Personas options) */}
           <div className="espacios-menu" />
           <button className="personas-drawer-item" onClick={() => { navigate('/TablaCel'); setOpen(false); }}>
-            Clientes (tabla)
+            Generar Tabla (tabla)
           </button>
           <button className="personas-drawer-item" onClick={() => { navigate('/auxiliares'); setOpen(false); }}>
             Auxiliares (tabla)

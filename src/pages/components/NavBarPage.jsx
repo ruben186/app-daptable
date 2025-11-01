@@ -49,12 +49,10 @@ function NavBar() {
             {/* contenedor de pills y búsqueda */}
             <div className="navbar-center d-flex align-items-center">
               <Nav className="pills-container d-flex align-items-center">
-e
                   <div className="personas-wrapper" ref={null}>
                     <PersonasMenu navigate={navigate} />
                   </div>
             
-
                 {/* Menú accesible por todos - pills con icono y label */}
                 <Nav.Link onClick={() => navigate('/xiaomi')} className="pill-link">
                   <div className="pill">
@@ -85,7 +83,6 @@ e
                     <small>Otros..</small>
                   </div>
                 </Nav.Link>
-
               </Nav>
 
               {/* caja de búsqueda */}

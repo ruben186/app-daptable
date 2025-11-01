@@ -8,6 +8,8 @@ import { auth, db } from '../../firebase';
 import { signOut } from 'firebase/auth';
 import './auxiliaresPage.css';
 import logo from '../../assets/logos/logoapp-daptable.jpeg';
+import NavBar from '../components/NavBarPage';
+import Footer from '../components/FooterPage';
 
 function AuxiliaresPage() {
     const navigate = useNavigate();
@@ -25,7 +27,7 @@ function AuxiliaresPage() {
             }))
             .filter(user => {
             const rol = user.rol?.toLowerCase();
-            return rol === 'admin' || rol === 'Usuario' || rol === '' || rol === '-';
+            return rol === 'admin' || rol === 'usuario' || rol === '' || rol === '-';
             });
 
         setAuxiliares(data);
@@ -82,11 +84,11 @@ function AuxiliaresPage() {
                     Swal.fire('Error', 'El campo de su nombre completo solo deben contener letras.', 'error');
                     return;
                 }
-                if (!soloNumeros.test(selectedAux.cedula) || !soloNumeros.test(selectedAux.telefono)) {
-                    Swal.fire('Error', 'El telefono solo deben contener numeros.', 'error');
+                if (!soloNumeros.test(selectedAux.telefono)) {
+                    Swal.fire('Error', 'El numero de telefono solo deben contener numeros.', 'error');
                     return;
                 }
-                if(selectedAux.cedula.length > 10 || selectedAux.telefono.length > 10){
+                if(selectedAux.telefono.length > 10){
                     Swal.fire('Error', 'El campo telefono debe tener como maximo 10 caracteres.', 'error');
                     return;
                 }
@@ -175,46 +177,7 @@ function AuxiliaresPage() {
     
     return (
         <>
-            {/* NAVBAR */}
-            <Navbar expand="lg" bg="dark" variant="dark" className="dashboard-navbar">
-                <Container>
-                    <Navbar.Brand onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>
-                        <img src={logo} alt="Logo" height="40" />
-                    </Navbar.Brand>
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                    <Navbar.Collapse id="basic-navbar-nav">
-                        <Nav className="ms-auto">
-                            <Nav.Link onClick={() => navigate('/clientes')}>Clientes</Nav.Link>
-                            <Nav.Link onClick={() => navigate('/auxiliares')}>Auxiliares</Nav.Link>
-                            <Nav.Link onClick={() => navigate('/servicios')}>Servicios</Nav.Link>
-                            <Nav.Link onClick={() => navigate('/cronograma')}>Cronograma</Nav.Link>
-
-                            <NavDropdown
-                                title={
-                                    <>
-                                        {user?.photoURL ? (
-                                            <Image src={user.photoURL} roundedCircle width="30" height="30" />
-                                        ) : (
-                                            <FaUserCircle size={24} color="#fff" />
-                                        )}
-                                    </>
-                                }
-                                id="user-nav-dropdown"
-                                align="end"
-                            >
-                                <NavDropdown.Item disabled>
-                                    {user?.email || 'Usuario'}
-                                </NavDropdown.Item>
-                                <NavDropdown.Divider />
-                                <NavDropdown.Item onClick={handleLogout}>
-                                    Cerrar Sesión
-                                </NavDropdown.Item>
-                            </NavDropdown>
-                        </Nav>
-                    </Navbar.Collapse>
-                </Container>
-            </Navbar>
-
+            <NavBar/>
             <main className="main-content">
                 <Container className="mt-4">
                     <h2 className="page-title text-center mb-4">
@@ -251,7 +214,7 @@ function AuxiliaresPage() {
                                         </td>
                                         <td>
                                             <span className={`badge estado-badge ${getRol(aux.rol)}`}>
-                                                {aux.rol || 'Usuario'}
+                                                {aux.rol || 'usuario'}
                                             </span>
                                         </td>
                                         
@@ -363,7 +326,7 @@ function AuxiliaresPage() {
                                 <Form.Label>Rol</Form.Label>
                                 <Form.Select
                                     name="rol"
-                                    value={selectedAux.rol || 'Usuario'}
+                                    value={selectedAux.rol || 'usuario'}
                                     onChange={handleModalChange}
                                 >
                                     <option value="">Seleccionar</option>

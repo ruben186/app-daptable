@@ -129,7 +129,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     mask-position: center;
     width: 20px;
     height: 20px;
-    background-image: url("../../assets/Iconos/imagen calendario.png");
+    background-image: url("../../assets/Iconos/imagenCalendario.png");
     background-repeat: no-repeat;
     background-position: center;
     background-size: 20px 20px;

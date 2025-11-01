@@ -79,7 +79,7 @@ function LoginPage() {
           edad: '',
           sexo: '',
           estado: 'Activo',
-          rol: 'Cliente'
+          rol: 'usuario'
         });
       }
   

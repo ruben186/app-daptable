@@ -1,6 +1,6 @@
 .main-content {
     background-color: #ffffff;
-    min-height: 80vh;
+    min-height: calc(100vh - 120px);
     padding: 20px;
 }
 
