@@ -17,6 +17,7 @@ import DashboardPage from './pages/dashBoardPage/dashBoardPage';
 import ResetPasswordPage from './pages/resetPasswordPage/resetPasswordPage';
 import AuxiliaresPage from './pages/auxiliaresPage/auxiliaresPage';
 import GeneradorTabla from './pages/GeneradorTabla/GeneradorTabla.jsx';
+import PerfilPage from './pages/perfilPage/PerfilPage.jsx';
 
 function App() {
   return (
@@ -30,7 +31,7 @@ function App() {
 
         {/* Rutas protegidas con Firebase Auth */}
         <Route path="/dashboard" element={
-          <ProtectedRoute allowedRoles={['admin', '', 'usuario']}>
+          <ProtectedRoute allowedRoles={['admin', 'invitado', 'usuario']}>
             <DashboardPage />
           </ProtectedRoute>
         } />
@@ -47,6 +48,11 @@ function App() {
           </ProtectedRoute>
         } />
         
+        <Route path="/perfil" element={
+          <ProtectedRoute allowedRoles={['admin', 'usuario']}>
+            <PerfilPage/>
+          </ProtectedRoute>
+        } />
 
        
 

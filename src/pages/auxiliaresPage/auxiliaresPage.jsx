@@ -12,13 +12,12 @@ import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 
 function AuxiliaresPage() {
-    const navigate = useNavigate();
-    const [auxiliares, setAuxiliares] = useState([]);
+    const [usuarios, setUsuarios] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [selectedAux, setSelectedAux] = useState(null);
 
     useEffect(() => {
-       const fetchAuxiliares = async () => {
+       const fetchUsuarios = async () => {
         const querySnapshot = await getDocs(collection(db, 'usuarios'));
         const data = querySnapshot.docs
             .map(doc => ({
@@ -30,15 +29,10 @@ function AuxiliaresPage() {
             return rol === 'admin' || rol === 'usuario' || rol === '' || rol === '-';
             });
 
-        setAuxiliares(data);
+        setUsuarios(data);
         };
-        fetchAuxiliares();
+        fetchUsuarios();
     }, []);
-   
-    const handleLogout = async () => {
-        await signOut(auth);
-        navigate('/');
-    };
 
     const handleEliminar = async (id) => {
         const result = await Swal.fire({
@@ -53,7 +47,7 @@ function AuxiliaresPage() {
         if (result.isConfirmed) {
             try {
                 await deleteDoc(doc(db, 'usuarios', id));
-                setAuxiliares(auxiliares.filter(a => a.id !== id));
+                setUsuarios(usuarios.filter(a => a.id !== id));
                 Swal.fire('Eliminado', 'Registro eliminado correctamente.', 'success');
             } catch (error) {
                 console.error(error);
@@ -107,7 +101,7 @@ function AuxiliaresPage() {
 
             });
 
-            setAuxiliares(auxiliares.map(a =>
+            setUsuarios(usuarios.map(a =>
                 a.id === selectedAux.id ? selectedAux : a
             ));
 
@@ -181,7 +175,7 @@ function AuxiliaresPage() {
             <main className="main-content">
                 <Container className="mt-4">
                     <h2 className="page-title text-center mb-4">
-                        AUXILIARES DE SERVICIOS REGISTRADOS EN TECHMOBILE
+                        Usuarios Registrados App-Daptable
                     </h2>
                     <div className="table-container">
                         <Table striped bordered hover responsive className="tabla-auxiliares">
@@ -199,7 +193,7 @@ function AuxiliaresPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {auxiliares.map(aux => (
+                                {usuarios.map(aux => (
                                     <tr key={aux.id}>
                                         <td>{aux.nombreCompleto}</td>
                                         <td>{aux.telefono}</td>
@@ -347,6 +341,7 @@ function AuxiliaresPage() {
                     </Button>
                 </Modal.Footer>
             </Modal>
+            <Footer/>
         </>
     );
 }

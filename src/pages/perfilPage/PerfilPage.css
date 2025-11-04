@@ -1,0 +1,199 @@
+
+/* Estilos generales */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+.body-perfil{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 60px;
+    width: 100%;
+}
+
+.perfil-container {
+    color: #42F1DD;
+    width: 100%;
+    padding: 30px;
+}
+
+/* --- Estilos de la Maquetación Principal --- */
+.perfil-header {
+    margin-bottom: 30px;
+}
+
+.volver-link {
+    color: #42F1DD;
+    text-decoration: none;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+}
+
+.perfil-main {
+    display: flex;
+    justify-content: center;
+    gap: 80px; /* Separación entre la info y el avatar */
+    margin-bottom: 40px;
+}
+
+.perfil-info {
+    flex-grow: 0.6;
+}
+
+/* --- Estilo de los Campos (Alineación Horizontal) --- */
+.campo {
+    display: flex; /* La clave para la alineación horizontal */
+    align-items: center;
+    margin-bottom: 40px; /* Espacio vertical reducido entre campos */
+}
+
+/* Columna del Título */
+.campo-label {
+    /* El ancho es crucial para que los campos de valor se alineen */
+    width: 28%; 
+    min-width: 150px; 
+    color: #42F1DD;
+    font-size: 1.2em;
+    white-space: nowrap; /* Evita que el título se rompa en varias líneas */
+}
+
+/* Columna del Valor (El 'input' estático) */
+.campo-valor {
+    width: 65%; /* Ocupa el espacio restante */
+    padding: 10px;
+    background-color: #07433E;
+    color: #169788;
+    border-radius: 5px;
+    font-size: 1em;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+.perfil-info::placeholder {
+    color: #169788; 
+}
+
+/* --- Avatar y Botón --- */
+.perfil-avatar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.avatar-circulo {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 10px solid #07433E; 
+    background-color: #020911; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 4em;
+    color: #42F1DD;
+}
+.user-photo {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: none;
+}
+
+.editar-perfil-btn {
+    background-color: #07433E; 
+    color: #42F1DD;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1em;
+    padding: 5px 15px;
+    border-radius: 4px;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+.editar-perfil-btn:hover {
+    background-color: #2b867f;
+    color: #fff;
+}
+
+/* --- Actividades Recientes --- */
+.perfil-info h2 { 
+    font-size: 1.1em;
+    margin-top: 25px; 
+    margin-bottom: 15px;
+    font-weight: normal;
+    color: #09665E; /* Título turquesa oscuro */
+}
+
+.actividades-recientes-grid { 
+    display: flex;
+    gap: 61px;
+    margin-top: 30px; 
+    margin-bottom: 20px;
+    width: 830px;
+    justify-content: center;
+}
+
+.actividad-item {
+    flex: 1;
+    width: 236px;
+    height: 335px; /* Aumentado la altura para acomodar las dos secciones */
+    background-color: transparent; /* El color se define en las secciones internas */
+    border-radius: 8px; /* Bordes más redondeados */
+    overflow: hidden; /* Importante para contener los bordes redondeados */
+    
+    /* El borde que se ve en la imagen es delgado y del color de acento. */
+    border: 10px solid #07433E; 
+
+    /* Usamos Flexbox para la estructura interna de la tarjeta */
+    display: flex;
+    flex-direction: column;
+}
+.actividad-item-superior {
+    height:70%; /* Aproximadamente el 70% de altura */
+    background-color: #020911; /* Color de fondo oscuro */
+}
+.actividad-item-inferior {
+    height: 40%; /* El 30% restante de altura */
+    background-color: #07433E; /* Turquesa oscuro sólido de la paleta */
+}
+
+/* Media Query para responsividad */
+@media (max-width: 768px) {
+    .perfil-main {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .perfil-avatar {
+        flex-direction: row;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .campo {
+        flex-direction: column; /* Apila el título y el valor en móvil */
+        align-items: flex-start;
+    }
+
+    .campo-label, .campo-valor {
+        width: 100%; /* Ocupa todo el ancho en móvil */
+    }
+
+    .campo-label {
+        margin-bottom: 5px;
+    }
+    
+    .actividades-recientes-grid {
+        flex-direction: column;
+        margin-top: 0;
+    }
+    
+    .actividad-item {
+        height: 100px;
+    }
+}
