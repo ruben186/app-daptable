@@ -18,7 +18,14 @@ function ForgotPasswordPage() {
 
     const formatoCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formatoCorreo.test(email)) {
-      Swal.fire("Correo inválido", "Por favor escribe un correo válido.", "error");
+       Swal.fire({
+              tittle:"Correo inválido", 
+              text: "Por favor escribe un correo válido.", 
+              icon: "error",
+              background: '#052b27ff', // Color de fondo personalizado
+              color: '#ffdfdfff', // Color del texto personalizado
+              confirmButtonColor: '#0b6860ff',
+            });
       return;
     }
 

@@ -36,7 +36,14 @@ function LoginPage() {
       if (userSnap.exists()) {
         const data = userSnap.data();
         if (data.estado === "Inactivo") {
-          Swal.fire("Acceso denegado", "Tu cuenta está inactiva. Contacta al administrador.", "error");
+          Swal.fire({
+                        tittle:"Acceso denegado", 
+                        text: "Tu cuenta está inactiva. Contacta al administrador.", 
+                        icon: "error",
+                        background: '#052b27ff', // Color de fondo personalizado
+                        color: '#ffdfdfff', // Color del texto personalizado
+                        confirmButtonColor: '#0b6860ff',
+                      });
           return;
         }
       }
@@ -45,6 +52,8 @@ function LoginPage() {
         title: "¡Bienvenido!",
         text: `Sesión iniciada como ${user.email}`,
         icon: "success",
+        background: '#052b27ff', // Color de fondo personalizado
+        color: '#ffff', // Color del texto personalizado
         timer: 2000,
         showConfirmButton: false
       }).then(() => {
@@ -53,7 +62,14 @@ function LoginPage() {
 
     } catch (error) {
       console.error(error);
-      Swal.fire("Error", "Credenciales incorrectas o usuario no existe.", "error");
+      Swal.fire({
+        tittle:"Error", 
+        text: "Credenciales incorrectas o usuario no existe.", 
+        icon: "error",
+        background: '#052b27ff', // Color de fondo personalizado
+        color: '#ffdfdfff', // Color del texto personalizado
+        confirmButtonColor: '#0b6860ff',
+      });
     }
   };
 
@@ -99,6 +115,8 @@ function LoginPage() {
         title: "¡Bienvenido!",
         text: `Sesión iniciada con Google: ${user.email}`,
         icon: "success",
+        background: '#052b27ff', // Color de fondo personalizado
+        color: '#ffff', // Color del texto personalizado
         timer: 2000,
         showConfirmButton: false
       }).then(() => {
@@ -107,7 +125,14 @@ function LoginPage() {
   
     } catch (error) {
       console.error(error);
-      Swal.fire("Error", "No se pudo iniciar sesión con Google.", "error");
+      Swal.fire({
+        tittle:"Error", 
+        text: "No se pudo iniciar sesión con Google.", 
+        icon: "error",
+        background: '#052b27ff', // Color de fondo personalizado
+        color: '#ffdfdfff', // Color del texto personalizado
+        confirmButtonColor: '#0b6860ff',
+      });
     }
   };
 

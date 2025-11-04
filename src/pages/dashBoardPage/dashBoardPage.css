@@ -113,22 +113,10 @@
   position: absolute;
   right: 100px;
 }
-.logout-container .logout-link:hover .user-photo-nav {
+.logout-container .logout-link:hover{
     border: 2px solid rgba(0,0,0,0.4);
     transform: scale(1.05);
 }
-
-/* Foto en navbar */
-.user-photo-nav {
-  width: 34px !important;
-  height: 34px !important;
-  border-radius: 50%;
-  border: 1px solid rgba(0,0,0,0.12);
-  transition: all 0.18s ease;
-  object-fit: cover;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
-}
-
 /* DROPDOWN */
 .navbar-dark .dropdown-menu {
     background-color: rgba(50,50,50,0.95);
@@ -334,14 +322,6 @@
     font-weight: 700;
     font-size: 1.05rem;
     margin-top: 10px;
-}
-
-.user-photo {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    margin-top: 15px;
-    border: 2px solid rgba(0,0,0,0.5);
 }
 
 /* FOOTER */

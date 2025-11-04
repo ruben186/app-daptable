@@ -34,22 +34,50 @@ function RegisterPage() {
     // Validaciones
     for (const key in formData) {
       if (formData[key] === '') {
-        Swal.fire("Campos incompletos", "Por favor llena todos los campos.", "warning");
+        Swal.fire({
+                      tittle:"Campos incompletos", 
+                      text: "Por favor llena todos los campos.", 
+                      icon: "warning",
+                      background: '#052b27ff', // Color de fondo personalizado
+                      color: '#ffffffff', // Color del texto personalizado
+                      confirmButtonColor: '#0b6860ff',
+                    });
         return;
       }
     }
     if(formData.telefono.length > 10 ){
-      Swal.fire('Error', 'El numero de telefono debe tener como maximo 10 caracteres.', 'error');
+      Swal.fire({
+                    tittle:"Error", 
+                    text: "El numero de telefono debe tener como maximo 10 caracteres.", 
+                    icon: "error",
+                    background: '#052b27ff', // Color de fondo personalizado
+                    color: '#ffdfdfff', // Color del texto personalizado
+                    confirmButtonColor: '#0b6860ff',
+                  });
       return;
   }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      Swal.fire("Correo inválido", "Escribe un correo válido.", "error");
+      Swal.fire({
+                    tittle:"Correo inválido", 
+                    text: "Escribe un correo válido.", 
+                    icon: "error",
+                    background: '#052b27ff', // Color de fondo personalizado
+                    color: '#ffdfdfff', // Color del texto personalizado
+                    confirmButtonColor: '#0b6860ff',
+                  });
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      Swal.fire("Contraseña", "Las contraseñas no coinciden.", "error");
+      Swal.fire({
+                    tittle:"Contraseña", 
+                    text: "Las contraseñas no coinciden.", 
+                    icon: "error",
+                    background: '#052b27ff', // Color de fondo personalizado
+                    color: '#ffdfdfff', // Color del texto personalizado
+                    confirmButtonColor: '#0b6860ff',
+                  });
       return;
     }
 
@@ -68,15 +96,37 @@ function RegisterPage() {
         rol: 'usuario' 
       });
 
-      Swal.fire("¡Registro exitoso!", "Usuario registrado correctamente.", "success").then(() => {
+      Swal.fire("¡Registro exitoso!", "Usuario registrado correctamente.", "success")
+      Swal.fire({
+                    tittle:"¡Registro exitoso!", 
+                    text: "Usuario registrado correctamente.", 
+                    icon: "success",
+                    background: '#052b27ff', // Color de fondo personalizado
+                    color: '#ffffffff', // Color del texto personalizado
+                    confirmButtonColor: '#0b6860ff',
+                  }).then(() => {
         window.location.href = "/";
       });
     } catch (error) {
       if (error.code === 'auth/email-already-in-use') {
-        Swal.fire("Error", "Este correo ya está registrado.", "error");
+        Swal.fire({
+                      tittle:"Error", 
+                      text: "Este correo ya está registrado.", 
+                      icon: "error",
+                      background: '#052b27ff', // Color de fondo personalizado
+                      color: '#ffdfdfff', // Color del texto personalizado
+                      confirmButtonColor: '#0b6860ff',
+                    });
       } else {
         console.error(error);
-        Swal.fire("Error", "No se pudo registrar el usuario.", "error");
+        Swal.fire({
+                      tittle:"Error", 
+                      text: "No se pudo registrar el usuario.", 
+                      icon: "error",
+                      background: '#052b27ff', // Color de fondo personalizado
+                      color: '#ffdfdfff', // Color del texto personalizado
+                      confirmButtonColor: '#0b6860ff',
+                    });
       }
     }
   };
