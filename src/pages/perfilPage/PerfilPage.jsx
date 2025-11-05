@@ -25,7 +25,7 @@ const EditableField = ({ label, value, name, type = 'text', onChange, isEditing,
                     name={name} 
                     value={value || ''} 
                     onChange={onChange} 
-                    className="campo-input"
+                    className="campo-valor"
                 >
                     {/* Opción por defecto o placeholder */}
                     <option value="" disabled>Selecciona una opción</option>
@@ -47,7 +47,7 @@ const EditableField = ({ label, value, name, type = 'text', onChange, isEditing,
                     name={name}
                     value={value || ''}
                     onChange={onChange}
-                    className="campo-input"
+                    className="campo-valor"
                     // Deshabilitar la edición del correo, ya que no se puede cambiar fácilmente en Firebase Auth
                     readOnly={name === 'email'} 
                     disabled={name === 'email'} 
@@ -127,16 +127,6 @@ function PerfilPage() {
     user?.photoURL
         ? `Usuario tiene foto: ${user.photoURL}`
         : `Usuario SIN foto, se usará: ${userDefault}`
-    );
-
-    const DisplayField = ({ label, value, placeholder = '' }) => (
-        <div className="campo">
-            <label className="campo-label">{label}</label>
-            <div className="campo-valor">
-                {/* Muestra el valor o el placeholder si el valor está vacío */}
-                {value || <span className="placeholder">{placeholder}</span>}
-            </div>
-        </div>
     );
 
     const handleInputChange = (e) => {
@@ -231,12 +221,11 @@ function PerfilPage() {
 
                 {/* Contenido Principal (Información y Avatar) */}
                 <main className="perfil-main">
-                    <main className="perfil-main">
                     <div className="perfil-info">
                         <EditableField
                             label="Nombre y Apellido:"
                             name="nombreCompleto"
-                            value={datosFormulario?.nombreCompleto}
+                            value={datosFormulario?.nombreCompleto || 'sin Nombre'}
                             isEditing={modoEdicion}
                             onChange={handleInputChange}
                         />
@@ -244,7 +233,7 @@ function PerfilPage() {
                             label="Fecha de Nacimiento:"
                             name="fechaNacimiento"
                             type="date"
-                            value={datosFormulario?.fechaNacimiento}
+                            value={datosFormulario?.fechaNacimiento || 'sin fecha'}
                             isEditing={modoEdicion}
                             onChange={handleInputChange}
                         />
@@ -252,7 +241,7 @@ function PerfilPage() {
                             label="Celular:"
                             name="telefono"
                             type="tel"
-                            value={datosFormulario?.telefono}
+                            value={datosFormulario?.telefono || 'sin teléfono'}
                             isEditing={modoEdicion}
                             onChange={handleInputChange}
                         />
@@ -261,17 +250,17 @@ function PerfilPage() {
                             label="Correo:"
                             name="email"
                             type="email"
-                            value={datosFormulario?.email}
+                            value={datosFormulario?.email || 'sin correo'}
                             isEditing={modoEdicion}
                             onChange={handleInputChange}
                         />
                         <EditableField
                             label="Sexo:"
                             name="sexo"
-                            value={datosFormulario?.sexo}
+                            value={datosFormulario?.sexo || 'sin sexo'}
                             isEditing={modoEdicion}
                             onChange={handleInputChange}
-                            options={['Masculino', 'Femenino', 'Otro']}
+                            options={['Masculino', 'Femenino', 'Prefiero no decirlo']}
                         />
                     </div>
 

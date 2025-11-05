@@ -86,6 +86,7 @@
 input[type="date"], select, .form-control {
     background: #073532;
     color: #42F1DD;
+    position: relative;
 }
 option {
     background-color: #073532;
@@ -134,6 +135,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     background-position: center;
     background-size: 20px 20px;
     border-radius: 5px;
+    position: absolute;
+    right: 10px;   /* distancia desde el borde derecho */
     transition: all 0.3s ease;
 }
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
