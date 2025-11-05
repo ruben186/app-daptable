@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { doc, setDoc, getDoc, collection, getDocs } from 'firebase/firestore'; 
 import { db } from '../../firebase'; // Asegúrate de que esta ruta sea correcta
 import './GeneradorTabla.css';
-import NavBar from '../components/NavBarPage';
 
 const GeneradorTabla = () => {
   const [nombre, setNombre] = useState('');
@@ -65,7 +64,6 @@ const GeneradorTabla = () => {
     setNumCampos(camposToUse.length);
     const nuevaTabla = camposToUse.map((campoNombre, i) => {
       const codigo = `${nombreParsed.trim().toUpperCase()}-${modeloUsed}-${i + 1}`;
-      const codigoCompatibilidad = '';
       return {
         campo: campoNombre,
         codigo,
@@ -94,7 +92,7 @@ const GeneradorTabla = () => {
     'VIDRIO TEMPLADO',
     'BATERIA',
     'FLEX DE BOTONES',
-    'FLEX DESCARGA',
+    'FLEX DE CARGA',
     'PUERTO DE CARGA',
     'AURICULAR',
   ];
@@ -313,6 +311,23 @@ const GeneradorTabla = () => {
     setTabla(copia);
   };
 
+
+
+// 🆕 Funciones de edición específicas para el modo de resultados de búsqueda (aggregatedRows)
+const editarAggregatedRow = (index, key, newValue) => {
+  if (!aggregatedMode) return; // Solo aplicable en modo búsqueda
+
+  // Creamos una copia del array de resultados agregados
+  const copiaAgg = [...aggregatedRows];
+
+  // Buscamos la fila por índice y actualizamos la clave con el nuevo valor
+  if (copiaAgg[index]) {
+    copiaAgg[index][key] = newValue;
+    setAggregatedRows(copiaAgg);
+  }
+};
+
+
   const eliminarTabla = () => {
     if (tabla.length === 0) return;
     const confirm = window.confirm('¿Deseas eliminar la tabla generada? Esta acción limpiará los datos en la interfaz.');
@@ -398,202 +413,213 @@ const GeneradorTabla = () => {
   };
 
   return (
-    <div className="page-offset">
-      <NavBar/>
-      <div className="generador-container">
-        <h2>Ingresa Celular</h2>
-        {/* calcular filas filtradas para usar en botones y tabla */}
-        {/* filteredRows se usa en el render para habilitar/deshabilitar Exportar */}
-        {(() => {})()}
-        <div className="generador-form">
-          {/* Search input at the start of the form (replaces name/model inputs) */}
-          <div className="search-row" style={{ flex: 1 }}>
-            <input
-              type="text"
-              placeholder="Buscar celular (ej: pantalla, moto g7, XT1962-4)"
-              value={searchQuery}
-              onFocus={() => { fetchRemoteTablas(); setShowSuggestions(true); updateSuggestions(searchQuery); }}
-              onChange={(e) => {
-                const v = e.target.value;
-                setSearchQuery(v);
-                if (!v || v.toString().trim() === '') {
-                  // if cleared, hide suggestions and results
-                  setSuggestions([]);
+    <div className="generador-container">
+      <h2>Ingresa Celular</h2>
+      {/* calcular filas filtradas para usar en botones y tabla */}
+      {/* filteredRows se usa en el render para habilitar/deshabilitar Exportar */}
+      {(() => {})()}
+      <div className="generador-form">
+        {/* Search input at the start of the form (replaces name/model inputs) */}
+        <div className="search-row" style={{ flex: 1 }}>
+          <input
+            type="text"
+            placeholder="Buscar celular (ej: pantalla, moto g7, XT1962-4)"
+            value={searchQuery}
+            onFocus={() => { fetchRemoteTablas(); setShowSuggestions(true); updateSuggestions(searchQuery); }}
+            onChange={(e) => {
+              const v = e.target.value;
+              setSearchQuery(v);
+                setTabla([]);
+                setNombre('');
+                setModelo('');
+              if (!v || v.toString().trim() === '') {
+                // if cleared, hide suggestions and results
+                setSuggestions([]);
+                setShowSuggestions(false);
+                setAggregatedMode(false);
+                setShowResults(false);
+                setTableGenerated(false);
+                return;
+              }
+              // Ensure remote tablas are loaded when user types
+              if (remoteTablas.length === 0 && !remoteLoading) fetchRemoteTablas();
+              updateSuggestions(v);
+              // typing a new query should hide any previously generated table until user confirms
+              setTableGenerated(false);
+              setShowResults(true);
+            }}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+            className="search-input"
+          />
+          {showSuggestions && suggestions && suggestions.length > 0 && (
+            <div className="suggestions">
+              {suggestions.map((s) => (
+                <div key={s._id} className="suggestion-item" onMouseDown={() => {
+                  // onMouseDown to capture click before input blur
+                  setNombre(s.nombre || '');
+                  setModelo(s.modelo || '');
+                  setMarca(s.marca || '');
+                  setTabla(s.campos || []);
+                  setSearchQuery(`${s.nombre || ''} ${s.modelo || ''}`.trim());
                   setShowSuggestions(false);
                   setAggregatedMode(false);
-                  setShowResults(false);
+                  // selecting a suggestion should not show action buttons until the user explicitly presses Generar Tabla
                   setTableGenerated(false);
-                  return;
-                }
-                // Ensure remote tablas are loaded when user types
-                if (remoteTablas.length === 0 && !remoteLoading) fetchRemoteTablas();
-                updateSuggestions(v);
-                // typing a new query should hide any previously generated table until user confirms
-                setTableGenerated(false);
-                setShowResults(true);
-              }}
-              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              className="search-input"
-            />
-            {showSuggestions && suggestions && suggestions.length > 0 && (
-              <div className="suggestions">
-                {suggestions.map((s) => (
-                  <div key={s._id} className="suggestion-item" onMouseDown={() => {
-                    // onMouseDown to capture click before input blur
-                    setNombre(s.nombre || '');
-                    setModelo(s.modelo || '');
-                    setMarca(s.marca || '');
-                    setTabla(s.campos || []);
-                    setSearchQuery(`${s.nombre || ''} ${s.modelo || ''}`.trim());
-                    setShowSuggestions(false);
-                    setAggregatedMode(false);
-                    // selecting a suggestion should not show action buttons until the user explicitly presses Generar Tabla
-                    setTableGenerated(false);
-                  }}>
-                    <strong>{s.nombre}</strong> {s.modelo ? <span style={{ color: '#666' }}>{s.modelo}</span> : null}
-                    <div style={{ fontSize: 12, color: '#999' }}>ID: {s._id}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-      </div>
-        </div>
-
-        {showResults && (
-          <>
-            {tableGenerated && (aggregatedMode ? aggregatedRows.length > 0 : tabla.filter((f) => matchesQuery(f)).length > 0) && (
-            <div className="generador-actions">
-              <button className="btn btn-gold" onClick={() => { setModoEdicion(!modoEdicion); setAggregatedMode(false); }}>{modoEdicion ? 'Cancelar' : 'Editar'}</button>
-              {/* Brand select shown after generating the table */}
-              <div style={{ display: 'inline-block', marginLeft: 12 }}>
-                <label style={{ marginRight: 8 }}>Marca:</label>
-                <select
-                  value={marca}
-                  onChange={(e) => setMarca(e.target.value)}
-                  className="brand-select"
-                >
-                  <option value="">-- Selecciona marca --</option>
-                  {marcasDisponibles.map((m) => (
-                    <option key={m} value={m}>{m}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* search is in the main form now */}
-              {/* Control para cambiar el número de campos */}
-              {modoEdicion && (
-                <div className="num-campos">
-                  <label>Número de campos:</label>
-                  <input
-                    type="number"
-                    min={1}
-                    value={numCampos}
-                    onChange={(e) => cambiarNumCampos(e.target.value)}
-                    className="small-input number-input"
-                  />
+                }}>
+                  <strong>{s.nombre}</strong> {s.modelo ? <span style={{ color: '#666' }}>{s.modelo}</span> : null}
+                  <div style={{ fontSize: 12, color: '#999' }}>ID: {s._id}</div>
                 </div>
-              )}
-              <button onClick={() => { guardarTabla(); setAggregatedMode(false); }}>Guardar</button>
+              ))}
             </div>
+          )}
+  </div>
+      </div>
+
+      {showResults && (
+        <>
+          {tableGenerated && (aggregatedMode ? aggregatedRows.length > 0 : tabla.filter((f) => matchesQuery(f)).length > 0) && (
+          <div className="generador-actions">
+            <button className="btn btn-gold" onClick={() => { setModoEdicion(!modoEdicion); setAggregatedMode(false); }}>{modoEdicion ? 'Cancelar' : 'Editar'}</button>
+            {/* Brand select shown after generating the table */}
+            <div style={{ display: 'inline-block', marginLeft: 12 }}>
+              <label style={{ marginRight: 8 }}>Marca:</label>
+              <select
+                value={marca}
+                onChange={(e) => setMarca(e.target.value)}
+                className="brand-select"
+              >
+                <option value="">-- Selecciona marca --</option>
+                {marcasDisponibles.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* search is in the main form now */}
+            {/* Control para cambiar el número de campos */}
+            {modoEdicion && (
+              <div className="num-campos">
+                <label>Número de campos:</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={numCampos}
+                  onChange={(e) => cambiarNumCampos(e.target.value)}
+                  className="small-input number-input"
+                />
+              </div>
             )}
+            <button onClick={() => { guardarTabla(); setAggregatedMode(false); }}>Guardar</button>
+          </div>
+          )}
 
-            {/** Compute displayed rows applying search and marca filter **/}
-              { (() => {
-                if (aggregatedMode) {
-                  const rowsAgg = aggregatedRows;
-                  if (!rowsAgg.length) {
-                    return (
-                      <div style={{ padding: 20, textAlign: 'center', color: '#666' }}>
-                        No se encontraron resultados para la búsqueda.
-                      </div>
-                    );
-                  }
+          {/** Compute displayed rows applying search and marca filter **/}
+            { (() => {
+              if (aggregatedMode) {
+                const rowsAgg = aggregatedRows;
+                if (!rowsAgg.length) {
                   return (
+                    <div style={{ padding: 20, textAlign: 'center', color: '#666' }}>
+                      No se encontraron resultados para la búsqueda.
+                    </div>
+                  );
+                  
+                  
+                return (
 
-                    <>
+                  <>
                     <button className="btn btn-gold" onClick={() => { setModoEdicion(!modoEdicion); }}>{modoEdicion ? 'Cancelar' : 'Editar'}</button>
 
-                    <button className="btn btn-success" onClick={() => exportToCSV(aggregatedMode ? aggregatedRows : tabla.filter((f) => matchesQuery(f)))} style={{ marginLeft: 8 }}>Exportar CSV</button>
-                    <button className="btn btn-danger eliminar-btn" onClick={eliminarTabla}>Eliminar Tabla</button>
+                  <button className="btn btn-success" onClick={() => exportToCSV(aggregatedMode ? aggregatedRows : tabla.filter((f) => matchesQuery(f)))} style={{ marginLeft: 8 }}>Exportar CSV</button>
+                  <button className="btn btn-danger eliminar-btn" onClick={eliminarTabla}>Eliminar Tabla</button>
 
-                    <table className="generador-table">
-                      <thead>
-                        
-                        <tr>
-                          <th>Nombre</th>
-                          <th>Modelo</th>
-                          <th>Marca</th>
-                          <th>Pieza</th>
-                          <th>Código</th>
-                          <th>Código compatibilidad</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {rowsAgg.map((fila, index) => (
-                          <tr key={`${fila._id || 'r'}-${index}`}>
-                            <td>
-                            {modoEdicion ? (
-                              <input
-                                type="text"
-                                value={fila.nombre}
-                                onChange={(e) => editarCampo(index, e.target.value)}
-                              />
-                                )  
+                  <table className="generador-table">
+                    <thead>
+                      <tr>
+                        <th>Nombre</th>
+                        <th>Modelo</th>
+                        <th>Marca</th>
+                        <th>Pieza</th>
+                        <th>Código</th>
+                        <th>Código compatibilidad</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rowsAgg.map((fila, index) => (
+                        <tr key={`${fila._id || 'r'}-${index}`}>
+                          <td>
+                           {modoEdicion ? (
+                            <input
+                              type="text"
+                              value={fila.nombre}
+                              onChange={(e) => editarAggregatedRow(index, 'nombre', e.target.value)}
+                            />
+                              )  
+                            
+                         : (fila.nombre)}</td>
+
+                          <td>
+                          {modoEdicion ? (
+                            <input
+                              type="text"
+                              value={fila.modelo}
+                              onChange={(e) => editarAggregatedRow(index, 'modelo', e.target.value)}
+                            />
+                          
+                           ) 
+                            : (fila.modelo)}</td>
+                          
                               
-                          : (fila.nombre)}</td>
+                          <td>
+                          {modoEdicion ? (
+                            <input
+                              type="text"
+                              value={fila.marca}
+                              onChange={(e) => editarAggregatedRow(index, 'marca', e.target.value)}
+                            />
+                           ) 
+                            : (fila.marca)}</td>
 
-                            <td>
-                            {modoEdicion ? (
-                              <input
-                                type="text"
-                                value={fila.modelo}
-                                onChange={(e) => editarCampo(index, e.target.value)}
-                              />
-                            
-                            ) 
-                              : (fila.modelo)}</td>
-                            
-                                
-                            <td>
-                            {modoEdicion ? (
-                              <input
-                                type="text"
-                                value={fila.campo}
-                                onChange={(e) => editarCampo(index, e.target.value)}
-                              />
-                            ) 
-                              : (fila.campo)}</td>
-
-                            <td>{
-                              modoEdicion ? (
-                              <input
-                                type="text"
-                                value={fila.codigo}
-                                onChange={(e) => editarCampo(index, e.target.value)}
-                              />
-                            ) 
-                              : (fila.codigo)
-                              }</td>
+                          <td>{
+                            modoEdicion ? (
+                            <input
+                              type="text"
+                              value={fila.campo}
+                              onChange={(e) => editarAggregatedRow(index, 'campo', e.target.value)}
+                            />
+                           ) 
+                            : (fila.campo)
+                            }</td>
 
                             <td>{
                             modoEdicion ? (
                               <input
                                 type="text"
-                                value={fila.codigoCompatibilidad|| ''}
-                                onChange={(e) => editarCampo(index, e.target.value)}
+                                value={fila.codigo}
+                                onChange={(e) => editarAggregatedRow(index, 'codigo', e.target.value)}
                               />
                             ) 
-                              : (fila.codigoCompatibilidad || '')
+                              : (fila.codigo)
                             
                               }</td>
-                          </tr>
 
-                        ))}
-                      </tbody>
-                    </table>
-                    </>
-                    
-                  );
+                          <td>{
+                          modoEdicion ? (
+                            <input
+                              type="text"
+                              value={fila.codigoCompatibilidad|| ''}
+                              onChange={(e) => editarAggregatedRow(index, 'codigoCompatibilidad', e.target.value)}
+                            />
+                           ) 
+                            : (fila.codigoCompatibilidad || '')
+                          
+                            }</td>
+                        </tr>
+
+                      ))}
+                    </tbody>
+                  </table>
+                );
               }
 
               const rows = tabla.filter((f) => matchesQuery(f));
@@ -605,7 +631,7 @@ const GeneradorTabla = () => {
                       <label style={{ display: 'block', marginBottom: 6 }}>Ingrese el modelo del celular para generarlo:</label>
                       <input
                         type="text"
-                        name="nuevoModelo"
+codigoCompatibilidadcodigoCompatibilidad                        name="nuevoModelo"
                         placeholder="Ej: XT1962-4 (Modelo del celular)"
                         value={nuevoModeloInput}
                         onChange={(e) => setNuevoModeloInput(e.target.value)}
@@ -615,7 +641,6 @@ const GeneradorTabla = () => {
                         className="btn btn-primary"
                         style={{ marginLeft: 8 }}
                         onClick={() => generarTablaConModeloManual(nuevoModeloInput)}
-                      
                       >Generar ahora</button>
                     </div>
                   </div>
@@ -676,7 +701,6 @@ const GeneradorTabla = () => {
           
         </>
       )}
-      </div>
     </div>
   );
 };
