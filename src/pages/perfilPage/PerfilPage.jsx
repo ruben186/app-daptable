@@ -62,7 +62,7 @@ const EditableField = ({ label, value, name, type = 'text', onChange, isEditing,
             <label className="campo-label">{label}</label>
             <div className="campo-valor">
                 {/* Muestra el valor o un placeholder si está vacío */}
-                {value || <span className="placeholder">No especificado</span>}
+                {value || "no encontrado"}
             </div>
         </div>
     );
@@ -145,25 +145,74 @@ function PerfilPage() {
         const { email, ...dataToSave } = datosFormulario;
         
         try {
+            const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+            const soloNumeros = /^[0-9]+$/;
+            if(datosFormulario.nombreCompleto === '' || datosFormulario.telefono === '' 
+                || datosFormulario.email === '' || datosFormulario.fechaNacimiento === '' || datosFormulario.sexo === ''){
+                Swal.fire({
+                    tittle:"Campos incompletos", 
+                    text: "Todos los campos deben ser llenados.", 
+                    icon: "error",
+                    background: '#052b27ff', // Color de fondo personalizado
+                    color: '#ffdfdfff', // Color del texto personalizado
+                    confirmButtonColor: '#0b6860ff',
+                });
+                return;
+            }else{
+                if (!soloLetras.test(datosFormulario.nombreCompleto)) {
+                    Swal.fire({
+                    tittle:"Error", 
+                    text: "El campo de su nombre completo solo debe contener letras.", 
+                    icon: "error",
+                    background: '#052b27ff', // Color de fondo personalizado
+                    color: '#ffdfdfff', // Color del texto personalizado
+                    confirmButtonColor: '#0b6860ff',
+                    });
+                    return;
+                }
+                if (!soloNumeros.test(datosFormulario.telefono)) {
+                    Swal.fire({
+                    tittle:"Error", 
+                    text: "El campo de telefono solo debe contener numeros.", 
+                    icon: "error",
+                    background: '#052b27ff', // Color de fondo personalizado
+                    color: '#ffdfdfff', // Color del texto personalizado
+                    confirmButtonColor: '#0b6860ff',
+                    });
+                    return;
+                }
+                if(datosFormulario.telefono.length > 10){
+                    Swal.fire({
+                    tittle:"Error", 
+                    text: "El campo de telefono debe tener como maximo 10 caracteres.", 
+                    icon: "error",
+                    background: '#052b27ff', // Color de fondo personalizado
+                    color: '#ffdfdfff', // Color del texto personalizado
+                    confirmButtonColor: '#0b6860ff',
+                    });
+                    return;
+                }
+                
+            }
             // Referencia al documento: /usuarios/{UID del usuario autenticado}
-            const docRef = doc(db, 'usuarios', user.uid);
+                const docRef = doc(db, 'usuarios', user.uid);
 
-            // Usamos setDoc con { merge: true } para crear el documento si no existe o actualizarlo
-            // O updateDoc si sabemos que el documento ya existe
-            await updateDoc(docRef, dataToSave); 
-            
-            // Actualizamos el estado de visualización con los datos guardados
-            setDatosPerfil(datosFormulario);
-            setModoEdicion(false); // Salimos del modo edición
-            
-            Swal.fire({
-                title: '¡Guardado!',
-                text: 'Tu perfil ha sido actualizado exitosamente.',
-                icon: 'success',
-                background: '#052b27ff',
-                color: '#ffff',
-                confirmButtonColor: '#07433E',
-            });
+                // Usamos setDoc con { merge: true } para crear el documento si no existe o actualizarlo
+                // O updateDoc si sabemos que el documento ya existe
+                await updateDoc(docRef, dataToSave); 
+                
+                // Actualizamos el estado de visualización con los datos guardados
+                setDatosPerfil(datosFormulario);
+                setModoEdicion(false); // Salimos del modo edición
+                
+                Swal.fire({
+                    title: '¡Guardado!',
+                    text: 'Tu perfil ha sido actualizado exitosamente.',
+                    icon: 'success',
+                    background: '#052b27ff',
+                    color: '#ffff',
+                    confirmButtonColor: '#07433E',
+                });
         } catch (error) {
             console.error("Error al guardar el perfil en Firestore:", error);
             Swal.fire('Error al Guardar', 'Hubo un problema al actualizar tu perfil.', 'error');
@@ -225,7 +274,7 @@ function PerfilPage() {
                         <EditableField
                             label="Nombre y Apellido:"
                             name="nombreCompleto"
-                            value={datosFormulario?.nombreCompleto || 'sin Nombre'}
+                            value={datosFormulario?.nombreCompleto}
                             isEditing={modoEdicion}
                             onChange={handleInputChange}
                         />
@@ -233,7 +282,7 @@ function PerfilPage() {
                             label="Fecha de Nacimiento:"
                             name="fechaNacimiento"
                             type="date"
-                            value={datosFormulario?.fechaNacimiento || 'sin fecha'}
+                            value={datosFormulario?.fechaNacimiento}
                             isEditing={modoEdicion}
                             onChange={handleInputChange}
                         />
@@ -241,7 +290,7 @@ function PerfilPage() {
                             label="Celular:"
                             name="telefono"
                             type="tel"
-                            value={datosFormulario?.telefono || 'sin teléfono'}
+                            value={datosFormulario?.telefono}
                             isEditing={modoEdicion}
                             onChange={handleInputChange}
                         />
@@ -250,14 +299,14 @@ function PerfilPage() {
                             label="Correo:"
                             name="email"
                             type="email"
-                            value={datosFormulario?.email || 'sin correo'}
+                            value={datosFormulario?.email}
                             isEditing={modoEdicion}
                             onChange={handleInputChange}
                         />
                         <EditableField
                             label="Sexo:"
                             name="sexo"
-                            value={datosFormulario?.sexo || 'sin sexo'}
+                            value={datosFormulario?.sexo}
                             isEditing={modoEdicion}
                             onChange={handleInputChange}
                             options={['Masculino', 'Femenino', 'Prefiero no decirlo']}

@@ -132,6 +132,9 @@ function PersonasMenu({ navigate }) {
           <button className="personas-drawer-item" onClick={() => { navigate('/auxiliares'); setOpen(false); }}>
             Auxiliares (tabla)
           </button>
+          <button className="personas-drawer-item" onClick={() => { navigate('/Gestion-admin'); setOpen(false); }}>
+            Gestión de Administrador
+          </button>
         </div>
       </aside>
     </div>
