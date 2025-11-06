@@ -71,19 +71,47 @@ function AuxiliaresPage() {
             if(selectedAux.nombreCompleto === '' || selectedAux.telefono === '' 
                 || selectedAux.email === '' || selectedAux.fechaNacimiento === '' || selectedAux.sexo === '' || selectedAux.estado === ''
                 || selectedAux.rol === ''){
-               Swal.fire('Error', 'Todos los campos deben ser llenados', 'error');
+               Swal.fire({
+                    tittle:"Campos incompletos", 
+                    text: "Todos los campos deben ser llenados.", 
+                    icon: "error",
+                    background: '#052b27ff', // Color de fondo personalizado
+                    color: '#ffdfdfff', // Color del texto personalizado
+                    confirmButtonColor: '#0b6860ff',
+                });
                 return;
             }else{
                 if (!soloLetras.test(selectedAux.nombreCompleto)) {
-                    Swal.fire('Error', 'El campo de su nombre completo solo deben contener letras.', 'error');
+                    Swal.fire({
+                    tittle:"Error", 
+                    text: "El campo de su nombre completo solo debe contener letras.", 
+                    icon: "error",
+                    background: '#052b27ff', // Color de fondo personalizado
+                    color: '#ffdfdfff', // Color del texto personalizado
+                    confirmButtonColor: '#0b6860ff',
+                    });
                     return;
                 }
                 if (!soloNumeros.test(selectedAux.telefono)) {
-                    Swal.fire('Error', 'El numero de telefono solo deben contener numeros.', 'error');
+                    Swal.fire({
+                    tittle:"Error", 
+                    text: "El campo de telefono solo debe contener numeros.", 
+                    icon: "error",
+                    background: '#052b27ff', // Color de fondo personalizado
+                    color: '#ffdfdfff', // Color del texto personalizado
+                    confirmButtonColor: '#0b6860ff',
+                    });
                     return;
                 }
                 if(selectedAux.telefono.length > 10){
-                    Swal.fire('Error', 'El campo telefono debe tener como maximo 10 caracteres.', 'error');
+                    Swal.fire({
+                    tittle:"Error", 
+                    text: "El campo de telefono debe tener como maximo 10 caracteres.", 
+                    icon: "error",
+                    background: '#052b27ff', // Color de fondo personalizado
+                    color: '#ffdfdfff', // Color del texto personalizado
+                    confirmButtonColor: '#0b6860ff',
+                    });
                     return;
                 }
                 

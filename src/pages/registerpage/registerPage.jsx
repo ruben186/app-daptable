@@ -35,13 +35,13 @@ function RegisterPage() {
     for (const key in formData) {
       if (formData[key] === '') {
         Swal.fire({
-                      tittle:"Campos incompletos", 
-                      text: "Por favor llena todos los campos.", 
-                      icon: "warning",
-                      background: '#052b27ff', // Color de fondo personalizado
-                      color: '#ffffffff', // Color del texto personalizado
-                      confirmButtonColor: '#0b6860ff',
-                    });
+          tittle:"Campos incompletos", 
+          text: "Por favor llena todos los campos.", 
+          icon: "error",
+          background: '#052b27ff', // Color de fondo personalizado
+          color: '#ffdfdfff', // Color del texto personalizado
+          confirmButtonColor: '#0b6860ff',
+        });
         return;
       }
     }

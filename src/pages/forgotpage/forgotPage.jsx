@@ -12,7 +12,15 @@ function ForgotPasswordPage() {
     e.preventDefault();
 
     if (!email) {
-      Swal.fire("Campo vacío", "Por favor ingresa tu correo.", "warning");
+
+      Swal.fire({
+              tittle:"Campo vacío", 
+              text: "Por favor ingresa tu correo.", 
+              icon: "warning",
+              background: '#052b27ff', // Color de fondo personalizado
+              color: '#ffdfdfff', // Color del texto personalizado
+              confirmButtonColor: '#0b6860ff',
+            });
       return;
     }
 
