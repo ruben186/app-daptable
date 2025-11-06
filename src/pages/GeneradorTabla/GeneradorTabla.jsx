@@ -204,12 +204,12 @@ const GeneradorTabla = () => {
   };
 
   // Update suggestions from remoteTablas based on current searchQuery
-  const updateSuggestions = (q) => {
+ const updateSuggestions = (q) => {
     const qlRaw = (q || '').toString();
     const ql = qlRaw ? qlRaw.toLowerCase().trim() : '';
     // normalize query
     const normalizeQuerySimple = (s) => {
-      if (!s) return '';
+     if (!s) return '';
       try {
         return s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/[-_]+/g, ' ').replace(/[^\p{L}\p{N}]+/gu, ' ').trim().replace(/\s+/g, ' ');
       } catch (e) {
@@ -217,26 +217,36 @@ const GeneradorTabla = () => {
       }
     };
     const qlNorm = normalizeQuerySimple(ql);
-    if (!qlNorm) {
+    
+    // ⬅️ PASO CLAVE 1: Dividir la consulta normalizada en términos
+    const qlTerms = qlNorm.split(' ').filter(term => term.length > 0);
+
+    if (qlTerms.length === 0) { // Usamos qlTerms para la verificación de vacío
       setSuggestions([]);
       setShowSuggestions(false);
       return;
     }
+    
     const found = [];
     const agg = [];
     remoteTablas.forEach((d) => {
-      // suggestions: add up to 6 matching documents
+  // sugerencias: añadir hasta 6 documentos que coincidan
       if (found.length < 6) {
         const docText = (extractText(d) + ' ' + (d._id || '')).toString().toLowerCase();
-        if (docText.includes(qlNorm)) {
+        
+        // ⬅️ PASO CLAVE 2A: Reemplazar .includes(qlNorm) por la verificación de todos los términos
+        // Verifica que CADA término de la consulta (qlTerms) esté incluido en el texto del documento (docText).
+        const allTermsMatch = qlTerms.every(term => docText.includes(term));
+
+        if (allTermsMatch) { // ⬅️ Usamos la nueva verificación
           found.push(d);
         }
       }
 
-      // aggregated rows: for every campo in the document, if the combined row text matches, add to agg
+  // filas agregadas: para cada campo en el documento, si el texto combinado de la fila coincide, añadir a agg
       const campos = Array.isArray(d.campos) ? d.campos : [];
       campos.forEach((c) => {
-        const combinedRow = {
+      const combinedRow = {
           nombre: d.nombre || '',
           modelo: d.modelo || '',
           marca: d.marca || '',
@@ -244,9 +254,13 @@ const GeneradorTabla = () => {
           ...c,
         };
         const rowText = extractText(combinedRow);
-        if (rowText.includes(qlNorm)) {
+        
+        // ⬅️ PASO CLAVE 2B: Aplicar la misma lógica a las filas agregadas
+        const allRowTermsMatch = qlTerms.every(term => rowText.includes(term));
+
+        if (allRowTermsMatch) { // ⬅️ Usamos la nueva verificación
           agg.push(combinedRow);
-        }
+         }
       });
     });
 
@@ -260,7 +274,7 @@ const GeneradorTabla = () => {
       setAggregatedRows([]);
       setAggregatedMode(false);
     }
-  };
+   };
 
   // Exportar filas (filtradas) a CSV
   const exportToCSV = (rowsParam) => {
@@ -552,6 +566,17 @@ const GeneradorTabla = () => {
                             
                             ) 
                               : (fila.modelo)}</td>
+
+                            <td>
+                            {modoEdicion ? (
+                              <input
+                                type="text"
+                                value={fila.marca}
+                                onChange={(e) => editarCampo(index, e.target.value)}
+                              />
+                            
+                            ) 
+                              : (fila.marca)}</td>
                             
                                 
                             <td>
