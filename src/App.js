@@ -18,6 +18,7 @@ import ResetPasswordPage from './pages/resetPasswordPage/resetPasswordPage';
 import AuxiliaresPage from './pages/auxiliaresPage/auxiliaresPage';
 import GeneradorTabla from './pages/GeneradorTabla/GeneradorTabla.jsx';
 import PerfilPage from './pages/perfilPage/PerfilPage.jsx';
+import GestionAdminPage from './pages/gestionAdminPage/gestionAdminPage.jsx';
 
 function App() {
   return (
@@ -53,6 +54,13 @@ function App() {
             <PerfilPage/>
           </ProtectedRoute>
         } />
+
+        <Route path="/gestionAdmin" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <GestionAdminPage />
+          </ProtectedRoute>
+        } />
+
 
        
 

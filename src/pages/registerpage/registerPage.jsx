@@ -4,12 +4,14 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { db } from '../../firebase';
 import { doc, setDoc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 import './registerPage.css';
 import logo from '../../assets/logos/App-Daptable-Cel.png';
 import ojoAbierto from '../../assets/Iconos/ojo_abierto_contraseña.png';
 import ojoCerrado from '../../assets/Iconos/ojo_cerrado_contraseña.png';
 
 function RegisterPage() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [sexoOpen, setSexoOpen] = useState(false);
@@ -133,7 +135,7 @@ function RegisterPage() {
 
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100 bg-gradient2">
-        <button type="button" className="btn-outline-secondary" onClick={() => window.location.href = "/"}>
+        <button type="button" className="btn-outline-secondary" onClick={() => navigate(-1)}>
           &lt; Volver
         </button>
         <div className="form-left">

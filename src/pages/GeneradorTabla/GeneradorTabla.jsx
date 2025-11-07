@@ -22,14 +22,79 @@ const GeneradorTabla = () => {
   const [tableGenerated, setTableGenerated] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [nuevoModeloInput, setNuevoModeloInput] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [selectedBrand, setSelectedBrand] = useState("");
 
-  const marcasDisponibles = [
+
+
+  // 1. Estado Inicial de Marcas (Usamos useState para poder modificarlas)
+  const [marcasDisponibles, setMarcasDisponibles] = useState([
     'Samsung',
     'Motorola',
     'Redmi',
     'Huawei',
-    'Otros',
-  ];
+    'Otros', // La opción que activa el modal
+  ]);
+
+  // 2. Estado de la Selección
+  const [marcaSeleccionada, setMarcaSeleccionada] = useState('');
+
+  // 3. Estado del Modal
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [nuevaMarcaInput, setNuevaMarcaInput] = useState('');
+
+  // Manejador para cuando cambia la selección en el <select>
+  const handleChange = (e) => {
+    const nuevaSeleccion = e.target.value;
+    
+    // Si la selección es "Otros", abrimos el modal
+    if (nuevaSeleccion === 'Otros') {
+      setMostrarModal(true);
+      // Mantenemos la marcaSeleccionada en su valor anterior hasta que se ingrese la nueva
+      // Opcionalmente podrías dejarla en 'Otros' o en ""
+    } else {
+      setMarcaSeleccionada(nuevaSeleccion);
+    }
+  };
+
+
+  // Manejador para agregar la nueva marca
+  const handleAgregarMarca = () => {
+    // Validar que el campo no esté vacío
+    if (!nuevaMarcaInput.trim()) {
+      alert("Por favor, ingresa un nombre de marca válido.");
+      return;
+    }
+
+    // 1. Agregar la nueva marca a la lista
+    // Usamos el spread operator para mantener las marcas existentes y añadir la nueva
+    const nuevaMarcaNormalizada = nuevaMarcaInput.trim();
+    
+    // Verificamos que no se esté agregando una marca duplicada (opcional, pero buena práctica)
+    if (marcasDisponibles.includes(nuevaMarcaNormalizada)) {
+        alert("Esa marca ya existe en la lista.");
+        setNuevaMarcaInput('');
+        setMostrarModal(false);
+        setMarcaSeleccionada(nuevaMarcaNormalizada);
+        return;
+    }
+      
+    // Creamos la nueva lista incluyendo la nueva marca, pero SIN la opción "Otros"
+    // y luego la re-agregamos al final para que siempre esté disponible.
+    const listaSinOtros = marcasDisponibles.filter(m => m !== 'Otros');
+    const nuevaListaMarcas = [...listaSinOtros, nuevaMarcaNormalizada, 'Otros'];
+    
+    setMarcasDisponibles(nuevaListaMarcas);
+
+    // 2. Establecer la nueva marca como la seleccionada actualmente
+    setMarcaSeleccionada(nuevaMarcaNormalizada);
+
+    // 3. Limpiar y cerrar
+    setNuevaMarcaInput('');
+    setMostrarModal(false);
+  };
+
+  
 
   // Genera el código para un campo usando la base: nombre (sin espacios, lowercase) + modelo
   // Ahora el código NO incluye el nombre del campo, solo la base y el contador: ej. motog7powerXT1962-4-1
@@ -40,6 +105,12 @@ const GeneradorTabla = () => {
     return `${nombreForCode}-${modeloForCode}-${index}`;
   };
 
+
+
+
+
+
+
   // Generar tabla usando un modelo proporcionado manualmente (evita depender del setState asincrónico)
   const generarTablaConModeloManual = (modeloManual) => {
     const q = (searchQuery || '').toString().trim();
@@ -48,7 +119,7 @@ const GeneradorTabla = () => {
       return;
     }
     const parsed = parseNameModelFromQuery(q);
-    const nombreParsed = parsed.name || q;
+    const nombreParsed = q;
     const modeloUsed = (modeloManual || '').toString().trim();
     if (!modeloUsed) {
       alert('Por favor ingresa un modelo válido.');
@@ -94,7 +165,7 @@ const GeneradorTabla = () => {
     'VIDRIO TEMPLADO',
     'BATERIA',
     'FLEX DE BOTONES',
-    'FLEX DESCARGA',
+    'FLEX DE CARGA',
     'PUERTO DE CARGA',
     'AURICULAR',
   ];
@@ -483,14 +554,62 @@ const GeneradorTabla = () => {
                 <label style={{ marginRight: 8 }}>Marca:</label>
                 <select
                   value={marca}
-                  onChange={(e) => setMarca(e.target.value)}
+                 // Necesitas reemplazar tu función inline con una lógica más compleja: 
+                  onChange={(e) => {
+                      const nuevaMarca = e.target.value;
+                      if (nuevaMarca === 'Otros') {
+                          // Lógica para abrir modal y resetear la selección (opcional)
+                          // setMostrarModal(true);
+                          // setMarca(''); 
+                      } else {
+                          // Lógica normal
+                          setMarca(nuevaMarca);
+                      }
+                  }}
                   className="brand-select"
                 >
                   <option value="">-- Selecciona marca --</option>
                   {marcasDisponibles.map((m) => (
                     <option key={m} value={m}>{m}</option>
+                    
                   ))}
                 </select>
+
+                {/* 4. MODAL VISIBLE CONDICIONALMENTE */}
+      {mostrarModal && (
+        <div >
+          <div >
+            <h4>Agregar Nueva Marca 🛠️</h4>
+            <p>Ingresa el nombre de la nueva marca:</p>
+            <input
+              type="text"
+              value={nuevaMarcaInput}
+              onChange={(e) => setNuevaMarcaInput(e.target.value)}
+              placeholder="Ej: Google Pixel"
+              style={{ padding: '8px', width: '90%', marginBottom: '15px' }}
+            />
+            <br />
+            <button 
+              onClick={handleAgregarMarca}
+              style={{ padding: '10px 15px', marginRight: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', cursor: 'pointer' }}
+            >
+              Guardar y Seleccionar
+            </button>
+            <button 
+              onClick={() => {
+                  setMostrarModal(false); 
+                  setNuevaMarcaInput('');
+                  // Si cancela, volvemos a la selección previa
+                  setMarcaSeleccionada(''); 
+              }}
+              style={{ padding: '10px 15px', backgroundColor: '#6c757d', color: 'white', border: 'none', cursor: 'pointer' }}
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
+
               </div>
 
               {/* search is in the main form now */}

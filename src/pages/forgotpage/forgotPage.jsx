@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 import './forgotPage.css';
 import logo from '../../assets/logos/user.png';
 import { auth } from '../../firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
 
 function ForgotPasswordPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
 
   const handleSubmit = async (e) => {
@@ -53,13 +55,9 @@ function ForgotPasswordPage() {
     }
   };
 
-  const handleGoBack = () => {
-    window.location.href = '/';
-  };
-
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100 bg-page" style={{position: 'relative'}}>
-      <button type="button" className="btn-outline-secondary" onClick={handleGoBack}>
+      <button type="button" className="btn-outline-secondary" onClick={() => navigate(-1)}>
           &lt; Volver
       </button>
       <div className="form-card">
