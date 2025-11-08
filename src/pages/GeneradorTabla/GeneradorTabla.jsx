@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // ⬅️ Importamos doc y setDoc para el ID personalizado
 import { doc, setDoc, getDoc, collection, getDocs } from 'firebase/firestore'; 
 import { db } from '../../firebase'; // Asegúrate de que esta ruta sea correcta
@@ -22,26 +22,46 @@ const GeneradorTabla = () => {
   const [tableGenerated, setTableGenerated] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [nuevoModeloInput, setNuevoModeloInput] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [selectedBrand, setSelectedBrand] = useState("");
-
-
-
-  // 1. Estado Inicial de Marcas (Usamos useState para poder modificarlas)
-  const [marcasDisponibles, setMarcasDisponibles] = useState([
-    'Samsung',
-    'Motorola',
-    'Redmi',
-    'Huawei',
-    'Otros', // La opción que activa el modal
-  ]);
-
-  // 2. Estado de la Selección
+  const [marcasDisponibles, setMarcasDisponibles] = useState(['Otros']);
   const [marcaSeleccionada, setMarcaSeleccionada] = useState('');
-
-  // 3. Estado del Modal
   const [mostrarModal, setMostrarModal] = useState(false);
   const [nuevaMarcaInput, setNuevaMarcaInput] = useState('');
+
+  useEffect(() => {
+    const fetchMarcasUnicas = async () => {
+      try {
+        //Referencia a la colección donde guardas tus productos/celulares
+        const coleccionRef = collection(db, 'tablas'); 
+        
+        // Obtener todos los documentos
+        const snapshot = await getDocs(coleccionRef);
+        
+        // Usar un Set para deduplicar los nombres de marca
+        const marcasSet = new Set();
+        
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          const marca = data.marca;
+          
+          if (marca && typeof marca === 'string') {
+            marcasSet.add(marca.trim()); 
+          }
+        });
+        
+        // Convertir el Set de vuelta a Array y añadir 'Otros'
+        const listaMarcas = [...Array.from(marcasSet), 'Otros'];
+
+        // Actualizar el estado con la lista sin repeticiones
+        setMarcasDisponibles(listaMarcas);
+
+      } catch (error) {
+        console.error("Error al obtener las marcas de Firebase: ", error);
+        setMarcasDisponibles(['Error de carga', 'Otros']);
+      }
+    };
+
+    fetchMarcasUnicas();
+  }, []); // El array vacío asegura que
 
   // Manejador para cuando cambia la selección en el <select>
   const handleChange = (e) => {
@@ -51,7 +71,6 @@ const GeneradorTabla = () => {
     if (nuevaSeleccion === 'Otros') {
       setMostrarModal(true);
       // Mantenemos la marcaSeleccionada en su valor anterior hasta que se ingrese la nueva
-      // Opcionalmente podrías dejarla en 'Otros' o en ""
     } else {
       setMarcaSeleccionada(nuevaSeleccion);
     }
@@ -86,12 +105,13 @@ const GeneradorTabla = () => {
     
     setMarcasDisponibles(nuevaListaMarcas);
 
-    // 2. Establecer la nueva marca como la seleccionada actualmente
-    setMarcaSeleccionada(nuevaMarcaNormalizada);
+    // Establecer la nueva marca como la seleccionada actualmente
+    setMarca(nuevaMarcaNormalizada);
 
-    // 3. Limpiar y cerrar
+    // Limpiar y cerrar
     setNuevaMarcaInput('');
     setMostrarModal(false);
+    
   };
 
   
@@ -559,8 +579,8 @@ const GeneradorTabla = () => {
                       const nuevaMarca = e.target.value;
                       if (nuevaMarca === 'Otros') {
                           // Lógica para abrir modal y resetear la selección (opcional)
-                          // setMostrarModal(true);
-                          // setMarca(''); 
+                          setMostrarModal(true);
+                          //setMarca(''); 
                       } else {
                           // Lógica normal
                           setMarca(nuevaMarca);

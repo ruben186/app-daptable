@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import { auth, db } from '../../firebase';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
+import IconoBuscar from '../../assets/Iconos/iconoLupa.png';
 
 // Importa estilos CSS para el diseño dark/tecno (debes crear el archivo)
 import './gestionAdminPage.css'; 
@@ -63,12 +64,9 @@ const extractTextForSearch = (value) => {
         }
     };
     helper(value);
-    // Unimos los valores normalizados para la búsqueda de subcadenas
+    //  valores normalizados para la búsqueda de subcadenas
     return parts.join(' '); 
 };
-
-// ----------------------------------------------------------------------------
-
 
 // Componente reutilizable para cada sección del dashboard
 
@@ -108,15 +106,19 @@ const DataCard = ({ title, icon: IconComponent, data, searchQuery, setSearchQuer
                     {/* Contenido del Header... */}
                     <div className="card-header-left">
                         <span className="card-icon"><IconComponent size={20} /></span> 
-                        <h3 className="card-title">{title}</h3>
+                        <h3 className="card-titulo">{title}</h3>
                     </div>
                     
                     <div className="card-header-right">
                         <button className="btn-icon new-btn" onClick={() => alert(`Navegar a creación de ${title}`)}>
-                            <FaPlus /> Nuevo
+                            <FaPlus className="plus-new" /> Nuevo
                         </button>
                         <button className={`btn-icon search-toggle-btn ${isSearchVisible ? 'active-search' : ''}`} onClick={toggleSearch}>
-                             <FaSearch size={20} />
+                             <img 
+                                width="28px"
+                                height="28px"
+                                src={IconoBuscar}
+                             />
                         </button>
                     </div>
                 </div>
@@ -129,7 +131,7 @@ const DataCard = ({ title, icon: IconComponent, data, searchQuery, setSearchQuer
                             placeholder="Buscar..." 
                             value={searchQuery}
                             onChange={handleSearchChange}
-                            className="search-input-full"
+                            className="search-input"
                         />
                     </div>
                 </div>
@@ -163,7 +165,7 @@ const DataCard = ({ title, icon: IconComponent, data, searchQuery, setSearchQuer
             {/* Este div tiene el fondo y el borde turquesa de la imagen */}
             <div className="card-footer-admin">
                 <button className="btn-ver-mas" onClick={() => alert(`Navegar a la tabla completa de ${title}`)}>
-                    V Ver más
+                    Ver más
                 </button>
             </div>
 

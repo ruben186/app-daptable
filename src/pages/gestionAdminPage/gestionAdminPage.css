@@ -29,13 +29,14 @@ body {
     align-items: center;
     background-color: #11413D;
     justify-content: space-between;
-    /* Eliminamos el border-bottom aquí para que la barra de búsqueda lo contenga */
-    padding-bottom: 0; 
+    padding: 3px; 
+    border-bottom: 5px solid #269689;
 }
 
 .card-header-left, .card-header-right {
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 /* Estilo del botón Lupa (contenedor del ícono) */
@@ -44,7 +45,7 @@ body {
     border: none;
     color: var(--text-color);
     cursor: pointer;
-    margin-left: 10px;
+    margin: 0 10px;
     padding: 0;
     transition: color 0.2s;
 }
@@ -72,15 +73,15 @@ body {
 /* Tarjeta Principal (Card) */
 .admin-card {
     background-color: #154844;
-    border: 15px solid #269689;
-    border-radius: 4px;
+    border: 5px solid #269689;
+    border-radius: 4px 4px 0 0;
     display: flex;
     flex-direction: column;
 }
 
 
-.card-title {
-    color: var(--text-color);
+.card-titulo {
+    color: #42F1DD;
     font-size: 1.2em;
     flex-grow: 1;
     margin: 0 10px;
@@ -93,15 +94,30 @@ body {
 
 /* Botones de Nuevo */
 .new-btn {
-    background: var(--text-color);
-    color: var(--bg-dark);
+    background: #147068;
+    color: #42F1DD;
     border: none;
-    padding: 5px 10px;
+    padding: 2px 10px;
     font-weight: bold;
     cursor: pointer;
-    border-radius: 2px;
+    border-radius: 23px;
     font-size: 0.85em;
     margin-right: 10px;
+    align-items: center;
+    transition: all 0.18s ease;
+}
+svg{
+    position: relative;
+    bottom: 1.5px;
+}
+
+.plus-new{
+    margin-right: 10px;
+}
+
+.new-btn:hover{
+    background: #2b867f;
+    color: #fff;
 }
 
 /* Caja de Búsqueda */
@@ -130,23 +146,9 @@ body {
     display: flex;
     align-items: center;
     /* Color de fondo que coincide con el de la imagen (un poco más oscuro que la tarjeta) */
-    background-color: #0d2e2b; 
+    background-color: #11413D; 
     width: 100%;
 }
-
-.search-input-full {
-    background: transparent;
-    border: none;
-    color: white;
-    padding: 3px 5px;
-    width: 100%; /* Ocupa todo el ancho */
-    outline: none;
-}
-.search-icon {
-    color: var(--text-color);
-    font-size: 0.9em;
-}
-
 /* Lista de Items */
 .card-list {
     flex-grow: 1;
@@ -183,29 +185,33 @@ body {
 /* Pie de la Tarjeta */
 .card-footer-admin {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     background-color: #227770;
-    align-items: flex-start;
-    padding-top: 5px;
-    margin-top: 5px;
+    text-align: center;
+    padding: 4px 0;
 }
 
 .btn-ver-mas {
     background: none;
     border: none;
-    color: var(--text-color);
+    color: #42F1DD;
     font-size: 1em;
     cursor: pointer;
-    margin-bottom: 10px;
+    margin-left: 20px;
 }
 
 .count-info {
-    color: white;
+    color: #42F1DD;
+    background-color: #082E2D;
     font-size: 0.9em;
+    display: flex;
+    align-items: center;
+
 }
 .count-number {
-    color: var(--text-color);
+    color: #42F1DD;
     font-size: 1.5em;
     font-weight: bold;
     display: block;
+    margin: 0px 20px;
 }

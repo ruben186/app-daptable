@@ -19,7 +19,7 @@ import AuxiliaresPage from './pages/auxiliaresPage/auxiliaresPage';
 import GeneradorTabla from './pages/GeneradorTabla/GeneradorTabla.jsx';
 import PerfilPage from './pages/perfilPage/PerfilPage.jsx';
 import GestionAdminPage from './pages/gestionAdminPage/gestionAdminPage.jsx';
-
+import Xiaomi from './pages/xiaomi/xiaomi.jsx';
 function App() {
   return (
     <BrowserRouter>
@@ -29,6 +29,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        
 
         {/* Rutas protegidas con Firebase Auth */}
         <Route path="/dashboard" element={
@@ -36,6 +37,14 @@ function App() {
             <DashboardPage />
           </ProtectedRoute>
         } />
+
+
+<Route path="/xiaomi" element={
+          <ProtectedRoute allowedRoles={['admin', 'invitado', 'usuario']}>
+            <Xiaomi/>
+          </ProtectedRoute>
+        } />
+        
 
         <Route path="/auxiliares" element={
           <ProtectedRoute allowedRoles={['admin']}>
