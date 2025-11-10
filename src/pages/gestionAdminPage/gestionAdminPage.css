@@ -7,8 +7,6 @@
 }
 
 body {
-    background-color: var(--bg-dark);
-    color: white; 
     font-family: 'Consolas', 'Courier New', monospace; /* Tipo de letra tecno */
 }
 
@@ -49,14 +47,7 @@ body {
     padding: 0;
     transition: color 0.2s;
 }
-.search-toggle-btn:hover {
-    color: white;
-}
-.search-toggle-btn.active-search {
-     /* Resalta la lupa cuando está activa */
-    color: white; 
-    text-shadow: 0 0 5px var(--text-color);
-}
+
 
 /* Grid del Dashboard */
 .dashboard-grid {
@@ -101,7 +92,7 @@ body {
     font-weight: bold;
     cursor: pointer;
     border-radius: 23px;
-    font-size: 0.85em;
+    font-size: 1em;
     margin-right: 10px;
     align-items: center;
     transition: all 0.18s ease;
@@ -125,22 +116,22 @@ svg{
     /* 💡 Clave para el efecto de despliegue */
     max-height: 0; 
     overflow: hidden;
-    transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+    transition: all 0.5s ease-in-out;
     width: 100%;
     /* Estilo del borde debajo del encabezado */
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid #269689;
 }
 
 .search-box-container.visible {
     /* 💡 Al estar visible, se le da la altura y padding para mostrarla */
     max-height: var(--search-height); 
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 1px;
+    padding-bottom: 1px;
 }
 
 .search-box {
     /* Estilo visual de la barra que contiene el input */
-    border: 1px solid var(--border-color);
+    border-bottom: 4px solid #269689;
     padding: 5px;
     border-radius: 2px;
     display: flex;
@@ -153,22 +144,38 @@ svg{
 .card-list {
     flex-grow: 1;
 }
-
+.btn-icon{
+    filter: brightness(1);
+    transform: scale(100%);
+    transition: all 0.3s ease;
+}
+.btn-icon:hover {
+   filter: brightness(10);
+   transform: scale(110%);
+}
 .list-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 8px 0;
-    border-bottom: 1px dotted rgba(0, 224, 183, 0.2);
-    color: white;
+    background-color: #155953;
+    color: #42F1DD;
+    margin: 10px 0;
+    border-radius: 15px;
 }
 .list-item:last-child {
     border-bottom: none;
 }
+.item-text {
+    flex-grow: 1;
+    margin-left: 15px;
+}
 .no-data {
-    color: #666;
+    color: #169788;
     font-style: italic;
     text-align: center;
+    display: flex;
+    justify-content: center;
 }
 
 /* Botones de Acción (Editar/Eliminar) */
@@ -179,9 +186,6 @@ svg{
     font-size: 1em;
     padding: 0 5px;
 }
-.edit-btn { color: gold; }
-.delete-btn { color: red; }
-
 /* Pie de la Tarjeta */
 .card-footer-admin {
     display: flex;
@@ -190,16 +194,17 @@ svg{
     text-align: center;
     padding: 4px 0;
 }
-
 .btn-ver-mas {
     background: none;
     border: none;
     color: #42F1DD;
     font-size: 1em;
     cursor: pointer;
-    margin-left: 20px;
+    transition: color 0.2s;
 }
-
+.btn-ver-mas:hover {
+    color: #d4f0ec;
+}
 .count-info {
     color: #42F1DD;
     background-color: #082E2D;

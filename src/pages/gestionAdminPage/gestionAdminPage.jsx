@@ -9,7 +9,11 @@ import { auth, db } from '../../firebase';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 import IconoBuscar from '../../assets/Iconos/iconoLupa.png';
-
+import IconoEditar from '../../assets/Iconos/iconoEditar.png';
+import IconoEliminar from '../../assets/Iconos/iconoEliminar.png';
+import IconoPieza from '../../assets/Iconos/iconoPieza.png';
+import IconoLibro from '../../assets/Iconos/iconoLibro.png';
+import IconoUsuario from '../../assets/Iconos/usuario2.png';
 // Importa estilos CSS para el diseño dark/tecno (debes crear el archivo)
 import './gestionAdminPage.css'; 
 
@@ -70,7 +74,7 @@ const extractTextForSearch = (value) => {
 
 // Componente reutilizable para cada sección del dashboard
 
-const DataCard = ({ title, icon: IconComponent, data, searchQuery, setSearchQuery, collectionName, handleEdit, handleDelete }) => {
+const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionName, handleEdit, handleDelete }) => {
     
     const [isSearchVisible, setIsSearchVisible] = useState(false); 
 
@@ -105,12 +109,12 @@ const DataCard = ({ title, icon: IconComponent, data, searchQuery, setSearchQuer
                 <div className="card-header-admin">
                     {/* Contenido del Header... */}
                     <div className="card-header-left">
-                        <span className="card-icon"><IconComponent size={20} /></span> 
+                        <span className="card-icon"><img src={icon} width="44px" height="44px" /></span> 
                         <h3 className="card-titulo">{title}</h3>
                     </div>
                     
                     <div className="card-header-right">
-                        <button className="btn-icon new-btn" onClick={() => alert(`Navegar a creación de ${title}`)}>
+                        <button className="new-btn" onClick={() => alert(`Navegar a creación de ${title}`)}>
                             <FaPlus className="plus-new" /> Nuevo
                         </button>
                         <button className={`btn-icon search-toggle-btn ${isSearchVisible ? 'active-search' : ''}`} onClick={toggleSearch}>
@@ -145,10 +149,20 @@ const DataCard = ({ title, icon: IconComponent, data, searchQuery, setSearchQuer
                             </span> 
                             <div className="item-actions">
                                 <button className="btn-icon edit-btn" title="Editar" onClick={() => handleEdit(item)}>
-                                    <FaEdit />
+                                    <img 
+                                    src={IconoEditar} 
+                                    alt="btn-editar" 
+                                    width="30px"
+                                    height="30px"
+                                    />
                                 </button>
                                 <button className="btn-icon delete-btn" title="Eliminar" onClick={() => handleDelete(item.id)}>
-                                    <FaTrash />
+                                    <img 
+                                    src={IconoEliminar} 
+                                    alt="btn-eliminar"
+                                    width="30px"
+                                    height="30px"
+                                    />
                                 </button>
                             </div>
                         </div>
@@ -165,7 +179,7 @@ const DataCard = ({ title, icon: IconComponent, data, searchQuery, setSearchQuer
             {/* Este div tiene el fondo y el borde turquesa de la imagen */}
             <div className="card-footer-admin">
                 <button className="btn-ver-mas" onClick={() => alert(`Navegar a la tabla completa de ${title}`)}>
-                    Ver más
+                   <span className='chevM'/> Ver más
                 </button>
             </div>
 
@@ -227,15 +241,18 @@ function GestionAdminPage() {
 
     // 2. Manejadores de CRUD (Tu lógica adaptada)
     const handleEliminar = async (id) => {
-        const result = await Swal.fire({
-            title: '¿Estás seguro?',
-            text: '¡No podrás recuperar este registro!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        });
-
+         const result = await Swal.fire({
+                title:"¿Estas Seguro?", 
+                text: "¡No podrás recuperar este registro!", 
+                icon: "warning",
+                showCancelButton: true,
+                background: '#052b27ff', // Color de fondo personalizado
+                color: '#ffdfdfff', // Color del texto personalizado
+                confirmButtonColor: '#07433E', // Color del botón de confirmación
+                cancelButtonColor: 'rgba(197, 81, 35, 1)',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            });
         if (result.isConfirmed) {
             try {
                 await deleteDoc(doc(db, 'usuarios', id));
@@ -326,7 +343,7 @@ function GestionAdminPage() {
     return (
         <>
             <NavBar/>
-            <main className="main-content-dashboard">
+            <main className="main-content-dashboard bg-gradient2">
                 <div className="admin-container">
                     <div className="header-admin">
                         <h1>Sistema de Gestion Administrador</h1>
@@ -337,7 +354,7 @@ function GestionAdminPage() {
                         {/* 1. SECCIÓN USUARIOS (Con toda la lógica de tu código) */}
                         <DataCard
                             title="Usuarios"
-                            icon={FaUser}
+                            icon={IconoUsuario}
                             data={usuarios}
                             searchQuery={searchQueryUsuarios}
                             setSearchQuery={setSearchQueryUsuarios}
@@ -349,7 +366,7 @@ function GestionAdminPage() {
                         {/* 2. SECCIÓN PIEZAS (Estructura visual, sin lógica de Firebase) */}
                         <DataCard
                             title="Piezas"
-                            icon={FaBox}
+                            icon={IconoPieza}
                             data={piezas}
                             searchQuery={''}
                             setSearchQuery={() => {}} 
@@ -361,7 +378,7 @@ function GestionAdminPage() {
                         {/* 3. SECCIÓN M. ESTUDIO (Estructura visual, sin lógica de Firebase) */}
                         <DataCard
                             title="M. Estudio"
-                            icon={FaBook}
+                            icon={IconoLibro}
                             data={estudios}
                             searchQuery={''}
                             setSearchQuery={() => {}} 
@@ -374,7 +391,7 @@ function GestionAdminPage() {
                         <div className="grid-full-width">
                             <DataCard
                                 title="Compatibilidad Sugerida"
-                                icon={FaBox}
+                                icon={IconoPieza}
                                 data={compatibilidad}
                                 searchQuery={''}
                                 setSearchQuery={() => {}} 

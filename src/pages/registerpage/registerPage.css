@@ -78,7 +78,7 @@
     color: rgba(66,241,221,0.25);
 }
 .form-control2:focus {
-     outline: none;
+    outline: none;
     box-shadow: 0 0 0 3px rgba(11, 189, 165, 0.473);
 }
 
@@ -87,14 +87,6 @@ input[type="date"], select, .form-control {
     background: #073532;
     color: #42F1DD;
     position: relative;
-}
-option {
-    background-color: #073532;
-    color: #42F1DD;
-}
-option:hover {
-    background-color: #0d7f73;
-    color: #fff;
 }
 
 /* Select wrapper con indicador de estado abierto/cerrado */

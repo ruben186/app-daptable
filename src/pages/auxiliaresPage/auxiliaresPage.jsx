@@ -36,10 +36,14 @@ function AuxiliaresPage() {
 
     const handleEliminar = async (id) => {
         const result = await Swal.fire({
-            title: '¿Estás seguro?',
-            text: '¡No podrás recuperar este registro!',
-            icon: 'warning',
+            title:"¿Estas Seguro?", 
+            text: "¡No podrás recuperar este registro!", 
+            icon: "warning",
             showCancelButton: true,
+            background: '#052b27ff', // Color de fondo personalizado
+            color: '#ffdfdfff', // Color del texto personalizado
+            confirmButtonColor: '#07433E', // Color del botón de confirmación
+            cancelButtonColor: 'rgba(197, 81, 35, 1)',
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar'
         });
@@ -200,7 +204,7 @@ function AuxiliaresPage() {
     return (
         <>
             <NavBar/>
-            <main className="main-content">
+            <main className="main-content-dashboard bg-gradient2">
                 <Container className="mt-4">
                     <h2 className="page-title text-center mb-4">
                         Usuarios Registrados App-Daptable
