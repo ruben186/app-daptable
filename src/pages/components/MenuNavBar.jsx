@@ -1,4 +1,4 @@
-     import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import menuIcon from '../../assets/Iconos/IconoMenu.png';
 
 // Componente local: grupo expandible accesible
@@ -128,9 +128,6 @@ function PersonasMenu({ navigate }) {
           <div className="espacios-menu" />
           <button className="personas-drawer-item" onClick={() => { navigate('/TablaCel'); setOpen(false); }}>
             Generar Tabla (tabla)
-          </button>
-          <button className="personas-drawer-item" onClick={() => { navigate('/auxiliares'); setOpen(false); }}>
-            Auxiliares (tabla)
           </button>
           <button className="personas-drawer-item" onClick={() => { navigate('/gestionAdmin'); setOpen(false); }}>
             Gestión de Administrador

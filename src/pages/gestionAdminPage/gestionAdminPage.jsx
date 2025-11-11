@@ -74,7 +74,7 @@ const extractTextForSearch = (value) => {
 
 // Componente reutilizable para cada sección del dashboard
 
-const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionName, handleEdit, handleDelete }) => {
+const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionName, handleEdit, handleDelete, link }) => {
     
     const [isSearchVisible, setIsSearchVisible] = useState(false); 
 
@@ -91,13 +91,14 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
     const toggleSearch = () => {
         setIsSearchVisible(!isSearchVisible);
         if (isSearchVisible) {
-             setSearchQuery('');
+            setSearchQuery('');
         }
     };
     
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
     };
+    const navigate = useNavigate();
 
     return (
         // 💡 1. CONTENEDOR PRINCIPAL QUE GESTIONA LA SEPARACIÓN (Gap vertical)
@@ -178,7 +179,7 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
             {/* 💡 3. BLOQUE SEPARADO: PIE DE PÁGINA (Botón "Ver más") */}
             {/* Este div tiene el fondo y el borde turquesa de la imagen */}
             <div className="card-footer-admin">
-                <button className="btn-ver-mas" onClick={() => alert(`Navegar a la tabla completa de ${title}`)}>
+                <button className="btn-ver-mas" onClick={() => navigate(link)}>
                    <span className='chevM'/> Ver más
                 </button>
             </div>
@@ -197,7 +198,6 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
 
 
 function GestionAdminPage() {
-    const navigate = useNavigate();
 
     // Estado centralizado de Usuarios
     const [usuarios, setUsuarios] = useState([]);
@@ -361,6 +361,7 @@ function GestionAdminPage() {
                             collectionName="usuarios"
                             handleEdit={handleEdit}
                             handleDelete={handleEliminar}
+                            link={'/registroUsuarios'}
                         />
                         
                         {/* 2. SECCIÓN PIEZAS (Estructura visual, sin lógica de Firebase) */}

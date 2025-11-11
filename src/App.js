@@ -15,7 +15,7 @@ import UseRefPlay from './pages/playground/UseRefPlay';
 import ProtectedRoute from './pages/components/protecterRoute';
 import DashboardPage from './pages/dashBoardPage/dashBoardPage';
 import ResetPasswordPage from './pages/resetPasswordPage/resetPasswordPage';
-import AuxiliaresPage from './pages/auxiliaresPage/auxiliaresPage';
+import RegistroUsuarioPage from './pages/registroUsuarioPage/registroUsuarioPage.jsx';
 import GeneradorTabla from './pages/GeneradorTabla/GeneradorTabla.jsx';
 import PerfilPage from './pages/perfilPage/PerfilPage.jsx';
 import GestionAdminPage from './pages/gestionAdminPage/gestionAdminPage.jsx';
@@ -46,9 +46,9 @@ function App() {
         } />
         
 
-        <Route path="/auxiliares" element={
+        <Route path="/registroUsuarios" element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <AuxiliaresPage />
+            <RegistroUsuarioPage/>
           </ProtectedRoute>
         } />
 
