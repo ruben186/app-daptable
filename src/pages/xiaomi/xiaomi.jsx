@@ -14,7 +14,7 @@ import IconoBuscar from '../../assets/Iconos/iconoLupa.png';
 import IconoEditar from '../../assets/Iconos/iconoEditar.png';
 import IconoEliminar from '../../assets/Iconos/iconoEliminar.png';
 import IconoUsuario from '../../assets/Iconos/usuario2.png';
-import IconologoXiami from '../../assets/logos/logoxiami.png';
+import IconologoXiami from '../../assets/logos/logoxiaomiverde2.png';
 
 
 function Xiaomi(){
@@ -34,14 +34,14 @@ function Xiaomi(){
             ...doc.data()
             }))
             .filter(user => {
-            const rol = user.rol?.toLowerCase();
-            return rol === 'admin' || rol === 'usuario' || rol === 'invitado' || rol === '-';
+            const marca = user.marca?.toLowerCase();
+            return marca === 'redmi' || marca === 'xiaomi'  || marca === '-';
             });
 
          setUsuarios(data);
          setUsuariosFiltrados(data); // Inicialmente, filtrados es igual a todos
         };
-        fetchUsuarios();
+        fetchUsuarios();  
     }, []);
 
     // Hook para manejar la lógica de búsqueda
@@ -71,53 +71,14 @@ function Xiaomi(){
              const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
              const soloNumeros = /^[0-9]+$/;
              if(selectedAux.nombre=== '' || selectedAux.Modelo        === '' 
-                 || selectedAux.email === '' || selectedAux.fechaNacimiento === '' || selectedAux.sexo === '' || selectedAux.estado === ''
-                 || selectedAux.rol === ''){
-                Swal.fire({
-                     tittle:"Campos incompletos", 
-                     text: "Todos los campos deben ser llenados.", 
-                     icon: "error",
-                     background: '#052b27ff', // Color de fondo personalizado
-                     color: '#ffdfdfff', // Color del texto personalizado
-                     confirmButtonColor: '#0b6860ff',
-                 });
-                 return;
-             }else{
-                 if (!soloLetras.test(selectedAux.nombreCompleto)) {
-                     Swal.fire({
-                     tittle:"Error", 
-                     text: "El campo de su nombre completo solo debe contener letras.", 
-                     icon: "error",
-                     background: '#052b27ff', // Color de fondo personalizado
-                     color: '#ffdfdfff', // Color del texto personalizado
-                     confirmButtonColor: '#0b6860ff',
-                     });
-                     return;
-                 }
-                 if (!soloNumeros.test(selectedAux.telefono)) {
-                     Swal.fire({
-                     tittle:"Error", 
-                     text: "El campo de telefono solo debe contener numeros.", 
-                     icon: "error",
-                     background: '#052b27ff', // Color de fondo personalizado
-                     color: '#ffdfdfff', // Color del texto personalizado
-                     confirmButtonColor: '#0b6860ff',
-                     });
-                     return;
-                 }
-                 if(selectedAux.telefono.length > 10){
-                     Swal.fire({
-                     tittle:"Error", 
-                     text: "El campo de telefono debe tener como maximo 10 caracteres.", 
-                     icon: "error",
-                     background: '#052b27ff', // Color de fondo personalizado
-                     color: '#ffdfdfff', // Color del texto personalizado
-                     confirmButtonColor: '#0b6860ff',
-                     });
+                ){
+               
                      return;
                  }
                  
-             }
+                 
+                 
+             
              const auxRef = doc(db, 'tablas',  selectedAux.id);
              await updateDoc(auxRef, {
                  nombreCompleto: selectedAux.nombre,
@@ -141,18 +102,10 @@ function Xiaomi(){
          }
     };
     
-    const handleModalChange = (e) => {
+       const handleModalChange = (e) => {
          const { name, value } = e.target;
     
-         setSelectedAux((prev) => {
-             const updated = { ...prev, [name]: value };
-    
-             if (name === 'fechaNacimiento') {
-                 updated.edad = calcularEdad(value);
-             }
-    
-             return updated;
-         });
+       
     };
     
     // Foto de usuario (si está logueado)
@@ -180,22 +133,7 @@ function Xiaomi(){
                  return 'bg-secondary'; // Gris por defecto
          }
     };
-    const calcularEdad = (fechaNacimiento) => {
-         if (!fechaNacimiento) return '';
     
-         const hoy = new Date();
-         const fechaNac = new Date(fechaNacimiento);
-    
-         let edad = hoy.getFullYear() - fechaNac.getFullYear();
-         const mes = hoy.getMonth() - fechaNac.getMonth();
-         const dia = hoy.getDate() - fechaNac.getDate();
-    
-         if (mes < 0 || (mes === 0 && dia < 0)) {
-             edad--;
-         }
-    
-         return edad;
-    };
     
     return (
         <>
@@ -250,9 +188,10 @@ function Xiaomi(){
                                  <tr>
                                      <th>Nombre </th>
                                      <th>Modelo</th>
-                                     
-                                     
-                                    
+                                      <th>Pantalla</th>
+                                     <th>Bateria</th>
+                                     <th>Flex Botones</th>
+                                    <th>Otros</th>
                                     
                                  </tr>
                              </thead>
@@ -272,7 +211,13 @@ function Xiaomi(){
                                                  {aux.rol || 'usuario'}
                                              </span>
                                          </td>
-                                         
+                                          <td>
+                                             <span className={`badge estado-badge ${getRol(aux.rol)}`}>
+                                                 {aux.rol || 'pantalla'}
+                                             </span>
+                                         </td>
+
+
                                          <td>
                                          
                                             
@@ -320,15 +265,7 @@ function Xiaomi(){
                                      value={selectedAux.email}
                                      disabled
                                  />
-                             </Form.Group>
-                             <Form.Group className="mb-2">
-                                 <Form.Label>Fecha de Nacimiento</Form.Label>
-                                 <Form.Control
-                                     type="date"
-                                     name="fechaNacimiento"
-                                     value={selectedAux.fechaNacimiento || ''}
-                                     onChange={handleModalChange}
-                                 />
+                            
                              <Form.Group className="mb-2">
                                  <Form.Label>Edad</Form.Label>
                                  <Form.Control
