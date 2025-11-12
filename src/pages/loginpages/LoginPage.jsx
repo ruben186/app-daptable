@@ -37,7 +37,7 @@ function LoginPage() {
         const data = userSnap.data();
         if (data.estado === "Inactivo") {
           Swal.fire({
-                        tittle:"Acceso denegado", 
+                        title:"Acceso denegado", 
                         text: "Tu cuenta está inactiva. Contacta al administrador.", 
                         icon: "error",
                         background: '#052b27ff', // Color de fondo personalizado
@@ -63,7 +63,7 @@ function LoginPage() {
     } catch (error) {
       console.error(error);
       Swal.fire({
-        tittle:"Error", 
+        title:"Error", 
         text: "Credenciales incorrectas o usuario no existe.", 
         icon: "error",
         background: '#052b27ff', // Color de fondo personalizado
@@ -126,7 +126,7 @@ function LoginPage() {
     } catch (error) {
       console.error(error);
       Swal.fire({
-        tittle:"Error", 
+        title:"Error", 
         text: "No se pudo iniciar sesión con Google.", 
         icon: "error",
         background: '#052b27ff', // Color de fondo personalizado

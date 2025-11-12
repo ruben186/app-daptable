@@ -1,16 +1,14 @@
 import { useState } from 'react';
 import Swal from 'sweetalert2';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { db } from '../../firebase';
-import { doc, setDoc, } from 'firebase/firestore';
+import { doc, setDoc, addDoc, collection} from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import './registerPage.css';
 import logo from '../../assets/logos/App-Daptable-Cel.png';
 import ojoAbierto from '../../assets/Iconos/ojo_abierto_contraseña.png';
 import ojoCerrado from '../../assets/Iconos/ojo_cerrado_contraseña.png';
 
-function RegisterPage() {
+function RegistroNuevoUsuario() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -22,7 +20,9 @@ function RegisterPage() {
     telefono: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    estado: '',
+    rol: ''
   });
 
   const handleChange = (e) => {
@@ -47,17 +47,7 @@ function RegisterPage() {
         return;
       }
     }
-    if(formData.telefono.length > 10 ){
-      Swal.fire({
-                    title:"Error", 
-                    text: "El numero de telefono debe tener como maximo 10 caracteres.", 
-                    icon: "error",
-                    background: '#052b27ff', // Color de fondo personalizado
-                    color: '#ffdfdfff', // Color del texto personalizado
-                    confirmButtonColor: '#0b6860ff',
-                  });
-      return;
-  }
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       Swal.fire({
@@ -84,18 +74,16 @@ function RegisterPage() {
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      const user = userCredential.user;
-
+        const postCollection = collection(db, 'usuarios');
       // Guardar datos adicionales en Firestore
-      await setDoc(doc(db, 'usuarios', user.uid), {
+        await addDoc(postCollection, {
         nombreCompleto: formData.nombreCompleto,
         fechaNacimiento: formData.fechaNacimiento,
         sexo: formData.sexo,
         telefono: formData.telefono,
         email: formData.email,
-        estado: 'pendiente',// campo para activar o desactivar luego
-        rol: 'usuario' 
+        estado: formData.estado,// campo para activar o desactivar luego
+        rol: formData.rol
       });
 
       Swal.fire("¡Registro exitoso!", "Usuario registrado correctamente.", "success")
@@ -107,7 +95,7 @@ function RegisterPage() {
                     color: '#ffffffff', // Color del texto personalizado
                     confirmButtonColor: '#0b6860ff',
                   }).then(() => {
-        window.location.href = "/";
+        navigate(-1);
       });
     } catch (error) {
       if (error.code === 'auth/email-already-in-use') {
@@ -139,7 +127,7 @@ function RegisterPage() {
           &lt; Volver
         </button>
         <div className="form-left">
-          <h3 className="mb-4">Registrate</h3>
+          <h3 className="mb-4">Registrar un nuevo Usuario</h3>
           <form onSubmit={handleSubmit}>
 
           <div className="mb-3">
@@ -236,6 +224,46 @@ function RegisterPage() {
             </div>
           </div>
 
+          <div className="mb-3">
+            <label className="form-label">Estado</label>
+            <div className={`select-wrapper ${sexoOpen ? 'open' : ''}`}>
+              <select
+                className="form-control2"
+                name="estado"
+                value={formData.estado}
+                onChange={handleChange}
+                onBlur={() => setSexoOpen(false)}
+                onClick={() => setSexoOpen(prev => !prev)}
+              >
+                <option value="">Seleccionar</option>
+                <option>Pendiente</option>
+                <option>Activo</option>
+                <option>Inactivo</option>
+              </select>
+              <span className="chev" aria-hidden="true" />
+            </div>
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">Rol</label>
+            <div className={`select-wrapper ${sexoOpen ? 'open' : ''}`}>
+              <select
+                className="form-control2"
+                name="rol"
+                value={formData.rol}
+                onChange={handleChange}
+                onBlur={() => setSexoOpen(false)}
+                onClick={() => setSexoOpen(prev => !prev)}
+              >
+                <option value="">Seleccionar</option>
+                <option>Usuario</option>
+                <option>Invitado</option>
+                <option>Admin</option>
+              </select>
+              <span className="chev" aria-hidden="true" />
+            </div>
+          </div>
+
           <div className="d-grid gap-2">
             <button type="submit" className="btn-primary">Registrar</button>
           </div>
@@ -251,4 +279,4 @@ function RegisterPage() {
   );
 }
 
-export default RegisterPage;
+export default RegistroNuevoUsuario;

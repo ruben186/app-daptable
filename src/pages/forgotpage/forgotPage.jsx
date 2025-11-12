@@ -16,7 +16,7 @@ function ForgotPasswordPage() {
     if (!email) {
 
       Swal.fire({
-              tittle:"Campo vacío", 
+              title:"Campo vacío", 
               text: "Por favor ingresa tu correo.", 
               icon: "warning",
               background: '#052b27ff', // Color de fondo personalizado
@@ -29,7 +29,7 @@ function ForgotPasswordPage() {
     const formatoCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formatoCorreo.test(email)) {
        Swal.fire({
-              tittle:"Correo inválido", 
+              title:"Correo inválido", 
               text: "Por favor escribe un correo válido.", 
               icon: "error",
               background: '#052b27ff', // Color de fondo personalizado

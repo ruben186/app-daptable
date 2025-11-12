@@ -19,6 +19,7 @@ function DashboardPage() {
   const [user] = useAuthState(auth);
     
       // Determinar foto de usuario
+      
       const userPhoto = user?.photoURL || userDefault;
     
       // Agregamos el console.log para verificar qué foto se está usando

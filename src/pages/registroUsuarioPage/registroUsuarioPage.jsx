@@ -58,8 +58,7 @@ function RegistroUsuariosPage() {
 
     const handleNuevo = () => {
         // Asumiendo que tienes una ruta para crear un nuevo usuario
-        // Reemplaza '/crear-usuario' con tu ruta real si es diferente
-        navigate('/crear-usuario'); 
+        navigate('/nuevoUsuario'); 
     };
 
     const handleEliminar = async (id) => {
@@ -77,14 +76,28 @@ function RegistroUsuariosPage() {
          });
 
          if (result.isConfirmed) {
-             try {
-                 await deleteDoc(doc(db, 'usuarios', id));
-                 setUsuarios(usuarios.filter(a => a.id !== id));
-                 Swal.fire('Eliminado', 'Registro eliminado correctamente.', 'success');
-             } catch (error) {
-                 console.error(error);
-                 Swal.fire('Error', 'No se pudo eliminar el registro.', 'error');
-             }
+            try {
+                await deleteDoc(doc(db, 'usuarios', id));
+                setUsuarios(usuarios.filter(a => a.id !== id));
+                Swal.fire({
+                    title: 'Eliminado', 
+                    text: 'Registro eliminado correctamente.', 
+                    icon: 'success',
+                    background: '#052b27ff', // Color de fondo personalizado
+                    color: '#ffdfdfff', // Color del texto personalizado
+                    confirmButtonColor: '#0b6860ff'
+                });
+            } catch (error) {
+                console.error(error);
+                Swal.fire({
+                    title:"Error", 
+                    text: "No se puedo eliminar el registro.", 
+                    icon: "error",
+                    background: '#052b27ff', // Color de fondo personalizado
+                    color: '#ffdfdfff', // Color del texto personalizado
+                    confirmButtonColor: '#0b6860ff',
+                });
+            }
          }
     };
 
@@ -104,7 +117,7 @@ function RegistroUsuariosPage() {
                  || selectedAux.email === '' || selectedAux.fechaNacimiento === '' || selectedAux.sexo === '' || selectedAux.estado === ''
                  || selectedAux.rol === ''){
                 Swal.fire({
-                     tittle:"Campos incompletos", 
+                     title:"Campos incompletos", 
                      text: "Todos los campos deben ser llenados.", 
                      icon: "error",
                      background: '#052b27ff', // Color de fondo personalizado
@@ -115,7 +128,7 @@ function RegistroUsuariosPage() {
              }else{
                  if (!soloLetras.test(selectedAux.nombreCompleto)) {
                      Swal.fire({
-                     tittle:"Error", 
+                     title:"Error", 
                      text: "El campo de su nombre completo solo debe contener letras.", 
                      icon: "error",
                      background: '#052b27ff', // Color de fondo personalizado
@@ -126,7 +139,7 @@ function RegistroUsuariosPage() {
                  }
                  if (!soloNumeros.test(selectedAux.telefono)) {
                      Swal.fire({
-                     tittle:"Error", 
+                     title:"Error", 
                      text: "El campo de telefono solo debe contener numeros.", 
                      icon: "error",
                      background: '#052b27ff', // Color de fondo personalizado
@@ -137,7 +150,7 @@ function RegistroUsuariosPage() {
                  }
                  if(selectedAux.telefono.length > 10){
                      Swal.fire({
-                     tittle:"Error", 
+                     title:"Error", 
                      text: "El campo de telefono debe tener como maximo 10 caracteres.", 
                      icon: "error",
                      background: '#052b27ff', // Color de fondo personalizado
@@ -354,7 +367,7 @@ function RegistroUsuariosPage() {
             {/* MODAL EDICIÓN */}
              <Modal show={showModal} onHide={() => setShowModal(false)}>
                  <Modal.Header closeButton>
-                     <Modal.Title>Editar Auxiliar</Modal.Title>
+                     <Modal.Title>Editar Usuario</Modal.Title>
                  </Modal.Header>
                  <Modal.Body>
                      {selectedAux && (
@@ -458,5 +471,5 @@ function RegistroUsuariosPage() {
         </>
     );
 }
-
+ 
 export default RegistroUsuariosPage;

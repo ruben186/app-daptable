@@ -74,7 +74,7 @@ const extractTextForSearch = (value) => {
 
 // Componente reutilizable para cada sección del dashboard
 
-const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionName, handleEdit, handleDelete, link }) => {
+const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionName, handleEdit, handleDelete, link, linkNuevo }) => {
     
     const [isSearchVisible, setIsSearchVisible] = useState(false); 
 
@@ -115,7 +115,7 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
                     </div>
                     
                     <div className="card-header-right">
-                        <button className="new-btn" onClick={() => alert(`Navegar a creación de ${title}`)}>
+                        <button className="new-btn" onClick={() => navigate(linkNuevo)}>
                             <FaPlus className="plus-new" /> Nuevo
                         </button>
                         <button className={`btn-icon search-toggle-btn ${isSearchVisible ? 'active-search' : ''}`} onClick={toggleSearch}>
@@ -257,10 +257,24 @@ function GestionAdminPage() {
             try {
                 await deleteDoc(doc(db, 'usuarios', id));
                 setUsuarios(usuarios.filter(a => a.id !== id));
-                Swal.fire('Eliminado', 'Registro eliminado correctamente.', 'success');
+                Swal.fire({
+                    title: 'Eliminado', 
+                    text: 'Registro eliminado correctamente.', 
+                    icon: 'success',
+                    background: '#052b27ff', // Color de fondo personalizado
+                    color: '#ffdfdfff', // Color del texto personalizado
+                    confirmButtonColor: '#0b6860ff'
+                });
             } catch (error) {
                 console.error(error);
-                Swal.fire('Error', 'No se pudo eliminar el registro.', 'error');
+                Swal.fire({
+                    title:"Error", 
+                    text: "No se puedo eliminar el registro.", 
+                    icon: "error",
+                    background: '#052b27ff', // Color de fondo personalizado
+                    color: '#ffdfdfff', // Color del texto personalizado
+                    confirmButtonColor: '#0b6860ff',
+                });
             }
         }
     };
@@ -284,19 +298,19 @@ function GestionAdminPage() {
             if(selectedAux.nombreCompleto === '' || selectedAux.telefono === '' 
                 || selectedAux.email === '' || selectedAux.fechaNacimiento === '' || selectedAux.sexo === '' || selectedAux.estado === ''
                 || selectedAux.rol === ''){
-                Swal.fire({ tittle:"Campos incompletos", text: "Todos los campos deben ser llenados.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff', });
+                Swal.fire({ title:"Campos incompletos", text: "Todos los campos deben ser llenados.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff', });
                 return;
             }else{
                 if (!soloLetras.test(selectedAux.nombreCompleto)) {
-                    Swal.fire({ tittle:"Error", text: "El campo de su nombre completo solo debe contener letras.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff', });
+                    Swal.fire({ title:"Error", text: "El campo de su nombre completo solo debe contener letras.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff', });
                     return;
                 }
                 if (!soloNumeros.test(selectedAux.telefono)) {
-                    Swal.fire({ tittle:"Error", text: "El campo de telefono solo debe contener numeros.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff', });
+                    Swal.fire({ title:"Error", text: "El campo de telefono solo debe contener numeros.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff', });
                     return;
                 }
                 if(selectedAux.telefono.length > 10){
-                    Swal.fire({ tittle:"Error", text: "El campo de telefono debe tener como maximo 10 caracteres.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff', });
+                    Swal.fire({ title:"Error", text: "El campo de telefono debe tener como maximo 10 caracteres.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff', });
                     return;
                 }
             }
@@ -362,6 +376,7 @@ function GestionAdminPage() {
                             handleEdit={handleEdit}
                             handleDelete={handleEliminar}
                             link={'/registroUsuarios'}
+                            linkNuevo={'/nuevoUsuario'}
                         />
                         
                         {/* 2. SECCIÓN PIEZAS (Estructura visual, sin lógica de Firebase) */}

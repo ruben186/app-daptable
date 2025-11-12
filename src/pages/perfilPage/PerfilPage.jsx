@@ -150,7 +150,7 @@ function PerfilPage() {
             if(datosFormulario.nombreCompleto === '' || datosFormulario.telefono === '' 
                 || datosFormulario.email === '' || datosFormulario.fechaNacimiento === '' || datosFormulario.sexo === ''){
                 Swal.fire({
-                    tittle:"Campos incompletos", 
+                    title:"Campos incompletos", 
                     text: "Todos los campos deben ser llenados.", 
                     icon: "error",
                     background: '#052b27ff', // Color de fondo personalizado
@@ -161,7 +161,7 @@ function PerfilPage() {
             }else{
                 if (!soloLetras.test(datosFormulario.nombreCompleto)) {
                     Swal.fire({
-                    tittle:"Error", 
+                    title:"Error", 
                     text: "El campo de su nombre completo solo debe contener letras.", 
                     icon: "error",
                     background: '#052b27ff', // Color de fondo personalizado
@@ -172,7 +172,7 @@ function PerfilPage() {
                 }
                 if (!soloNumeros.test(datosFormulario.telefono)) {
                     Swal.fire({
-                    tittle:"Error", 
+                    title:"Error", 
                     text: "El campo de telefono solo debe contener numeros.", 
                     icon: "error",
                     background: '#052b27ff', // Color de fondo personalizado
@@ -183,7 +183,7 @@ function PerfilPage() {
                 }
                 if(datosFormulario.telefono.length > 10){
                     Swal.fire({
-                    tittle:"Error", 
+                    title:"Error", 
                     text: "El campo de telefono debe tener como maximo 10 caracteres.", 
                     icon: "error",
                     background: '#052b27ff', // Color de fondo personalizado

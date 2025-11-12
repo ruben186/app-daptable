@@ -20,6 +20,7 @@ import GeneradorTabla from './pages/GeneradorTabla/GeneradorTabla.jsx';
 import PerfilPage from './pages/perfilPage/PerfilPage.jsx';
 import GestionAdminPage from './pages/gestionAdminPage/gestionAdminPage.jsx';
 import Xiaomi from './pages/xiaomi/xiaomi.jsx';
+import RegNuevoUsuario from './pages/registroNuevoUsuario/registroNuevoUsuario';
 function App() {
   return (
     <BrowserRouter>
@@ -39,7 +40,7 @@ function App() {
         } />
 
 
-<Route path="/xiaomi" element={
+        <Route path="/xiaomi" element={
           <ProtectedRoute allowedRoles={['admin', 'invitado', 'usuario']}>
             <Xiaomi/>
           </ProtectedRoute>
@@ -67,6 +68,12 @@ function App() {
         <Route path="/gestionAdmin" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <GestionAdminPage />
+          </ProtectedRoute>
+        } />
+
+         <Route path="/nuevoUsuario" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <RegNuevoUsuario/>
           </ProtectedRoute>
         } />
 

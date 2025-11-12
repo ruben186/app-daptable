@@ -94,15 +94,9 @@ function NavBar() {
 
             {/* brand a la derecha y logout */}
             <div className="wrapper-logo">
-              {/* <Nav.Item className="logout-container me-3" onClick={handleLogout}>
-                <Nav.Link className="logout-link d-flex align-items-center gap-2">
-                  <FaSignOutAlt /> Cerrar Sesión
-                  <img src={userPhoto} alt="Foto de usuario" className="user-photo-nav" />
-                </Nav.Link>
-              </Nav.Item> */}
               <div className="brand-right">
                 <Navbar.Brand onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>
-                  <img src={logo} alt="Logo" height="44" className="d-inline-block align-top brand-logo" />
+                  <img src={logo} alt="Logo" className="brand-logo" />
                 </Navbar.Brand>
               </div>
             </div>
