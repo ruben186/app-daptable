@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-// Solo importaremos Modal, Form de Bootstrap, y los iconos Fa
 import { Modal, Form, Button } from 'react-bootstrap'; 
 import { FaEdit, FaTrash, FaUser, FaPlus, FaSearch, FaBook, FaBox } from 'react-icons/fa';
 import Swal from 'sweetalert2';
@@ -14,7 +13,6 @@ import IconoEliminar from '../../assets/Iconos/iconoEliminar.png';
 import IconoPieza from '../../assets/Iconos/iconoPieza.png';
 import IconoLibro from '../../assets/Iconos/iconoLibro.png';
 import IconoUsuario from '../../assets/Iconos/usuario2.png';
-// Importa estilos CSS para el diseño dark/tecno (debes crear el archivo)
 import './gestionAdminPage.css'; 
 
 
@@ -58,17 +56,26 @@ const normalizeString = (s) => {
 
 const extractTextForSearch = (value) => {
     const parts = [];
+    
     const helper = (v) => {
         if (v === null || v === undefined) return;
         const t = typeof v;
+        
         if (t === 'string' || t === 'number' || t === 'boolean') {
+            // Caso base: Si es un valor simple, lo agregamos.
             parts.push(normalizeString(v));
+            
+        } else if (Array.isArray(v)) {
+            v.forEach(helper);
+            
         } else if (t === 'object') {
+            // Si es un objeto (como {campo: "Pantalla", codigo: "..."}),
+            // iteramos recursivamente sobre CADA valor de sus propiedades.
             Object.values(v).forEach(helper);
         }
     };
+    
     helper(value);
-    //  valores normalizados para la búsqueda de subcadenas
     return parts.join(' '); 
 };
 
@@ -120,9 +127,9 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
                         </button>
                         <button className={`btn-icon search-toggle-btn ${isSearchVisible ? 'active-search' : ''}`} onClick={toggleSearch}>
                              <img 
-                                width="28px"
-                                height="28px"
-                                src={IconoBuscar}
+                                 width="28px"
+                                 height="28px"
+                                 src={IconoBuscar}
                              />
                         </button>
                     </div>
@@ -199,21 +206,27 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
 
 function GestionAdminPage() {
 
+    const navigate = useNavigate();
+
     // Estado centralizado de Usuarios
     const [usuarios, setUsuarios] = useState([]);
     const [searchQueryUsuarios, setSearchQueryUsuarios] = useState('');
-    const [loading, setLoading] = useState(false);
     
-    // Estados para Edición/Modal (Reutilizados de tu código)
-    const [showModal, setShowModal] = useState(false);
-    const [selectedAux, setSelectedAux] = useState(null);
+    // Estados para otras colecciones
+    const [piezas, setPiezas] = useState([]);
+    const [searchQueryPiezas, setSearchQueryPiezas] = useState('');
 
-    // Estados para otras colecciones (solo para visualización inicial)
-    const [piezas, setPiezas] = useState(Array(3).fill({ id: 1, nombre: 'Pantalla XYZ' }));
     const [estudios, setEstudios] = useState(Array(3).fill({ id: 1, nombre: 'Modelo A-2024' }));
     const [compatibilidad, setCompatibilidad] = useState(Array(4).fill({ id: 1, nombre: 'Comp. Sugerida' }));
+
+    const [loading, setLoading] = useState(false);
     
-    // 1. Carga de Usuarios (Tu lógica de `useEffect`)
+    // Estados para Edición/Modal
+    const [showModal, setShowModal] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null); // Almacena el item (usuario o pieza) a editar
+    const [itemType, setItemType] = useState(null); // 'usuario' o 'pieza'
+    
+    // 1. Carga de Usuarios
     useEffect(() => {
         const fetchUsuarios = async () => {
             setLoading(true);
@@ -226,7 +239,6 @@ function GestionAdminPage() {
                     }))
                     .filter(user => {
                         const rol = user.rol?.toLowerCase();
-                        // Mantenemos tu filtro de roles
                         return rol === 'admin' || rol === 'usuario' || rol === '' || rol === '-'; 
                     });
                 setUsuarios(data);
@@ -239,16 +251,51 @@ function GestionAdminPage() {
         fetchUsuarios();
     }, []);
 
-    // 2. Manejadores de CRUD (Tu lógica adaptada)
-    const handleEliminar = async (id) => {
-         const result = await Swal.fire({
-                title:"¿Estas Seguro?", 
-                text: "¡No podrás recuperar este registro!", 
+    // 2. Carga de Piezas
+    useEffect(() => {
+        const fetchPiezas = async () => {
+            setLoading(true);
+            try {
+                const querySnapshot = await getDocs(collection(db, 'tablas')); 
+                const data = querySnapshot.docs
+                    .map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+                setPiezas(data);
+            } catch (error) {
+                console.error("Error al cargar piezas (tablas):", error);
+                setPiezas([]); 
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchPiezas();
+    }, []);
+
+    // ------------------------------------------------------------------
+    // --- MANEJADORES DE USUARIO ---
+    // ------------------------------------------------------------------
+    
+    const handleEditUser = (user) => {
+        setSelectedItem({
+            ...user,
+            // Asegura que la edad se calcule al abrir
+            edad: calcularEdad(user.fechaNacimiento) 
+        });
+        setItemType('usuario');
+        setShowModal(true);
+    };
+
+    const handleEliminarUser = async (id) => {
+           const result = await Swal.fire({
+                title:"¿Estás Seguro?", 
+                text: "¡No podrás recuperar este registro de usuario!", 
                 icon: "warning",
                 showCancelButton: true,
-                background: '#052b27ff', // Color de fondo personalizado
-                color: '#ffdfdfff', // Color del texto personalizado
-                confirmButtonColor: '#07433E', // Color del botón de confirmación
+                background: '#052b27ff',
+                color: '#ffdfdfff',
+                confirmButtonColor: '#07433E',
                 cancelButtonColor: 'rgba(197, 81, 35, 1)',
                 confirmButtonText: 'Sí, eliminar',
                 cancelButtonText: 'Cancelar'
@@ -259,91 +306,83 @@ function GestionAdminPage() {
                 setUsuarios(usuarios.filter(a => a.id !== id));
                 Swal.fire({
                     title: 'Eliminado', 
-                    text: 'Registro eliminado correctamente.', 
+                    text: 'Registro de usuario eliminado correctamente.', 
                     icon: 'success',
-                    background: '#052b27ff', // Color de fondo personalizado
-                    color: '#ffdfdfff', // Color del texto personalizado
+                    background: '#052b27ff',
+                    color: '#ffdfdfff',
                     confirmButtonColor: '#0b6860ff'
                 });
             } catch (error) {
                 console.error(error);
                 Swal.fire({
                     title:"Error", 
-                    text: "No se puedo eliminar el registro.", 
+                    text: "No se pudo eliminar el registro de usuario.", 
                     icon: "error",
-                    background: '#052b27ff', // Color de fondo personalizado
-                    color: '#ffdfdfff', // Color del texto personalizado
+                    background: '#052b27ff',
+                    color: '#ffdfdfff',
                     confirmButtonColor: '#0b6860ff',
                 });
             }
         }
     };
     
-    const handleEdit = (aux) => {
-        setSelectedAux({
-            ...aux,
-            // Asegura que la edad se calcule al abrir
-            edad: calcularEdad(aux.fechaNacimiento) 
-        });
-        setShowModal(true);
-    };
+    const handleSaveChangesUser = async () => {
+        if (!selectedItem || itemType !== 'usuario') return;
 
-    const handleSaveChanges = async () => {
-        // Validación adaptada de tu código
+        // ... (Tu bloque de validaciones completo aquí)
         try {
             const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
             const soloNumeros = /^[0-9]+$/;
             
-            // ... (Tu bloque de validaciones completo aquí)
-            if(selectedAux.nombreCompleto === '' || selectedAux.telefono === '' 
-                || selectedAux.email === '' || selectedAux.fechaNacimiento === '' || selectedAux.sexo === '' || selectedAux.estado === ''
-                || selectedAux.rol === ''){
+            if(selectedItem.nombreCompleto === '' || selectedItem.telefono === '' 
+                || selectedItem.email === '' || selectedItem.fechaNacimiento === '' || selectedItem.sexo === '' || selectedItem.estado === ''
+                || selectedItem.rol === ''){
                 Swal.fire({ title:"Campos incompletos", text: "Todos los campos deben ser llenados.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff', });
                 return;
             }else{
-                if (!soloLetras.test(selectedAux.nombreCompleto)) {
+                if (!soloLetras.test(selectedItem.nombreCompleto)) {
                     Swal.fire({ title:"Error", text: "El campo de su nombre completo solo debe contener letras.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff', });
                     return;
                 }
-                if (!soloNumeros.test(selectedAux.telefono)) {
+                if (!soloNumeros.test(selectedItem.telefono)) {
                     Swal.fire({ title:"Error", text: "El campo de telefono solo debe contener numeros.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff', });
                     return;
                 }
-                if(selectedAux.telefono.length > 10){
+                if(selectedItem.telefono.length > 10){
                     Swal.fire({ title:"Error", text: "El campo de telefono debe tener como maximo 10 caracteres.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff', });
                     return;
                 }
             }
             // ... (Fin de tu bloque de validaciones)
 
-            const auxRef = doc(db, 'usuarios', selectedAux.id);
-            await updateDoc(auxRef, {
-                nombreCompleto: selectedAux.nombreCompleto,
-                telefono: selectedAux.telefono,
-                email: selectedAux.email,
-                fechaNacimiento: selectedAux.fechaNacimiento,
-                edad: selectedAux.edad,
-                sexo: selectedAux.sexo,
-                estado: selectedAux.estado,
-                rol: selectedAux.rol
+            const userRef = doc(db, 'usuarios', selectedItem.id);
+            await updateDoc(userRef, {
+                nombreCompleto: selectedItem.nombreCompleto,
+                telefono: selectedItem.telefono,
+                email: selectedItem.email,
+                fechaNacimiento: selectedItem.fechaNacimiento,
+                edad: selectedItem.edad,
+                sexo: selectedItem.sexo,
+                estado: selectedItem.estado,
+                rol: selectedItem.rol
             });
 
             // Actualiza el estado local de usuarios
             setUsuarios(usuarios.map(a =>
-                a.id === selectedAux.id ? selectedAux : a
+                a.id === selectedItem.id ? selectedItem : a
             ));
 
             setShowModal(false);
-            Swal.fire('Actualizado', 'Los datos fueron actualizados.', 'success');
+            Swal.fire('Actualizado', 'Los datos del usuario fueron actualizados.', 'success');
         } catch (error) {
             console.error(error);
-            Swal.fire('Error', 'No se pudo actualizar.', 'error');
+            Swal.fire('Error', 'No se pudo actualizar el usuario.', 'error');
         }
     };
-    
-    const handleModalChange = (e) => {
+
+    const handleModalChangeUser = (e) => {
         const { name, value } = e.target;
-        setSelectedAux((prev) => {
+        setSelectedItem((prev) => {
             const updated = { ...prev, [name]: value };
             if (name === 'fechaNacimiento') {
                 updated.edad = calcularEdad(value);
@@ -353,7 +392,319 @@ function GestionAdminPage() {
     };
 
     // ------------------------------------------------------------------
+    // --- MANEJADORES DE PIEZA ---
+    // ------------------------------------------------------------------
     
+   const handleEditPieza = (pieza) => {
+    // 💡 SOLUCIÓN: Creamos una copia plana, y si existe el array 'campos',
+    // lo usamos para inicializar los campos del modal.
+    const tempItem = {
+        ...pieza,
+        // Usamos campos temporales para el modal, extrayendo el primer elemento si existe
+        campo: (pieza.campos && pieza.campos[0] && pieza.campos[0].campo) || '',
+        codigo: (pieza.campos && pieza.campos[0] && pieza.campos[0].codigo) || '',
+        codigoCompatibilidad: (pieza.campos && pieza.campos[0] && pieza.campos[0].codigoCompatibilidad) || '',
+        
+        // Almacenamos el array original de campos si queremos mantener los demás elementos
+        // o si queremos actualizar completamente el array campos en la base de datos.
+        // Aquí vamos a SIMPLIFICAR y solo editamos el primer elemento (índice 0).
+    };
+
+    setSelectedItem(tempItem);
+    setItemType('pieza');
+    setShowModal(true);
+};
+    
+    const handleDeletePiezaReal = async (id) => {
+        const result = await Swal.fire({
+            title:"¿Estás Seguro?", 
+            text: "¡No podrás recuperar este registro de pieza!", 
+            icon: "warning",
+            showCancelButton: true,
+            background: '#052b27ff',
+            color: '#ffdfdfff',
+            confirmButtonColor: '#07433E',
+            cancelButtonColor: 'rgba(197, 81, 35, 1)',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await deleteDoc(doc(db, 'tablas', id)); // Asumiendo que las Piezas están en la colección 'tablas'
+                setPiezas(piezas.filter(p => p.id !== id));
+                Swal.fire({
+                    title: 'Eliminado', 
+                    text: 'Registro de pieza eliminado correctamente.', 
+                    icon: 'success',
+                    background: '#052b27ff',
+                    color: '#ffdfdfff',
+                    confirmButtonColor: '#0b6860ff'
+                });
+            } catch (error) {
+                console.error("Error al eliminar pieza:", error);
+                Swal.fire({
+                    title:"Error", 
+                    text: "No se pudo eliminar el registro de pieza.", 
+                    icon: "error",
+                    background: '#052b27ff',
+                    color: '#ffdfdfff',
+                    confirmButtonColor: '#0b6860ff',
+                });
+            }
+        }
+    };
+    
+    const handleSaveChangesPieza = async () => {
+    if (!selectedItem || itemType !== 'pieza') return;
+    
+    // Asumimos que solo editamos el primer elemento del array 'campos'
+    // y que los campos anidados son 'campo', 'codigo', y 'codigoCompatibilidad'.
+    
+    try {
+        const piezaRef = doc(db, 'tablas', selectedItem.id);
+        
+        // 🚨 SOLUCIÓN: Reconstruir el array 'campos' manteniendo la estructura
+        // Al editar solo un conjunto de campos, asumimos que son los únicos o los más relevantes.
+        
+        // El array 'campos' tendrá un solo elemento con los datos editados:
+        const camposArray = [
+            { 
+                campo: selectedItem.campo || '', 
+                codigo: selectedItem.codigo || '', 
+                codigoCompatibilidad: selectedItem.codigoCompatibilidad || '' 
+            },
+        ];
+        
+        // Objeto a actualizar en Firebase
+        const dataToUpdate = {
+            nombre: selectedItem.nombre || '',
+            marca: selectedItem.marca || '',
+            modelo: selectedItem.modelo || '',
+            campos: camposArray, // Guardamos el array reconstruido
+        };
+
+        await updateDoc(piezaRef, dataToUpdate);
+
+        // Actualiza el estado local de piezas (importante para la vista)
+        setPiezas(prevPiezas => prevPiezas.map(p => {
+            if (p.id === selectedItem.id) {
+                // Devolvemos el objeto actualizado con los nuevos campos anidados
+                return { ...p, ...dataToUpdate };
+            }
+            return p;
+        }));
+
+        setShowModal(false);
+        Swal.fire({
+            title:'Actualizado', 
+            text: 'Los datos de la pieza fueron actualizados.', 
+            icon: 'success',
+            background: '#052b27ff',
+            color: '#ffdfdfff',
+            confirmButtonColor: '#0b6860ff'
+        });
+    } catch (error) {
+        console.error("Error al guardar cambios de pieza:", error);
+        Swal.fire({
+            title:'Error', 
+            text: 'No se pudo actualizar la pieza.', 
+            icon: 'error',
+            background: '#052b27ff',
+            color: '#ffdfdfff',
+            confirmButtonColor: '#0b6860ff'
+        });
+    }
+};
+
+   const handleModalChangePieza = (e) => {
+    const { name, value } = e.target;
+    // La modificación del estado temporal es sencilla ya que los campos están planos
+    setSelectedItem((prev) => ({ ...prev, [name]: value }));
+};
+    
+    // ------------------------------------------------------------------
+    // --- RENDERIZADO DEL MODAL ---
+    // ------------------------------------------------------------------
+
+    const renderModalBody = () => {
+        if (!selectedItem) return null;
+
+        if (itemType === 'usuario') {
+            return (
+                <Form>
+                    {/* Nombre Completo */}
+                    <Form.Group className="mb-2">
+                        <Form.Label>Nombres Completo</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="nombreCompleto"
+                            value={selectedItem.nombreCompleto || ''}
+                            onChange={handleModalChangeUser}
+                        />
+                    </Form.Group>
+                    {/* Teléfono */}
+                    <Form.Group className="mb-2">
+                        <Form.Label>Teléfono</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="telefono"
+                            value={selectedItem.telefono || ''}
+                            onChange={handleModalChangeUser}
+                        />
+                    </Form.Group>
+                    {/* Email */}
+                    <Form.Group className="mb-2">
+                        <Form.Label>Email</Form.Label>
+                        <Form.Control
+                            type="email"
+                            name="email"
+                            value={selectedItem.email || ''}
+                            disabled 
+                        />
+                    </Form.Group>
+                    {/* Fecha Nacimiento y Edad */}
+                    <div className="d-flex justify-content-between">
+                        <Form.Group className="mb-2 w-50 pe-2">
+                            <Form.Label>Fecha de Nacimiento</Form.Label>
+                            <Form.Control
+                                type="date"
+                                name="fechaNacimiento"
+                                value={selectedItem.fechaNacimiento || ''}
+                                onChange={handleModalChangeUser}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-2 w-50 ps-2">
+                            <Form.Label>Edad</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="edad"
+                                value={selectedItem.edad || '-'}
+                                readOnly
+                            />
+                        </Form.Group>
+                    </div>
+                    {/* Sexo */}
+                    <Form.Group className="mb-2">
+                        <Form.Label>Sexo</Form.Label>
+                        <Form.Select
+                            name="sexo"
+                            value={selectedItem.sexo || ''}
+                            onChange={handleModalChangeUser}
+                        >
+                            <option value="">Seleccionar</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Indeciso">Prefiero no decirlo</option>
+                        </Form.Select>
+                    </Form.Group>
+                    {/* Estado */}
+                    <Form.Group className="mb-2">
+                        <Form.Label>Estado</Form.Label>
+                        <Form.Select
+                            name="estado"
+                            value={selectedItem.estado || 'Pendiente'}
+                            onChange={handleModalChangeUser}
+                        >
+                            <option>Pendiente</option>
+                            <option>Activo</option>
+                            <option>Inactivo</option>
+                        </Form.Select>
+                    </Form.Group>
+                    {/* Rol */}
+                    <Form.Group className="mb-2">
+                        <Form.Label>Rol</Form.Label>
+                        <Form.Select
+                            name="rol"
+                            value={selectedItem.rol || 'usuario'}
+                            onChange={handleModalChangeUser}
+                        >
+                            <option value="">Seleccionar</option>
+                            <option>Usuario</option>
+                            <option>Invitado</option>
+                            <option>Admin</option>
+                        </Form.Select>
+                    </Form.Group>
+                </Form>
+            );
+        } else if (itemType === 'pieza') {
+            return (
+                <Form>
+                    {/* Nombre */}
+                    <Form.Group className="mb-2">
+                        <Form.Label>Nombre de la Pieza</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="nombre"
+                            value={selectedItem.nombre || ''}
+                            onChange={handleModalChangePieza}
+                        />
+                    </Form.Group>
+                    {/* Campo */}
+                    <Form.Group className="mb-2">
+                        <Form.Label>Pieza</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="campo"
+                            value={selectedItem.campo || ''}
+                            onChange={handleModalChangePieza}
+                        />
+                    </Form.Group>
+                    {/* Código */}
+                    <Form.Group className="mb-2">
+                        <Form.Label>Código de Pieza</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="codigo"
+                            value={selectedItem.codigo || ''}
+                            onChange={handleModalChangePieza}
+                        />
+                    </Form.Group>
+                    {/* Código Compatibilidad */}
+                    <Form.Group className="mb-2">
+                        <Form.Label>Código Compatibilidad</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="codigoCompatibilidad"
+                            value={selectedItem.codigoCompatibilidad || ''}
+                            onChange={handleModalChangePieza}
+                        />
+                    </Form.Group>
+                    {/* Marca */}
+                    <Form.Group className="mb-2">
+                        <Form.Label>Marca</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="marca"
+                            value={selectedItem.marca || ''}
+                            onChange={handleModalChangePieza}
+                        />
+                    </Form.Group>
+                    {/* Modelo */}
+                    <Form.Group className="mb-2">
+                        <Form.Label>Modelo</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="modelo"
+                            value={selectedItem.modelo || ''}
+                            onChange={handleModalChangePieza}
+                        />
+                    </Form.Group>
+                </Form>
+            );
+        }
+        return null;
+    };
+    
+    const handleSave = itemType === 'usuario' ? handleSaveChangesUser : 
+                       itemType === 'pieza' ? handleSaveChangesPieza : 
+                       () => alert('Función de guardado no definida');
+                       
+    const modalTitle = itemType === 'usuario' ? 'Editar Usuario' : 
+                       itemType === 'pieza' ? 'Editar Pieza' : 
+                       'Editar Registro';
+
+
     return (
         <>
             <NavBar/>
@@ -365,7 +716,7 @@ function GestionAdminPage() {
                     
                     <div className="dashboard-grid">
                         
-                        {/* 1. SECCIÓN USUARIOS (Con toda la lógica de tu código) */}
+                        {/* 1. SECCIÓN USUARIOS */}
                         <DataCard
                             title="Usuarios"
                             icon={IconoUsuario}
@@ -373,25 +724,27 @@ function GestionAdminPage() {
                             searchQuery={searchQueryUsuarios}
                             setSearchQuery={setSearchQueryUsuarios}
                             collectionName="usuarios"
-                            handleEdit={handleEdit}
-                            handleDelete={handleEliminar}
+                            handleEdit={handleEditUser}
+                            handleDelete={handleEliminarUser}
                             link={'/registroUsuarios'}
                             linkNuevo={'/nuevoUsuario'}
                         />
                         
-                        {/* 2. SECCIÓN PIEZAS (Estructura visual, sin lógica de Firebase) */}
+                        {/* 2. SECCIÓN PIEZAS  */}
                         <DataCard
                             title="Piezas"
                             icon={IconoPieza}
                             data={piezas}
-                            searchQuery={''}
-                            setSearchQuery={() => {}} 
+                            searchQuery={searchQueryPiezas}
+                            setSearchQuery={setSearchQueryPiezas} 
                             collectionName="piezas"
-                            handleEdit={() => alert('Implementar edición de Piezas')}
-                            handleDelete={() => alert('Implementar eliminación de Piezas')}
+                            handleEdit={handleEditPieza}
+                            handleDelete={handleDeletePiezaReal}
+                            link={'/registroPiezas'}
+                            linkNuevo={'/nuevaPieza'}
                         />
                         
-                        {/* 3. SECCIÓN M. ESTUDIO (Estructura visual, sin lógica de Firebase) */}
+                        {/* 3. SECCIÓN M. ESTUDIO  */}
                         <DataCard
                             title="M. Estudio"
                             icon={IconoLibro}
@@ -401,9 +754,11 @@ function GestionAdminPage() {
                             collectionName="estudios"
                             handleEdit={() => alert('Implementar edición de M. Estudio')}
                             handleDelete={() => alert('Implementar eliminación de M. Estudio')}
+                            link={'/registroEstudios'}
+                            linkNuevo={'/nuevoEstudio'}
                         />
                         
-                        {/* 4. SECCIÓN COMPATIBILIDAD SUGERIDA (Abajo) */}
+                        {/* 4. SECCIÓN COMPATIBILIDAD SUGERIDA */}
                         <div className="grid-full-width">
                             <DataCard
                                 title="Compatibilidad Sugerida"
@@ -414,6 +769,8 @@ function GestionAdminPage() {
                                 collectionName="compatibilidad"
                                 handleEdit={() => alert('Implementar edición de Compatibilidad')}
                                 handleDelete={() => alert('Implementar eliminación de Compatibilidad')}
+                                link={'/registroCompatibilidad'}
+                                linkNuevo={'/nuevaCompatibilidad'}
                             />
 
                         </div>
@@ -421,114 +778,19 @@ function GestionAdminPage() {
                 </div>
             </main>
 
-            {/* MODAL EDICIÓN (Reutilizado de tu código) */}
+            {/* MODAL EDICIÓN (REUTILIZADO) */}
             <Modal show={showModal} onHide={() => setShowModal(false)} centered>
                 <Modal.Header closeButton className="modal-header-custom">
-                    <Modal.Title>Editar Usuario</Modal.Title>
+                    <Modal.Title>{modalTitle}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="modal-body-custom">
-                    {selectedAux && (
-                        <Form>
-                            {/* Nombre Completo */}
-                            <Form.Group className="mb-2">
-                                <Form.Label>Nombres Completo</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="nombreCompleto"
-                                    value={selectedAux.nombreCompleto}
-                                    onChange={handleModalChange}
-                                />
-                            </Form.Group>
-                            {/* Teléfono */}
-                            <Form.Group className="mb-2">
-                                <Form.Label>Teléfono</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="telefono"
-                                    value={selectedAux.telefono}
-                                    onChange={handleModalChange}
-                                />
-                            </Form.Group>
-                            {/* Email */}
-                            <Form.Group className="mb-2">
-                                <Form.Label>Email</Form.Label>
-                                <Form.Control
-                                    type="email"
-                                    name="email"
-                                    value={selectedAux.email}
-                                    disabled // Mantienes el campo deshabilitado
-                                />
-                            </Form.Group>
-                            {/* Fecha Nacimiento y Edad */}
-                            <div className="d-flex justify-content-between">
-                                <Form.Group className="mb-2 w-50 pe-2">
-                                    <Form.Label>Fecha de Nacimiento</Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        name="fechaNacimiento"
-                                        value={selectedAux.fechaNacimiento || ''}
-                                        onChange={handleModalChange}
-                                    />
-                                </Form.Group>
-                                <Form.Group className="mb-2 w-50 ps-2">
-                                    <Form.Label>Edad</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="edad"
-                                        value={selectedAux.edad || '-'}
-                                        readOnly
-                                    />
-                                </Form.Group>
-                            </div>
-                            {/* Sexo */}
-                            <Form.Group className="mb-2">
-                                <Form.Label>Sexo</Form.Label>
-                                <Form.Select
-                                    name="sexo"
-                                    value={selectedAux.sexo || ''}
-                                    onChange={handleModalChange}
-                                >
-                                    <option value="">Seleccionar</option>
-                                    <option value="Masculino">Masculino</option>
-                                    <option value="Femenino">Femenino</option>
-                                    <option value="Indeciso">Prefiero no decirlo</option>
-                                </Form.Select>
-                            </Form.Group>
-                            {/* Estado */}
-                            <Form.Group className="mb-2">
-                                <Form.Label>Estado</Form.Label>
-                                <Form.Select
-                                    name="estado"
-                                    value={selectedAux.estado || 'Pendiente'}
-                                    onChange={handleModalChange}
-                                >
-                                    <option>Pendiente</option>
-                                    <option>Activo</option>
-                                    <option>Inactivo</option>
-                                </Form.Select>
-                            </Form.Group>
-                            {/* Rol */}
-                            <Form.Group className="mb-2">
-                                <Form.Label>Rol</Form.Label>
-                                <Form.Select
-                                    name="rol"
-                                    value={selectedAux.rol || 'usuario'}
-                                    onChange={handleModalChange}
-                                >
-                                    <option value="">Seleccionar</option>
-                                    <option>Usuario</option>
-                                    <option>Invitado</option>
-                                    <option>Admin</option>
-                                </Form.Select>
-                            </Form.Group>
-                        </Form>
-                    )}
+                    {renderModalBody()}
                 </Modal.Body>
                 <Modal.Footer className="modal-footer-custom">
                     <Button variant="secondary" onClick={() => setShowModal(false)}>
                         Cancelar
                     </Button>
-                    <Button variant="primary" onClick={handleSaveChanges}>
+                    <Button variant="primary" onClick={handleSave}>
                         Guardar Cambios
                     </Button>
                 </Modal.Footer>

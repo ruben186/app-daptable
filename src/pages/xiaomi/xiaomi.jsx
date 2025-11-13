@@ -11,9 +11,10 @@ import logo from '../../assets/logos/logoapp-daptable.jpeg';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 import IconoBuscar from '../../assets/Iconos/iconoLupa.png';
-import IconoEditar from '../../assets/Iconos/iconoEditar.png';
-import IconoEliminar from '../../assets/Iconos/iconoEliminar.png';
-import IconoUsuario from '../../assets/Iconos/usuario2.png';
+import IconoPantallaV from '../../assets/Iconos/iconoPantallaVerde.png';
+import IconoPantallaR from '../../assets/Iconos/iconoPantallaRojo.png';
+import IconoBateriaR from '../../assets/Iconos/IconoBateriaR3.png';
+import IconoBateriaV from '../../assets/Iconos/IconoBateriaV.png';
 import IconologoXiami from '../../assets/logos/logoxiaomiverde2.png';
 
 
@@ -75,7 +76,7 @@ function Xiaomi(){
                
                      return;
                  }
-                 
+           
                  
                  
              
@@ -111,28 +112,7 @@ function Xiaomi(){
     // Foto de usuario (si está logueado)
     const user = auth.currentUser;
 
-    const getEstadoClase = (estado) => {
-         switch ((estado || 'Pendiente').toLowerCase()) {
-             case 'activo':
-                 return 'bg-success1'; // Verde
-             case 'inactivo':
-                 return 'bg-danger1'; // Rojo
-             case 'pendiente':
-                 return 'bg-warning1'; // Amarillo
-             default:
-                 return 'bg-secondary1'; // Gris por defecto
-         }
-    };
-    const getRol = (rol) => {
-         switch ((rol || '').toLowerCase()) {
-             case 'usuario':
-                 return 'bg-primary'; 
-             case 'admin':
-                 return 'bg-dark'; 
-             default:
-                 return 'bg-secondary'; // Gris por defecto
-         }
-    };
+   
     
     
     return (
@@ -146,26 +126,21 @@ function Xiaomi(){
                     <div className="table-container">
                             <div className="header-tabla">
                                 {/* Título e Ícono */}
-                                <div className="nombre-tabla">
-                                    <img src={IconoUsuario} width="44px" height="44px" />
+                                
+                                {/* Contador y Búsqueda */}
+                                <div className="d-flex align-items-center">
+                                   
+                                </div>
+                            </div>
+                        <div className='header-tabla2'>
+                            
+                          <div className="nombre-tabla">
+                                    <img src={IconologoXiami} width="54px" height="54px" />
                                     <h2>
                                         
                                     </h2>
                                 </div>
-                                {/* Contador y Búsqueda */}
-                                <div className="d-flex align-items-center">
-                                    {/* Contador */}
-                                    <div className="count-info2">
-                                        <span className="count-number2">{usuariosFiltrados.length}</span> Usuarios Registrados
-                                    </div>
-                                </div>
-                            </div>
-                        <div className='header-tabla2'>
-                             {/* Botón Nuevo */}
-                            <Button variant="success" className="btn-nuevo" onClick={handleNuevo}>
-                                <FaPlus className="plus-new"/> Nuevo
-                            </Button>
-                            {/* Búsqueda */}
+                            
                             <InputGroup className="search-input-group" style={{ maxWidth: '300px' }}>
                                 <Form.Control
                                     type="text"
@@ -191,7 +166,7 @@ function Xiaomi(){
                                       <th>Pantalla</th>
                                      <th>Bateria</th>
                                      <th>Flex Botones</th>
-                                    <th>Otros</th>
+                                    <th>Mas</th>
                                     
                                  </tr>
                              </thead>
@@ -202,27 +177,35 @@ function Xiaomi(){
                                          <td>{aux.modelo}</td>
                                          
                                          <td>
-                                             <span className={`badge estado-badge ${getEstadoClase(aux.estado)}`}>
-                                                 {aux.estado || 'Pendiente'}
+                                             <span className={`badge estado-badge `}>
+                                                 {aux.estado || ''}
+
+                                                  <img src={IconoPantallaV} width="24px" height="34px" />
+                                  
+                                             </span>
+                                         </td>
+                                        
+                                            <td>
+                                             <span className={`badge estado-badge `}>
+                                                 {aux.estado || ''}
+
+                                                  <img src={IconoBateriaR} width="34px" height="24px" />
+                                  
                                              </span>
                                          </td>
                                          <td>
-                                             <span className={`badge estado-badge ${getRol(aux.rol)}`}>
-                                                 {aux.rol || 'usuario'}
-                                             </span>
-                                         </td>
-                                          <td>
-                                             <span className={`badge estado-badge ${getRol(aux.rol)}`}>
-                                                 {aux.rol || 'pantalla'}
+                                             <span className={`badge estado-badge `}>
+                                                 {aux.estado || ''}
+
+                                                  <img src={IconoBateriaV} width="34px" height="34px" />
+                                  
                                              </span>
                                          </td>
 
 
-                                         <td>
                                          
-                                            
-                                             
-                                         </td>
+
+                                         
                                      </tr>
                                  ))}
                              </tbody>
