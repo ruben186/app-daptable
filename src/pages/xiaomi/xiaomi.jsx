@@ -15,6 +15,9 @@ import IconoPantallaV from '../../assets/Iconos/iconoPantallaVerde.png';
 import IconoPantallaR from '../../assets/Iconos/iconoPantallaRojo.png';
 import IconoBateriaR from '../../assets/Iconos/IconoBateriaR3.png';
 import IconoBateriaV from '../../assets/Iconos/IconoBateriaV.png';
+import IconoFlexBotonesV from '../../assets/Iconos/flexBotonesV.png';
+import IconoFlexBotonesR from '../../assets/Iconos/flexBotonesR.png';
+import IconoPiezaA from '../../assets/Iconos/IconoPiezaA.png';
 import IconologoXiami from '../../assets/logos/logoxiaomiverde2.png';
 
 
@@ -134,12 +137,13 @@ function Xiaomi(){
                             </div>
                         <div className='header-tabla2'>
                             
-                          <div className="nombre-tabla">
-                                    <img src={IconologoXiami} width="54px" height="54px" />
-                                    <h2>
-                                        
-                                    </h2>
-                                </div>
+                         <div className="nombre-tabla">
+    <img src={IconologoXiami} width="54px" height="54px" />
+   <h5>
+    si el Iconos es <span style={{ color: 'red' }}>rojo</span> quiere decir que por el momento no hay informacion de Compatibilidad 
+</h5>
+    
+</div>
                             
                             <InputGroup className="search-input-group" style={{ maxWidth: '300px' }}>
                                 <Form.Control
@@ -180,7 +184,7 @@ function Xiaomi(){
                                              <span className={`badge estado-badge `}>
                                                  {aux.estado || ''}
 
-                                                  <img src={IconoPantallaV} width="24px" height="34px" />
+                                                  <img src={IconoPantallaV} width="22x" height="34px" />
                                   
                                              </span>
                                          </td>
@@ -189,7 +193,7 @@ function Xiaomi(){
                                              <span className={`badge estado-badge `}>
                                                  {aux.estado || ''}
 
-                                                  <img src={IconoBateriaR} width="34px" height="24px" />
+                                                  <img src={IconoBateriaR} width="24px" height="34px" />
                                   
                                              </span>
                                          </td>
@@ -197,7 +201,15 @@ function Xiaomi(){
                                              <span className={`badge estado-badge `}>
                                                  {aux.estado || ''}
 
-                                                  <img src={IconoBateriaV} width="34px" height="34px" />
+                                                  <img src={IconoFlexBotonesV} width="34px" height="34px" />
+                                  
+                                             </span>
+                                         </td>
+                                          <td>
+                                             <span className={`badge estado-badge `}>
+                                                 {aux.estado || ''}
+
+                                                  <img src={IconoPiezaA} width="34px" height="34px" />
                                   
                                              </span>
                                          </td>
