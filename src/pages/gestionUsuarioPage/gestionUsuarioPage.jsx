@@ -6,7 +6,7 @@ import { FaEdit, FaTrash, FaUserCircle, FaPlus, FaSearch } from 'react-icons/fa'
 import Swal from 'sweetalert2';
 import { auth, db } from '../../firebase';
 import { signOut } from 'firebase/auth';
-import './registroUsuarioPage.css';
+import './gestionUsuarioPage.css';
 import logo from '../../assets/logos/logoapp-daptable.jpeg';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
@@ -15,7 +15,7 @@ import IconoEditar from '../../assets/Iconos/iconoEditar.png';
 import IconoEliminar from '../../assets/Iconos/iconoEliminar.png';
 import IconoUsuario from '../../assets/Iconos/usuario2.png';
 
-function RegistroUsuariosPage() {
+function GestionUsuariosPage() {
     const navigate = useNavigate(); // Añadir useNavigate
     const [usuarios, setUsuarios] = useState([]);
     const [usuariosFiltrados, setUsuariosFiltrados] = useState([]); // Nuevo estado para usuarios filtrados
@@ -472,4 +472,4 @@ function RegistroUsuariosPage() {
     );
 }
  
-export default RegistroUsuariosPage;
+export default GestionUsuariosPage;

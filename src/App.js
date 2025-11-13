@@ -15,12 +15,14 @@ import UseRefPlay from './pages/playground/UseRefPlay';
 import ProtectedRoute from './pages/components/protecterRoute';
 import DashboardPage from './pages/dashBoardPage/dashBoardPage';
 import ResetPasswordPage from './pages/resetPasswordPage/resetPasswordPage';
-import RegistroUsuarioPage from './pages/registroUsuarioPage/registroUsuarioPage.jsx';
 import GeneradorTabla from './pages/GeneradorTabla/GeneradorTabla.jsx';
 import PerfilPage from './pages/perfilPage/PerfilPage.jsx';
 import GestionAdminPage from './pages/gestionAdminPage/gestionAdminPage.jsx';
+import GestionUsuariosPage from './pages/gestionUsuarioPage/gestionUsuarioPage.jsx';
+import GestionPiezasPage from './pages/gestionPiezasPage/gestionPiezasPage.jsx';
 import Xiaomi from './pages/xiaomi/xiaomi.jsx';
 import RegNuevoUsuario from './pages/registroNuevoUsuario/registroNuevoUsuario';
+
 function App() {
   return (
     <BrowserRouter>
@@ -47,11 +49,18 @@ function App() {
         } />
         
 
-        <Route path="/registroUsuarios" element={
+        <Route path="/gestionUsuarios" element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <RegistroUsuarioPage/>
+            <GestionUsuariosPage/>
           </ProtectedRoute>
         } />
+
+         <Route path="/gestionPiezas" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <GestionPiezasPage/>
+          </ProtectedRoute>
+        } />
+
 
         <Route path="/TablaCel" element={
           <ProtectedRoute allowedRoles={['admin']}>
