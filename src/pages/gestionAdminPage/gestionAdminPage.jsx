@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, deleteDoc, doc, getDoc} from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { Modal, Form, Button } from 'react-bootstrap'; 
 import { FaEdit, FaTrash, FaUser, FaPlus, FaSearch, FaBook, FaBox } from 'react-icons/fa';
@@ -153,7 +153,7 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
                     {filteredData.slice(0, 4).map((item) => (
                         <div key={item.id} className="list-item">
                             <span className="item-text">
-                                {isUserCard ? (item.nombreCompleto || item.email || item.id) : (item.nombre || item.id)}
+                                {isUserCard ? (item.nombreCompleto || item.email || item.id) : `${item.nombre || item.id} ${item.campo ? ' - ' + item.campo : ''}`}
                             </span> 
                             <div className="item-actions">
                                 <button className="btn-icon edit-btn" title="Editar" onClick={() => handleEdit(item)}>
@@ -164,7 +164,7 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
                                     height="30px"
                                     />
                                 </button>
-                                <button className="btn-icon delete-btn" title="Eliminar" onClick={() => handleDelete(item.id)}>
+                                <button className="btn-icon delete-btn" title="Eliminar" onClick={() => handleDelete(item.parentId)}>
                                     <img 
                                     src={IconoEliminar} 
                                     alt="btn-eliminar"
@@ -253,26 +253,74 @@ function GestionAdminPage() {
 
     // 2. Carga de Piezas
     useEffect(() => {
-        const fetchPiezas = async () => {
-            setLoading(true);
-            try {
-                const querySnapshot = await getDocs(collection(db, 'tablas')); 
-                const data = querySnapshot.docs
-                    .map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
+    const fetchPiezas = async () => {
+        setLoading(true);
+        try {
+            const querySnapshot = await getDocs(collection(db, 'tablas')); 
+            
+            const rawPiezas = querySnapshot.docs
+                .map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+            
+            // 💡 Nuevo paso: Aplanar la estructura de datos
+            const flatPiezas = rawPiezas.flatMap(pieza => {
+                // Si 'campos' es un array válido y tiene elementos
+                if (Array.isArray(pieza.campos) && pieza.campos.length > 0) {
+                    return pieza.campos.map((campoItem, index) => ({
+                        // 1. Datos de nivel superior
+                        id: `${pieza.id}-${index}`, // ID ÚNICO para la fila: ID_Documento-Indice_Array
+                        parentId: pieza.id,          // Referencia al ID del documento de Firestore
+                        nombre: pieza.nombre || '',
+                        marca: pieza.marca || '',
+                        modelo: pieza.modelo || '',
+                        
+                        // 2. Datos anidados del array 'campos'
+                        campo: campoItem.campo || '',
+                        codigo: campoItem.codigo || '',
+                        codigoCompatibilidad: campoItem.codigoCompatibilidad || '',
+                        
+                        // 3. Índice original para el manejo de la edición
+                        campoIndex: index 
                     }));
-                setPiezas(data);
-            } catch (error) {
-                console.error("Error al cargar piezas (tablas):", error);
-                setPiezas([]); 
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchPiezas();
-    }, []);
+                }
+                
+                // Si la pieza no tiene campos, aún la incluimos (si es necesario) o la ignoramos.
+                // Aquí la incluiremos como una sola fila 'vacía'.
+                return [{
+                    id: `${pieza.id}-0`, 
+                    parentId: pieza.id,
+                    nombre: pieza.nombre || '',
+                    marca: pieza.marca || '',
+                    modelo: pieza.modelo || '',
+                    campo: '', codigo: '', codigoCompatibilidad: '',
+                    campoIndex: 0
+                }];
+            });
 
+            // ➡️ Ahora, 'flatPiezas' es el array que usará la lista.
+            setPiezas(flatPiezas);
+        } catch (error) {
+            console.error("Error al cargar piezas (tablas):", error);
+            setPiezas([]); 
+        } finally {
+            setLoading(false);
+        }
+    };
+    fetchPiezas();
+}, []);
+const handleNestedFieldChange = (index, fieldName, value) => {
+    setSelectedItem((prev) => {
+        const newCampos = [...prev.campos];
+        // El index debe ser 0 para la edición en el modal
+        newCampos[index] = { 
+            ...newCampos[index],
+            [fieldName]: value
+        };
+        return { ...prev, campos: newCampos };
+    });
+};
     // ------------------------------------------------------------------
     // --- MANEJADORES DE USUARIO ---
     // ------------------------------------------------------------------
@@ -395,26 +443,29 @@ function GestionAdminPage() {
     // --- MANEJADORES DE PIEZA ---
     // ------------------------------------------------------------------
     
-   const handleEditPieza = (pieza) => {
-    // 💡 SOLUCIÓN: Creamos una copia plana, y si existe el array 'campos',
-    // lo usamos para inicializar los campos del modal.
-    const tempItem = {
-        ...pieza,
-        // Usamos campos temporales para el modal, extrayendo el primer elemento si existe
-        campo: (pieza.campos && pieza.campos[0] && pieza.campos[0].campo) || '',
-        codigo: (pieza.campos && pieza.campos[0] && pieza.campos[0].codigo) || '',
-        codigoCompatibilidad: (pieza.campos && pieza.campos[0] && pieza.campos[0].codigoCompatibilidad) || '',
+   const handleEditPieza = (flatPiezaItem) => {
+    // 💡 Paso 1: Usamos la estructura principal del documento y el ID de la fila
+    setSelectedItem({
+        // Datos de nivel superior (usados en la parte superior del modal)
+        id: flatPiezaItem.parentId, // ID del documento de Firestore
+        nombre: flatPiezaItem.nombre,
+        marca: flatPiezaItem.marca,
+        modelo: flatPiezaItem.modelo,
         
-        // Almacenamos el array original de campos si queremos mantener los demás elementos
-        // o si queremos actualizar completamente el array campos en la base de datos.
-        // Aquí vamos a SIMPLIFICAR y solo editamos el primer elemento (índice 0).
-    };
-
-    setSelectedItem(tempItem);
+        // 💡 Paso 2: Crear el array 'campos' SOLO con el elemento que se está editando.
+        // El modal lo leerá como 'selectedItem.campos[0]'.
+        campos: [{ 
+            campo: flatPiezaItem.campo,
+            codigo: flatPiezaItem.codigo,
+            codigoCompatibilidad: flatPiezaItem.codigoCompatibilidad,
+        }],
+        
+        // 💡 Paso 3: Guardamos el índice original para saber qué actualizar en la DB.
+        campoIndexToUpdate: flatPiezaItem.campoIndex 
+    });
     setItemType('pieza');
     setShowModal(true);
 };
-    
     const handleDeletePiezaReal = async (id) => {
         const result = await Swal.fire({
             title:"¿Estás Seguro?", 
@@ -457,63 +508,98 @@ function GestionAdminPage() {
     
     const handleSaveChangesPieza = async () => {
     if (!selectedItem || itemType !== 'pieza') return;
-    
-    // Asumimos que solo editamos el primer elemento del array 'campos'
-    // y que los campos anidados son 'campo', 'codigo', y 'codigoCompatibilidad'.
+    const updatedCampo = selectedItem.campos && selectedItem.campos[0];
+    if (!selectedItem.nombre || !selectedItem.marca || !selectedItem.modelo || !updatedCampo || !updatedCampo.campo || !updatedCampo.codigo || !updatedCampo.codigoCompatibilidad) {
+        Swal.fire({ 
+            title: "Campos Incompletos", 
+            text: "Todos los campos deben ser llenados.", 
+            icon: "error", 
+            background: '#052b27ff', 
+            color: '#ffdfdfff', 
+            confirmButtonColor: '#0b6860ff' 
+        });
+        return;
+    }
     
     try {
         const piezaRef = doc(db, 'tablas', selectedItem.id);
         
-        // 🚨 SOLUCIÓN: Reconstruir el array 'campos' manteniendo la estructura
-        // Al editar solo un conjunto de campos, asumimos que son los únicos o los más relevantes.
+        // 1. Obtener el documento actual de Firestore para obtener el array 'campos' completo
+        const docSnap = await getDoc(piezaRef);
+        if (!docSnap.exists()) {
+            throw new Error("El documento de la pieza no existe.");
+        }
+        const currentData = docSnap.data();
+        const existingCampos = Array.isArray(currentData.campos) ? currentData.campos : [];
+
+        // 2. Crear la nueva versión del campo a actualizar (viene del modal)
+        const updatedCampo = selectedItem.campos[0];
         
-        // El array 'campos' tendrá un solo elemento con los datos editados:
-        const camposArray = [
-            { 
-                campo: selectedItem.campo || '', 
-                codigo: selectedItem.codigo || '', 
-                codigoCompatibilidad: selectedItem.codigoCompatibilidad || '' 
-            },
-        ];
+        // 3. Crear el array de campos actualizado
+        const newCampos = [...existingCampos];
         
-        // Objeto a actualizar en Firebase
+        // 4. Actualizar el elemento en el índice correcto
+        const indexToUpdate = selectedItem.campoIndexToUpdate;
+
+        if (indexToUpdate >= 0 && indexToUpdate < newCampos.length) {
+            newCampos[indexToUpdate] = updatedCampo;
+        } else {
+            // Manejar error o si el elemento fue eliminado por otro admin, etc.
+            Swal.fire({
+                title:'Error', 
+                text: "Índice de campo no válido. El elemento no se pudo actualizar.", 
+                icon: 'error',
+                background: '#052b27ff',
+                color: '#ffdfdfff',
+                confirmButtonColor: '#0b6860ff',
+            });
+            return;
+        }
+
+        // 5. Objeto final a actualizar en Firebase
         const dataToUpdate = {
             nombre: selectedItem.nombre || '',
             marca: selectedItem.marca || '',
             modelo: selectedItem.modelo || '',
-            campos: camposArray, // Guardamos el array reconstruido
+            campos: newCampos, // Guardamos el array completo y corregido
         };
 
-        await updateDoc(piezaRef, dataToUpdate);
-
-        // Actualiza el estado local de piezas (importante para la vista)
         setPiezas(prevPiezas => prevPiezas.map(p => {
-            if (p.id === selectedItem.id) {
-                // Devolvemos el objeto actualizado con los nuevos campos anidados
-                return { ...p, ...dataToUpdate };
+            // Verifica si la fila pertenece al documento que acabamos de editar
+            if (p.parentId === selectedItem.id) {
+                
+                // Actualiza los campos de nivel superior para todas las filas de este documento
+                let updatedRow = { 
+                    ...p, 
+                    nombre: dataToUpdate.nombre, 
+                    marca: dataToUpdate.marca, 
+                    modelo: dataToUpdate.modelo 
+                };
+                
+                // Si esta es la fila específica editada (coincide el índice)
+                if (p.campoIndex === indexToUpdate) {
+                    // Actualiza también los campos anidados de ESA fila específica
+                    updatedRow = {
+                        ...updatedRow,
+                        campo: updatedCampo.campo,
+                        codigo: updatedCampo.codigo,
+                        codigoCompatibilidad: updatedCampo.codigoCompatibilidad,
+                    };
+                }
+                return updatedRow;
             }
-            return p;
+            return p; // Deja las otras piezas sin cambios
         }));
 
+        await updateDoc(piezaRef, dataToUpdate);
+        
+        // ... (Actualización del estado local y mensajes de éxito) ...
         setShowModal(false);
-        Swal.fire({
-            title:'Actualizado', 
-            text: 'Los datos de la pieza fueron actualizados.', 
-            icon: 'success',
-            background: '#052b27ff',
-            color: '#ffdfdfff',
-            confirmButtonColor: '#0b6860ff'
-        });
+        Swal.fire('Actualizado', 'Los datos de la pieza fueron actualizados.', 'success');
+        
     } catch (error) {
         console.error("Error al guardar cambios de pieza:", error);
-        Swal.fire({
-            title:'Error', 
-            text: 'No se pudo actualizar la pieza.', 
-            icon: 'error',
-            background: '#052b27ff',
-            color: '#ffdfdfff',
-            confirmButtonColor: '#0b6860ff'
-        });
+        Swal.fire('Error', 'No se pudo actualizar la pieza.', 'error');
     }
 };
 
@@ -628,6 +714,8 @@ function GestionAdminPage() {
                 </Form>
             );
         } else if (itemType === 'pieza') {
+            const campoItem = selectedItem.campos && selectedItem.campos[0] ? selectedItem.campos[0] : {};
+            const originalIndex = selectedItem.campoIndexToUpdate;
             return (
                 <Form>
                     {/* Nombre */}
@@ -641,23 +729,24 @@ function GestionAdminPage() {
                         />
                     </Form.Group>
                     {/* Campo */}
-                    <Form.Group className="mb-2">
+                   <Form.Group className="mb-2">
                         <Form.Label>Pieza</Form.Label>
                         <Form.Control
                             type="text"
                             name="campo"
-                            value={selectedItem.campo || ''}
-                            onChange={handleModalChangePieza}
+                            value={campoItem.campo || ''}
+                            onChange={(e) => handleNestedFieldChange(0, 'campo', e.target.value)}
                         />
                     </Form.Group>
                     {/* Código */}
-                    <Form.Group className="mb-2">
+                   <Form.Group className="mb-2">
                         <Form.Label>Código de Pieza</Form.Label>
                         <Form.Control
                             type="text"
                             name="codigo"
-                            value={selectedItem.codigo || ''}
-                            onChange={handleModalChangePieza}
+                            value={campoItem.codigo || ''}
+                            onChange={(e) => handleNestedFieldChange(0, 'codigo', e.target.value)}
+                            disabled
                         />
                     </Form.Group>
                     {/* Código Compatibilidad */}
@@ -666,8 +755,8 @@ function GestionAdminPage() {
                         <Form.Control
                             type="text"
                             name="codigoCompatibilidad"
-                            value={selectedItem.codigoCompatibilidad || ''}
-                            onChange={handleModalChangePieza}
+                            value={campoItem.codigoCompatibilidad || ''}
+                            onChange={(e) => handleNestedFieldChange(0, 'codigoCompatibilidad', e.target.value)}
                         />
                     </Form.Group>
                     {/* Marca */}
@@ -678,6 +767,7 @@ function GestionAdminPage() {
                             name="marca"
                             value={selectedItem.marca || ''}
                             onChange={handleModalChangePieza}
+                            disabled
                         />
                     </Form.Group>
                     {/* Modelo */}
@@ -726,7 +816,7 @@ function GestionAdminPage() {
                             collectionName="usuarios"
                             handleEdit={handleEditUser}
                             handleDelete={handleEliminarUser}
-                            link={'/registroUsuarios'}
+                            link={'/gestionUsuarios'}
                             linkNuevo={'/nuevoUsuario'}
                         />
                         
@@ -740,7 +830,7 @@ function GestionAdminPage() {
                             collectionName="piezas"
                             handleEdit={handleEditPieza}
                             handleDelete={handleDeletePiezaReal}
-                            link={'/registroPiezas'}
+                            link={'/gestionPiezas'}
                             linkNuevo={'/nuevaPieza'}
                         />
                         
