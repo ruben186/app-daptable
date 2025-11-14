@@ -503,7 +503,7 @@ const GeneradorTabla = () => {
   };
 
   return (
-    <div className="page-offset">
+    <div className="page-offset bg-gradient2">
       <NavBar/>
       <div className="generador-container">
         <h2>Ingresa Celular</h2>
@@ -669,7 +669,7 @@ const GeneradorTabla = () => {
                     <button className="btn btn-success" onClick={() => exportToCSV(aggregatedMode ? aggregatedRows : tabla.filter((f) => matchesQuery(f)))} style={{ marginLeft: 8 }}>Exportar CSV</button>
                     <button className="btn btn-danger eliminar-btn" onClick={eliminarTabla}>Eliminar Tabla</button>
 
-                    <table className="generador-table">
+                    <table className="tabla-auxiliares">
                       <thead>
                         
                         <tr>
@@ -787,7 +787,7 @@ const GeneradorTabla = () => {
               }
 
               return (
-                <table className="generador-table">
+                <table className="tabla-auxiliares">
                   <thead>
                     <tr>
                       <th>pieza</th>

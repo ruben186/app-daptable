@@ -315,7 +315,7 @@ function PerfilPage() {
 
                     <div className="perfil-avatar">
                         <div className="avatar-circulo">
-                            <img src={userPhoto} alt="Foto de usuario" className="user-photo" />
+                            <img src={userPhoto} className="user-photo" />
                         </div>
                         {modoEdicion ? (
                                 <>

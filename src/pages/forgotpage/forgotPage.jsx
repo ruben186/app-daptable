@@ -19,7 +19,7 @@ function ForgotPasswordPage() {
               title:"Campo vacío", 
               text: "Por favor ingresa tu correo.", 
               icon: "warning",
-              background: '#052b27ff', // Color de fondo personalizado
+              background: '#1c6d65ff', // Color de fondo personalizado
               color: '#ffdfdfff', // Color del texto personalizado
               confirmButtonColor: '#0b6860ff',
             });

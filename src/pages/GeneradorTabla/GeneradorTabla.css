@@ -1,16 +1,17 @@
 .generador-container {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 40px auto;
   padding: 20px;
   font-family: 'Segoe UI', sans-serif;
-  background-color: #fdfdfd;
+  background-color: #05211F;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: #42F1DD;
 }
 
-.generador-container h2 {
+.generador-container h2 { 
   text-align: center;
-  color: #333;
+  color: #42F1DD;
   margin-bottom: 20px;
 }
 
@@ -36,18 +37,22 @@
 
 .btn {
   padding: 8px 12px;
+  position: relative;
+  left: 650px;
   border-radius: 6px;
   border: none;
   cursor: pointer;
   color: #fff;
   font-size: 14px;
+  margin-bottom: 10px;
 }
 
 .btn-primary { background-color: #0078d4; }
 .btn-success { background-color: #28a745; }
 .btn-success-light { background-color: #5cb85c; }
 .btn-gold { background-color: #FFD700; color: #000; }
-.btn-danger { background-color: #d9534f; }
+.btn-danger { background-color: rgba(197, 81, 35, 1)!important; transition: all 0.3s ease;  }
+.btn-danger:hover{ background-color: rgba(197, 81, 35, 1)!important }
 
 .small-input { padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
 .number-input { width: 80px; }
