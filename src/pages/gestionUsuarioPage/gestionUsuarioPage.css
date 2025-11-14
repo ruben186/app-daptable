@@ -9,7 +9,6 @@ CSS
 /* 1. Estilo de Contenedor General */
 .main-content-dashboard {
     /* El fondo de la página entera debe ser muy oscuro */
-    background-color: #000000 !important; 
     min-height: 100vh;
     padding: 0;
 }
@@ -133,8 +132,7 @@ CSS
     border: 5px solid #269689;
     text-align: center;
     vertical-align: middle;
-    padding-top: 15px !important; 
-    padding-bottom: 15px !important;
+    padding: 15px 8px 15px 8px !important; 
     height: 60px; 
 }
 

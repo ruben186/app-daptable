@@ -42,26 +42,38 @@
   cursor: pointer;
   color: #fff;
   font-size: 14px;
-  margin-bottom: 10px;
 }
 
-.btn-primary { background-color: #0078d4; }
+.btn-generar { background-color: #008b8b !important; color: white !important; margin: 0; width: 200px; transition: all 0.3s ease !important;}
+.btn-generar:hover { background-color: #003838 !important;}
 .btn-success { background-color: #28a745; }
 .btn-success-light { background-color: #5cb85c; }
-.btn-gold { background-color: #FFD700 !important; transition: all 0.3s ease;}
-.btn-gold:hover{ background-color: #a78e00!important }
+.btn-gold { background-color: #93ad00 !important; transition: all 0.3s ease; color: white!important;}
+.btn-gold:hover{ background-color: #849200!important }
 .btn-danger { background-color: rgba(197, 81, 35, 1)!important; transition: all 0.3s ease;}
 .btn-danger:hover{ background-color: rgb(155, 62, 25)!important }
 
-.eliminar-btn{position: relative; left: 650px;}
-.exportar-btn{position: relative; left: 650px;}
-.editar-btn{position: relative; left: 650px;}
 
-.small-input { padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
+.small-input { 
+  padding: 8px; 
+  border-radius: 6px;
+  background: #073532;
+  border: none;
+  color: white;
+}
+.small-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(14, 128, 84);
+}
+.small-input::placeholder {
+  color: rgba(66,241,221,0.25);
+}
 .number-input { width: 80px; }
 
-.brand-select { padding: 6px; border-radius: 6px; border: 1px solid #ccc; }
+.brand-select { padding: 6px; border-radius: 6px; border: 1px solid #005f4e; }
+.brand-select:focus { outline: none;}
 .num-campos { display: inline-block; margin-left: 12px; }
+.num-campos label {margin-right: 8px;}
 
 .generador-form input {
   flex: 1;
@@ -137,4 +149,42 @@
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 4px;
+}
+
+.tabla-edicion-input{
+  background: #073532;
+  border: none;
+  color: white;
+  padding: 10px 12px;
+  border-radius: 4px;    
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  appearance: none;
+  background-clip: padding-box;
+}
+.tabla-edicion-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(255, 255, 255);
+}
+.contenedor-otros-marca{
+  padding: 5px;
+}
+.contenedor-otros-marca h5,p{
+  align-items: center;
+  text-align: center;
+}
+.contenedor-otros-marca h5{
+  margin-top: 10px;
+}
+.select-marca{
+  display: flex;
+  align-items: center;
+  text-align: center;
+  flex-direction: column;
+  justify-content: center;
 }

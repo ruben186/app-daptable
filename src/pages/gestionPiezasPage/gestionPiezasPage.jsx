@@ -249,7 +249,7 @@ function GestionPiezasPage() {
     };
     
     const handleSearch = (e) => setSearchTerm(e.target.value);
-    const handleNuevo = () => navigate('/nuevaPieza'); // Nueva ruta para crear piezas
+    const handleNuevo = () => navigate('/TablaCel'); // Nueva ruta para crear piezas
     const handleEliminar = async (id) => { /* Lógica de eliminación de pieza (documento completo) */ }; // Implementación pendiente
 
     // --- JSX ---
@@ -275,7 +275,7 @@ function GestionPiezasPage() {
                         </div>
                         <div className='header-tabla2'>
                             <Button variant="success" className="btn-nuevo" onClick={handleNuevo}>
-                                <FaPlus className="plus-new"/> Nuevo
+                                <FaPlus className="plus-new"/> Nueva Pieza
                             </Button>
                             <InputGroup className="search-input-group" style={{ maxWidth: '300px' }}>
                                 <Form.Control
@@ -338,7 +338,7 @@ function GestionPiezasPage() {
             {/* MODAL EDICIÓN */}
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Editar Pieza - Fila {selectedItem?.campoIndexToUpdate + 1}</Modal.Title>
+                    <Modal.Title>Editar Pieza</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {selectedItem && selectedItem.campos && selectedItem.campos[0] && (

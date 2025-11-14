@@ -831,7 +831,7 @@ const handleNestedFieldChange = (index, fieldName, value) => {
                             handleEdit={handleEditPieza}
                             handleDelete={handleDeletePiezaReal}
                             link={'/gestionPiezas'}
-                            linkNuevo={'/nuevaPieza'}
+                            linkNuevo={'/TablaCel'}
                         />
                         
                         {/* 3. SECCIÓN M. ESTUDIO  */}

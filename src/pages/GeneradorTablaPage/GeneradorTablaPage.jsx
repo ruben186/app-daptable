@@ -570,65 +570,71 @@ const GeneradorTabla = () => {
             <div className="generador-actions">
               <button className="btn btn-gold" onClick={() => { setModoEdicion(!modoEdicion); setAggregatedMode(false); }}>{modoEdicion ? 'Cancelar' : 'Editar'}</button>
               {/* Brand select shown after generating the table */}
-              <div style={{ display: 'inline-block', marginLeft: 12 }}>
-                <label style={{ marginRight: 8 }}>Marca:</label>
-                <select
-                  value={marca}
-                 // Necesitas reemplazar tu función inline con una lógica más compleja: 
-                  onChange={(e) => {
-                      const nuevaMarca = e.target.value;
-                      if (nuevaMarca === 'Otros') {
-                          // Lógica para abrir modal y resetear la selección (opcional)
-                          setMostrarModal(true);
-                          //setMarca(''); 
-                      } else {
-                          // Lógica normal
-                          setMarca(nuevaMarca);
-                      }
-                  }}
-                  className="brand-select"
-                >
-                  <option value="">-- Selecciona marca --</option>
-                  {marcasDisponibles.map((m) => (
-                    <option key={m} value={m}>{m}</option>
-                    
-                  ))}
-                </select>
+              <div  className='select-marca' style={{ marginLeft: 12}}>
+                <div>
+                  <label style={{ marginRight: 8 }}>Marca:</label>
+                  <select
+                    value={marca}
+                  // Necesitas reemplazar tu función inline con una lógica más compleja: 
+                    onChange={(e) => {
+                        const nuevaMarca = e.target.value;
+                        if (nuevaMarca === 'Otros') {
+                            // Lógica para abrir modal y resetear la selección (opcional)
+                            setMostrarModal(true);
+                            //setMarca(''); 
+                        } else {
+                            // Lógica normal
+                            setMarca(nuevaMarca);
+                        }
+                    }}
+                    className="brand-select"
+                  >
+                    <option value="">-- Selecciona marca --</option>
+                    {marcasDisponibles.map((m) => (
+                      <option key={m} value={m}>{m}</option>
+                      
+                    ))}
+                  </select>
+                </div>
+                
 
                 {/* 4. MODAL VISIBLE CONDICIONALMENTE */}
-      {mostrarModal && (
-        <div >
-          <div >
-            <h4>Agregar Nueva Marca 🛠️</h4>
-            <p>Ingresa el nombre de la nueva marca:</p>
-            <input
-              type="text"
-              value={nuevaMarcaInput}
-              onChange={(e) => setNuevaMarcaInput(e.target.value)}
-              placeholder="Ej: Google Pixel"
-              style={{ padding: '8px', width: '90%', marginBottom: '15px' }}
-            />
-            <br />
-            <button 
-              onClick={handleAgregarMarca}
-              style={{ padding: '10px 15px', marginRight: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', cursor: 'pointer' }}
-            >
-              Guardar y Seleccionar
-            </button>
-            <button 
-              onClick={() => {
-                  setMostrarModal(false); 
-                  setNuevaMarcaInput('');
-                  // Si cancela, volvemos a la selección previa
-                  setMarcaSeleccionada(''); 
-              }}
-              style={{ padding: '10px 15px', backgroundColor: '#6c757d', color: 'white', border: 'none', cursor: 'pointer' }}
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-      )}
+                {mostrarModal && (
+                  <div>
+                    <div className='contenedor-otros-marca'>
+                      <h5>Agregar Nueva Marca</h5>
+                      <p>Ingresa el nombre de la nueva marca:</p>
+                      <input
+                        type="text"
+                        value={nuevaMarcaInput}
+                        onChange={(e) => setNuevaMarcaInput(e.target.value)}
+                        placeholder="Ej: Google Pixel"
+                        className='small-input'
+                        style={{ padding: '8px', width: '90%', marginBottom: '15px' }}
+                      />
+                      <br />
+                      <button 
+                        onClick={handleAgregarMarca}
+                        className='btn-generar'
+                        style={{ padding: '10px 15px', marginRight: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', cursor: 'pointer' }}
+                      >
+                        Guardar y Seleccionar
+                      </button>
+                      <button 
+                        onClick={() => {
+                            setMostrarModal(false); 
+                            setNuevaMarcaInput('');
+                            // Si cancela, volvemos a la selección previa
+                            setMarcaSeleccionada(''); 
+                        }}
+                        className='btn-danger'
+                        style={{ padding: '10px 15px', backgroundColor: '#6c757d', color: 'white', border: 'none', cursor: 'pointer' }}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                )}
 
               </div>
 
@@ -656,7 +662,7 @@ const GeneradorTabla = () => {
                   const rowsAgg = aggregatedRows;
                   if (!rowsAgg.length) {
                     return (
-                      <div style={{ padding: 20, textAlign: 'center', color: '#666' }}>
+                      <div style={{ padding: 20, textAlign: 'center' }}>
                         No se encontraron resultados para la búsqueda.
                       </div>
                     );
@@ -664,11 +670,11 @@ const GeneradorTabla = () => {
                   return (
 
                     <>
-                    <button className="btn btn-gold editar-btn" onClick={() => { setModoEdicion(!modoEdicion); }}>{modoEdicion ? 'Cancelar' : 'Editar'}</button>
-
+                    <div className='generador-actions'>
+                      <button className="btn btn-gold editar-btn" onClick={() => { setModoEdicion(!modoEdicion); }}>{modoEdicion ? 'Cancelar' : 'Editar'}</button>
                     <button className="btn btn-success exportar-btn" onClick={() => exportToCSV(aggregatedMode ? aggregatedRows : tabla.filter((f) => matchesQuery(f)))} style={{ marginLeft: 8 }}>Exportar CSV</button>
-                    <button className="btn btn-danger eliminar-btn" onClick={eliminarTabla}>Eliminar Tabla</button>
-
+                    <button className="btn btn-danger eliminar-btn" onClick={eliminarTabla} style={{ marginLeft: 8 }}>Eliminar Tabla</button>
+                    </div>
                     <table className="tabla-auxiliares">
                       <thead>
                         
@@ -688,6 +694,7 @@ const GeneradorTabla = () => {
                             {modoEdicion ? (
                               <input
                                 type="text"
+                                className='tabla-edicion-input'
                                 value={fila.nombre}
                                 onChange={(e) => editarCampo(index, e.target.value)}
                               />
@@ -699,6 +706,7 @@ const GeneradorTabla = () => {
                             {modoEdicion ? (
                               <input
                                 type="text"
+                                className='tabla-edicion-input'
                                 value={fila.modelo}
                                 onChange={(e) => editarCampo(index, e.target.value)}
                               />
@@ -710,6 +718,7 @@ const GeneradorTabla = () => {
                             {modoEdicion ? (
                               <input
                                 type="text"
+                                className='tabla-edicion-input'
                                 value={fila.marca}
                                 onChange={(e) => editarCampo(index, e.target.value)}
                               />
@@ -722,6 +731,7 @@ const GeneradorTabla = () => {
                             {modoEdicion ? (
                               <input
                                 type="text"
+                                className='tabla-edicion-input'
                                 value={fila.campo}
                                 onChange={(e) => editarCampo(index, e.target.value)}
                               />
@@ -732,6 +742,7 @@ const GeneradorTabla = () => {
                               modoEdicion ? (
                               <input
                                 type="text"
+                                className='tabla-edicion-input'
                                 value={fila.codigo}
                                 onChange={(e) => editarCampo(index, e.target.value)}
                               />
@@ -743,6 +754,7 @@ const GeneradorTabla = () => {
                             modoEdicion ? (
                               <input
                                 type="text"
+                                className='tabla-edicion-input'
                                 value={fila.codigoCompatibilidad|| ''}
                                 onChange={(e) => editarCampo(index, e.target.value)}
                               />
@@ -763,11 +775,12 @@ const GeneradorTabla = () => {
               const rows = tabla.filter((f) => matchesQuery(f));
               if (!rows.length) {
                 return (
-                  <div style={{ padding: 20, textAlign: 'center', color: '#666' }}>
+                  <div style={{ padding: 20, textAlign: 'center'}}>
                     <div>No se encontraron resultados.</div>
                     <div style={{ marginTop: 12 }}>
                       <label style={{ display: 'block', marginBottom: 6 }}>Ingrese el modelo del celular para generarlo:</label>
-                      <input
+                      <div style={{ display:'flex', justifyContent:'center'}}>
+                        <input
                         type="text"
                         name="nuevoModelo"
                         placeholder="Ej: XT1962-4 (Modelo del celular)"
@@ -776,11 +789,12 @@ const GeneradorTabla = () => {
                         className="small-input"
                       />
                       <button
-                        className="btn btn-primary"
+                        className="btn btn-generar"
                         style={{ marginLeft: 8 }}
                         onClick={() => generarTablaConModeloManual(nuevoModeloInput)}
                       
                       >Generar ahora</button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -802,6 +816,7 @@ const GeneradorTabla = () => {
                           {modoEdicion ? (
                             <input
                               type="text"
+                              className='tabla-edicion-input'
                               value={fila.campo}
                               onChange={(e) => editarCampo(index, e.target.value)}
                             />
@@ -813,6 +828,7 @@ const GeneradorTabla = () => {
                           {modoEdicion ? (
                             <input
                               type="text"
+                              className='tabla-edicion-input'
                               value={fila.codigo}
                               onChange={(e) => editarCodigo(index, e.target.value)}
                             />
@@ -824,6 +840,7 @@ const GeneradorTabla = () => {
                           {modoEdicion ? (
                             <input
                               type="text"
+                              className='tabla-edicion-input'
                               value={fila.codigoCompatibilidad || ''}
                               onChange={(e) => editarCompatibilidad(index, e.target.value)}
                             />
