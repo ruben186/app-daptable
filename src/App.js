@@ -15,7 +15,7 @@ import UseRefPlay from './pages/playground/UseRefPlay';
 import ProtectedRoute from './pages/components/protecterRoute';
 import DashboardPage from './pages/dashBoardPage/dashBoardPage';
 import ResetPasswordPage from './pages/resetPasswordPage/resetPasswordPage';
-import GeneradorTabla from './pages/GeneradorTabla/GeneradorTabla.jsx';
+import GeneradorTablaPage from './pages/GeneradorTablaPage/GeneradorTablaPage.jsx';
 import PerfilPage from './pages/perfilPage/PerfilPage.jsx';
 import GestionAdminPage from './pages/gestionAdminPage/gestionAdminPage.jsx';
 import GestionUsuariosPage from './pages/gestionUsuarioPage/gestionUsuarioPage.jsx';
@@ -64,7 +64,7 @@ function App() {
 
         <Route path="/TablaCel" element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <GeneradorTabla/>
+            <GeneradorTablaPage/>
           </ProtectedRoute>
         } />
         

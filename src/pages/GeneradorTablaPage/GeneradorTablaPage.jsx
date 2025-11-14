@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 // ⬅️ Importamos doc y setDoc para el ID personalizado
 import { doc, setDoc, getDoc, collection, getDocs } from 'firebase/firestore'; 
 import { db } from '../../firebase'; // Asegúrate de que esta ruta sea correcta
-import './GeneradorTabla.css';
+import './GeneradorTablaPage.css';
 import NavBar from '../components/NavBarPage';
 
 const GeneradorTabla = () => {
@@ -664,9 +664,9 @@ const GeneradorTabla = () => {
                   return (
 
                     <>
-                    <button className="btn btn-gold" onClick={() => { setModoEdicion(!modoEdicion); }}>{modoEdicion ? 'Cancelar' : 'Editar'}</button>
+                    <button className="btn btn-gold editar-btn" onClick={() => { setModoEdicion(!modoEdicion); }}>{modoEdicion ? 'Cancelar' : 'Editar'}</button>
 
-                    <button className="btn btn-success" onClick={() => exportToCSV(aggregatedMode ? aggregatedRows : tabla.filter((f) => matchesQuery(f)))} style={{ marginLeft: 8 }}>Exportar CSV</button>
+                    <button className="btn btn-success exportar-btn" onClick={() => exportToCSV(aggregatedMode ? aggregatedRows : tabla.filter((f) => matchesQuery(f)))} style={{ marginLeft: 8 }}>Exportar CSV</button>
                     <button className="btn btn-danger eliminar-btn" onClick={eliminarTabla}>Eliminar Tabla</button>
 
                     <table className="tabla-auxiliares">

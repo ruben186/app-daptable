@@ -37,8 +37,6 @@
 
 .btn {
   padding: 8px 12px;
-  position: relative;
-  left: 650px;
   border-radius: 6px;
   border: none;
   cursor: pointer;
@@ -50,9 +48,14 @@
 .btn-primary { background-color: #0078d4; }
 .btn-success { background-color: #28a745; }
 .btn-success-light { background-color: #5cb85c; }
-.btn-gold { background-color: #FFD700; color: #000; }
-.btn-danger { background-color: rgba(197, 81, 35, 1)!important; transition: all 0.3s ease;  }
-.btn-danger:hover{ background-color: rgba(197, 81, 35, 1)!important }
+.btn-gold { background-color: #FFD700 !important; transition: all 0.3s ease;}
+.btn-gold:hover{ background-color: #a78e00!important }
+.btn-danger { background-color: rgba(197, 81, 35, 1)!important; transition: all 0.3s ease;}
+.btn-danger:hover{ background-color: rgb(155, 62, 25)!important }
+
+.eliminar-btn{position: relative; left: 650px;}
+.exportar-btn{position: relative; left: 650px;}
+.editar-btn{position: relative; left: 650px;}
 
 .small-input { padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
 .number-input { width: 80px; }
@@ -64,7 +67,7 @@
   flex: 1;
   padding: 10px;
   font-size: 16px;
-  border: 1px solid #ccc;
+  border: 1px solid #005f4e;
   border-radius: 6px;
 }
 
