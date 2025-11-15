@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 // ⬅️ Importamos doc y setDoc para el ID personalizado
-import { doc, setDoc, getDoc, collection, getDocs } from 'firebase/firestore'; 
+import { doc, setDoc, getDoc, collection, getDocs, updateDoc } from 'firebase/firestore'; 
 import { Modal, Button, Form } from 'react-bootstrap';
 import { db } from '../../firebase'; // Asegúrate de que esta ruta sea correcta
 import './GeneradorTablaPage.css';
@@ -31,6 +31,7 @@ const GeneradorTabla = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const fetchMarcasUnicas = async () => {
@@ -43,6 +44,9 @@ const GeneradorTabla = () => {
         
         // Usar un Set para deduplicar los nombres de marca
         const marcasSet = new Set();
+
+        const params = new URLSearchParams(location.search);
+        const queryFromUrl = params.get('query');
         
         snapshot.forEach((doc) => {
           const data = doc.data();
@@ -52,12 +56,28 @@ const GeneradorTabla = () => {
             marcasSet.add(marca.trim()); 
           }
         });
-        
         // Convertir el Set de vuelta a Array y añadir 'Otros'
         const listaMarcas = [...Array.from(marcasSet), 'Otros'];
 
         // Actualizar el estado con la lista sin repeticiones
         setMarcasDisponibles(listaMarcas);
+
+        if (queryFromUrl) {
+          const decodedQuery = decodeURIComponent(queryFromUrl);
+          if (remoteTablas.length === 0 && !remoteLoading) {
+              fetchRemoteTablas(); 
+          }
+
+          setSearchQuery(decodedQuery);
+
+          updateSuggestions(decodedQuery); 
+
+          setShowResults(true); 
+
+          setModoEdicion(true);
+
+          setShowSuggestions(false);
+        }
 
       } catch (error) {
         console.error("Error al obtener las marcas de Firebase: ", error);
@@ -66,7 +86,7 @@ const GeneradorTabla = () => {
     };
 
     fetchMarcasUnicas();
-  }, []); // El array vacío asegura que
+  }, [location.search, remoteTablas.length]); // El array vacío asegura que
 
   // Manejador para cuando cambia la selección en el <select>
   const handleChange = (e) => {
@@ -372,39 +392,6 @@ const GeneradorTabla = () => {
     }
    };
 
-  // Exportar filas (filtradas) a CSV
-  const exportToCSV = (rowsParam) => {
-    const rows = Array.isArray(rowsParam) ? rowsParam : tabla.filter((f) => matchesQuery(f));
-    if (!rows.length) {
-      alert('No hay filas para exportar');
-      return;
-    }
-
-    const headers = ['Nombre', 'Modelo', 'Marca', 'Pieza', 'Código', 'Código compatibilidad'];
-    const csvLines = [];
-    csvLines.push(headers.join(','));
-    rows.forEach((r) => {
-      // Escape comas si es necesario
-      const safe = (s) => `"${(s || '').toString().replace(/"/g, '""')}"`;
-      const rowNombre = (r && r.nombre) ? r.nombre : nombre;
-      const rowModelo = (r && r.modelo) ? r.modelo : modelo;
-      const rowMarca = (r && r.marca) ? r.marca : marca;
-      csvLines.push([safe(rowNombre), safe(rowModelo), safe(rowMarca), safe(r.campo), safe(r.codigo), safe(r.codigoCompatibilidad || '')].join(','));
-    });
-
-    const csvContent = csvLines.join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-  const baseName = (rowsParam && aggregatedMode) ? (searchQuery ? searchQuery.replace(/\s+/g, '_') : 'resultados') : (generarDocId(nombre, modelo) || 'tabla');
-  a.download = `${baseName}_export.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
   const editarCodigo = (index, nuevoCodigo) => {
     const copia = [...tabla];
     copia[index].codigo = nuevoCodigo;
@@ -497,6 +484,110 @@ const GeneradorTabla = () => {
   }
   };
 
+  const guardarCambiosAgregados = async () => {
+    if (!aggregatedRows || aggregatedRows.length === 0) {
+        alert("No hay datos para guardar.");
+        return;
+    }
+
+    if (!window.confirm("¡Advertencia! Está a punto de guardar cambios en múltiples documentos. ¿Desea continuar?")) {
+        return;
+    }
+
+    // Opcional: Establecer un estado de carga si lo tienes (ej: setLoading(true))
+
+    // 1. Agrupar las filas editadas por su ID de documento padre (parentId)
+    const updatesByDocId = {};
+
+    aggregatedRows.forEach(row => {
+        const docId = row.parentId; 
+        
+        // Inicializar el array para el documento si es la primera vez que se ve
+        if (!updatesByDocId[docId]) {
+            updatesByDocId[docId] = [];
+        }
+        
+        // Almacenar solo los datos relevantes para la actualización
+        updatesByDocId[docId].push({
+            campo: row.campo,
+            codigo: row.codigo,
+            codigoCompatibilidad: row.codigoCompatibilidad,
+            campoIndex: row.campoIndex // El índice es crucial para apuntar al elemento correcto
+        });
+    });
+
+    const docIdsToUpdate = Object.keys(updatesByDocId);
+    let successfulUpdates = 0;
+    
+    // 2. Ejecutar las actualizaciones de documentos
+    for (const docId of docIdsToUpdate) {
+        const editedFields = updatesByDocId[docId];
+        const docRef = doc(db, 'tablas', docId); // Asegúrate de tener 'db' y 'doc' importados
+        const docSnap = await getDoc(docRef);    // Asegúrate de tener 'getDoc' importado
+
+        if (docSnap.exists()) {
+            const existingData = docSnap.data();
+            // Clonar el array existente para modificarlo
+            const existingFields = [...existingData.campos]; 
+            let changed = false;
+
+            // Aplicar los cambios de las filas agregadas al array de campos original
+            editedFields.forEach(editedField => {
+                const index = editedField.campoIndex;
+                if (index >= 0 && index < existingFields.length) {
+                    const originalField = existingFields[index];
+                    
+                    // Solo actualizamos si detectamos un cambio en codigo o codigoCompatibilidad
+                    if (originalField.codigo !== editedField.codigo || 
+                        originalField.codigoCompatibilidad !== editedField.codigoCompatibilidad) 
+                    {
+                        // Sobrescribir el campo específico manteniendo otras propiedades originales
+                        existingFields[index] = {
+                            ...originalField,
+                            codigo: editedField.codigo,
+                            codigoCompatibilidad: editedField.codigoCompatibilidad,
+                        };
+                        changed = true;
+                    }
+                }
+            });
+
+            // Si se detectó algún cambio, escribir en Firebase
+            if (changed) {
+                try {
+                    await updateDoc(docRef, { campos: existingFields }); // Asegúrate de tener 'updateDoc' importado
+                    successfulUpdates++;
+                } catch (error) {
+                    console.error(`Error al actualizar documento ${docId}:`, error);
+                }
+            }
+        }
+    }
+
+    // Opcional: Establecer un estado de carga (ej: setLoading(false))
+    setModoEdicion(false);
+    
+    if (successfulUpdates > 0) {
+        alert(`Cambios guardados exitosamente en ${successfulUpdates} documento(s).`);
+        // Opcional: Re-ejecutar la búsqueda para recargar los datos
+    } else {
+        alert("No se detectaron cambios en los documentos filtrados.");
+    }
+};
+
+const handleAggregatedRowChange = (newValue, parentId, campoIndex, fieldName) => {
+    setAggregatedRows(prevRows => {
+        return prevRows.map(row => {
+            if (row.parentId === parentId && row.campoIndex === campoIndex) {
+                return { 
+                    ...row, 
+                    [fieldName]: newValue // Actualiza el estado
+                };
+            }
+            return row;
+        });
+    });
+};
   return (
     <div className="page-offset bg-gradient2">
       <NavBar/>
@@ -667,9 +758,24 @@ const GeneradorTabla = () => {
 
                     <>
                     <div className='generador-actions'>
-                      <button className="btn btn-gold editar-btn" onClick={() => { setModoEdicion(!modoEdicion); }}>{modoEdicion ? 'Cancelar' : 'Editar'}</button>
-                    <button className="btn btn-success exportar-btn" onClick={() => exportToCSV(aggregatedMode ? aggregatedRows : tabla.filter((f) => matchesQuery(f)))} style={{ marginLeft: 8 }}>Exportar CSV</button>
-                    <button className="btn btn-danger volver-btn" onClick={volver} style={{ marginLeft: 8 }}>Volver</button>
+                       {modoEdicion && (
+                          <button 
+                              className="btn btn-success" 
+                              onClick={guardarCambiosAgregados} 
+                              style={{ marginLeft: '8px' }}
+                          >
+                              Guardar Cambios
+                          </button>
+                      )}
+                      <button 
+                          className={`btn ${modoEdicion ? 'volver-btn' : 'btn-gold'}`} 
+                          onClick={() => { setModoEdicion(!modoEdicion); }}
+                      >
+                          {modoEdicion ? 'Cancelar Edición' : 'Editar Tabla'}
+                      </button>
+                     
+                      
+                      <button className="btn btn-danger volver-btn" onClick={volver} style={{ marginLeft: 8 }}>Volver</button>
                     </div>
                     <table className="tabla-auxiliares">
                       <thead>
@@ -686,29 +792,9 @@ const GeneradorTabla = () => {
                       <tbody>
                         {rowsAgg.map((fila, index) => (
                           <tr key={`${fila._id || 'r'}-${index}`}>
-                            <td>
-                            {modoEdicion ? (
-                              <input
-                                type="text"
-                                className='tabla-edicion-input'
-                                value={fila.nombre}
-                                onChange={(e) => editarCampo(index, e.target.value)}
-                              />
-                                )  
-                              
-                          : (fila.nombre)}</td>
+                            <td>{fila.nombre}</td>
 
-                            <td>
-                            {modoEdicion ? (
-                              <input
-                                type="text"
-                                className='tabla-edicion-input'
-                                value={fila.modelo}
-                                onChange={(e) => editarCampo(index, e.target.value)}
-                              />
-                            
-                            ) 
-                              : (fila.modelo)}</td>
+                            <td>{fila.modelo}</td>
 
                             <td>
                             {modoEdicion ? (
@@ -716,35 +802,23 @@ const GeneradorTabla = () => {
                                 type="text"
                                 className='tabla-edicion-input'
                                 value={fila.marca}
-                                onChange={(e) => editarCampo(index, e.target.value)}
+                                onChange={(e) => 
+                                    handleAggregatedRowChange(
+                                        e.target.value, 
+                                        fila.parentId, 
+                                        fila.campoIndex, 
+                                        'marca'
+                                    )
+                                }
                               />
                             
                             ) 
                               : (fila.marca)}</td>
                             
                                 
-                            <td>
-                            {modoEdicion ? (
-                              <input
-                                type="text"
-                                className='tabla-edicion-input'
-                                value={fila.campo}
-                                onChange={(e) => editarCampo(index, e.target.value)}
-                              />
-                            ) 
-                              : (fila.campo)}</td>
+                            <td>{fila.campo}</td>
 
-                            <td>{
-                              modoEdicion ? (
-                              <input
-                                type="text"
-                                className='tabla-edicion-input'
-                                value={fila.codigo}
-                                onChange={(e) => editarCampo(index, e.target.value)}
-                              />
-                            ) 
-                              : (fila.codigo)
-                              }</td>
+                            <td>{fila.codigo}</td>
 
                             <td>{
                             modoEdicion ? (
@@ -752,7 +826,14 @@ const GeneradorTabla = () => {
                                 type="text"
                                 className='tabla-edicion-input'
                                 value={fila.codigoCompatibilidad|| ''}
-                                onChange={(e) => editarCampo(index, e.target.value)}
+                                onChange={(e) => 
+                                    handleAggregatedRowChange(
+                                        e.target.value, 
+                                        fila.parentId, 
+                                        fila.campoIndex, 
+                                        'codigoCompatibilidad'
+                                    )
+                                }
                               />
                             ) 
                               : (fila.codigoCompatibilidad || '')

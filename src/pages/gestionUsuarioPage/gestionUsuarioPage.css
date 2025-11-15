@@ -81,6 +81,7 @@ CSS
     border: none; 
     border-radius: 6px;
     margin-right: 5px;
+    margin-left: 10px;
 }
 .search-input-group .form-control.search-buscar {
     background: #22887F;
@@ -320,4 +321,16 @@ div:where(.swal2-container).swal2-backdrop-show, div:where(.swal2-container).swa
 }
 .bg-warning1{
     background-color:darkgoldenrod !important;
+}
+
+.exportar-btn{
+    margin: 0;
+    position: relative;
+    left: 250px;
+    background-color: #147068 !important; 
+    color: #42F1DD !important;
+    border: none !important;
+}
+.exportar-btn:hover{
+    background-color: #12534d !important;
 }

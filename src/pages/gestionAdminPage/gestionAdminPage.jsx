@@ -444,27 +444,36 @@ const handleNestedFieldChange = (index, fieldName, value) => {
     // ------------------------------------------------------------------
     
    const handleEditPieza = (flatPiezaItem) => {
-    // 💡 Paso 1: Usamos la estructura principal del documento y el ID de la fila
+    const nombreCelular = flatPiezaItem.nombre || ''; 
+    const modelo = flatPiezaItem.modelo || '';     
+
+    const combinedQuery = `${nombreCelular} ${modelo}`.trim();
+
+    if (combinedQuery) {
+        
+        // Codificar la única cadena combinada
+        const queryTerm = encodeURIComponent(combinedQuery);
+
+        // 2. Navegar con UN SOLO parámetro de consulta: 'query'
+        navigate(`/TablaCel?query=${queryTerm}`);
+    } else {
+        console.error("No se pudo generar la cadena de búsqueda combinada.");
+        return;
+    }
     setSelectedItem({
-        // Datos de nivel superior (usados en la parte superior del modal)
-        id: flatPiezaItem.parentId, // ID del documento de Firestore
+        id: flatPiezaItem.parentId, 
         nombre: flatPiezaItem.nombre,
         marca: flatPiezaItem.marca,
         modelo: flatPiezaItem.modelo,
-        
-        // 💡 Paso 2: Crear el array 'campos' SOLO con el elemento que se está editando.
-        // El modal lo leerá como 'selectedItem.campos[0]'.
+
         campos: [{ 
             campo: flatPiezaItem.campo,
             codigo: flatPiezaItem.codigo,
             codigoCompatibilidad: flatPiezaItem.codigoCompatibilidad,
         }],
-        
-        // 💡 Paso 3: Guardamos el índice original para saber qué actualizar en la DB.
+
         campoIndexToUpdate: flatPiezaItem.campoIndex 
     });
-    setItemType('pieza');
-    setShowModal(true);
 };
     const handleDeletePiezaReal = async (id) => {
         const result = await Swal.fire({
@@ -713,85 +722,14 @@ const handleNestedFieldChange = (index, fieldName, value) => {
                     </Form.Group>
                 </Form>
             );
-        } else if (itemType === 'pieza') {
-            const campoItem = selectedItem.campos && selectedItem.campos[0] ? selectedItem.campos[0] : {};
-            const originalIndex = selectedItem.campoIndexToUpdate;
-            return (
-                <Form>
-                    {/* Nombre */}
-                    <Form.Group className="mb-2">
-                        <Form.Label>Nombre del Celular</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="nombre"
-                            value={selectedItem.nombre || ''}
-                            onChange={handleModalChangePieza}
-                        />
-                    </Form.Group>
-                    {/* Campo */}
-                   <Form.Group className="mb-2">
-                        <Form.Label>Pieza</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="campo"
-                            value={campoItem.campo || ''}
-                            onChange={(e) => handleNestedFieldChange(0, 'campo', e.target.value)}
-                        />
-                    </Form.Group>
-                    {/* Código */}
-                   <Form.Group className="mb-2">
-                        <Form.Label>Código de Pieza</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="codigo"
-                            value={campoItem.codigo || ''}
-                            onChange={(e) => handleNestedFieldChange(0, 'codigo', e.target.value)}
-                            disabled
-                        />
-                    </Form.Group>
-                    {/* Código Compatibilidad */}
-                    <Form.Group className="mb-2">
-                        <Form.Label>Código Compatibilidad</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="codigoCompatibilidad"
-                            value={campoItem.codigoCompatibilidad || ''}
-                            onChange={(e) => handleNestedFieldChange(0, 'codigoCompatibilidad', e.target.value)}
-                        />
-                    </Form.Group>
-                    {/* Marca */}
-                    <Form.Group className="mb-2">
-                        <Form.Label>Marca</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="marca"
-                            value={selectedItem.marca || ''}
-                            onChange={handleModalChangePieza}
-                            disabled
-                        />
-                    </Form.Group>
-                    {/* Modelo */}
-                    <Form.Group className="mb-2">
-                        <Form.Label>Modelo</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="modelo"
-                            value={selectedItem.modelo || ''}
-                            onChange={handleModalChangePieza}
-                        />
-                    </Form.Group>
-                </Form>
-            );
         }
         return null;
     };
     
     const handleSave = itemType === 'usuario' ? handleSaveChangesUser : 
-                       itemType === 'pieza' ? handleSaveChangesPieza : 
                        () => alert('Función de guardado no definida');
                        
-    const modalTitle = itemType === 'usuario' ? 'Editar Usuario' : 
-                       itemType === 'pieza' ? 'Editar Pieza' : 
+    const modalTitle = itemType === 'usuario' ? 'Editar Usuario': 
                        'Editar Registro';
 
 

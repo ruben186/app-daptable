@@ -290,6 +290,48 @@ function GestionPiezasPage() {
         }
     }; 
 
+    const exportToCSV = (rowsToExport) => {
+        // Usamos directamente las filas proporcionadas (piezasFiltradas)
+        const rows = rowsToExport; 
+
+        if (!rows.length) {
+            alert('No hay filas para exportar');
+            return;
+        }
+
+        const headers = ['Nombre', 'Modelo', 'Marca', 'Pieza', 'Codigo', 'Codigo compatibilidad'];
+        const csvLines = [];
+        csvLines.push(headers.join(';'));
+        
+        rows.forEach((r) => {
+            // Escape comas si es necesario
+            const safe = (s) => `"${(s || '').toString().replace(/"/g, '""')}"`;
+            csvLines.push([
+                safe(r.nombre), 
+                safe(r.modelo), 
+                safe(r.marca), 
+                safe(r.campo), 
+                safe(r.codigo), 
+                safe(r.codigoCompatibilidad || '')
+            ].join(';'));
+        });
+
+        const csvContent = csvLines.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        
+        // Generar un nombre de archivo más simple para esta vista
+        const baseName = searchTerm ? `piezas_${searchTerm.replace(/\s+/g, '_')}` : 'piezas_completas';
+        a.download = `${baseName}_export.csv`;
+        
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
     // --- JSX ---
     return (
         <>
@@ -314,6 +356,9 @@ function GestionPiezasPage() {
                         <div className='header-tabla2'>
                             <Button variant="success" className="btn-nuevo" title='Ingresar nuevo Celular' onClick={handleNuevo}>
                                 <FaPlus className="plus-new" /> Nuevo
+                            </Button>
+                            <Button className="btn-success exportar-btn" onClick={()=> exportToCSV(piezasFiltradas)}>
+                                Exportar CSV
                             </Button>
                             <InputGroup className="search-input-group" style={{ maxWidth: '300px' }}>
                                 <Form.Control

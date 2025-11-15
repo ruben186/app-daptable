@@ -48,9 +48,9 @@
 .btn-generar:hover { background-color: #003838 !important;}
 .btn-success { background-color: #28a745; }
 .btn-success-light { background-color: #5cb85c; }
-.btn-gold { background-color: #93ad00 !important; transition: all 0.3s ease; color: white!important;}
+.btn-gold { background-color: #93ad00 !important; color: white!important; transition: all 0.3s ease !important; }
 .btn-gold:hover{ background-color: #849200!important }
-.volver-btn{background-color: rgba(197, 81, 35, 1)!important; transition: all 0.3s ease;}
+.volver-btn{background-color: rgba(197, 81, 35, 1)!important; color:white!important; transition: all 0.3s ease !important; }
 .volver-btn:hover{background-color: rgb(119, 49, 21)!important;}
 
 .small-input { 
@@ -111,10 +111,6 @@
   border: none;
   border-radius: 6px;
   cursor: pointer;
-}
-
-.generador-actions button:first-child {
-  background-color: #ffc107;
 }
 
 .generador-actions button:hover {
