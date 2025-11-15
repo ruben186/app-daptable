@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 // ⬅️ Importamos doc y setDoc para el ID personalizado
 import { doc, setDoc, getDoc, collection, getDocs } from 'firebase/firestore'; 
+import { Modal, Button, Form } from 'react-bootstrap';
 import { db } from '../../firebase'; // Asegúrate de que esta ruta sea correcta
 import './GeneradorTablaPage.css';
 import NavBar from '../components/NavBarPage';
@@ -26,6 +28,9 @@ const GeneradorTabla = () => {
   const [marcaSeleccionada, setMarcaSeleccionada] = useState('');
   const [mostrarModal, setMostrarModal] = useState(false);
   const [nuevaMarcaInput, setNuevaMarcaInput] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMarcasUnicas = async () => {
@@ -418,18 +423,8 @@ const GeneradorTabla = () => {
     setTabla(copia);
   };
 
-  const eliminarTabla = () => {
-    if (tabla.length === 0) return;
-    const confirm = window.confirm('¿Deseas eliminar la tabla generada? Esta acción limpiará los datos en la interfaz.');
-    if (!confirm) return;
-    
-    // Limpieza de estados en la interfaz
-    setTabla([]);
-    setNombre('');
-    setModelo('');
-    setMarca('');
-    setModoEdicion(false);
-    setNumCampos(7);
+  const volver = () => {
+    navigate(-1);
   };
 
   const cambiarNumCampos = (nuevoNum) => {
@@ -599,47 +594,48 @@ const GeneradorTabla = () => {
                 
 
                 {/* 4. MODAL VISIBLE CONDICIONALMENTE */}
-                {mostrarModal && (
-                  <div>
-                    <div className='contenedor-otros-marca'>
-                      <h5>Agregar Nueva Marca</h5>
-                      <p>Ingresa el nombre de la nueva marca:</p>
-                      <input
-                        type="text"
-                        value={nuevaMarcaInput}
-                        onChange={(e) => setNuevaMarcaInput(e.target.value)}
-                        placeholder="Ej: Google Pixel"
-                        className='small-input'
-                        style={{ padding: '8px', width: '90%', marginBottom: '15px' }}
-                      />
-                      <br />
-                      <button 
-                        onClick={handleAgregarMarca}
-                        className='btn-generar'
-                        style={{ padding: '10px 15px', marginRight: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', cursor: 'pointer' }}
-                      >
-                        Guardar y Seleccionar
-                      </button>
-                      <button 
-                        onClick={() => {
+                <Modal show={mostrarModal} onHide={() => {
+                // Función de cancelación completa
+                setMostrarModal(false); 
+                setNuevaMarcaInput('');
+                // setMarcaSeleccionada(''); 
+                setMarca(''); 
+                }}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Agregar Nueva Marca</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Nombre de la nueva marca:</Form.Label>
+                                <input
+                                  type="text"
+                                  value={nuevaMarcaInput}
+                                  className='tabla-edicion-input'
+                                  onChange={(e) => setNuevaMarcaInput(e.target.value)}
+                                  placeholder="Ej: Google Pixel"
+                                />
+                            </Form.Group>
+                        </Form>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        {/* Botón Cancelar */}
+                        <Button variant="secondary" onClick={() => {
                             setMostrarModal(false); 
                             setNuevaMarcaInput('');
-                            // Si cancela, volvemos a la selección previa
-                            setMarcaSeleccionada(''); 
-                        }}
-                        className='btn-danger'
-                        style={{ padding: '10px 15px', backgroundColor: '#6c757d', color: 'white', border: 'none', cursor: 'pointer' }}
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </div>
-                )}
+                            // setMarcaSeleccionada(''); // Si aplica
+                            setMarca('');
+                        }}>
+                            Cancelar
+                        </Button>
+                        <Button variant="primary" onClick={handleAgregarMarca}>
+                            Guardar y Seleccionar
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
 
               </div>
 
-              {/* search is in the main form now */}
-              {/* Control para cambiar el número de campos */}
               {modoEdicion && (
                 <div className="num-campos">
                   <label>Número de campos:</label>
@@ -673,7 +669,7 @@ const GeneradorTabla = () => {
                     <div className='generador-actions'>
                       <button className="btn btn-gold editar-btn" onClick={() => { setModoEdicion(!modoEdicion); }}>{modoEdicion ? 'Cancelar' : 'Editar'}</button>
                     <button className="btn btn-success exportar-btn" onClick={() => exportToCSV(aggregatedMode ? aggregatedRows : tabla.filter((f) => matchesQuery(f)))} style={{ marginLeft: 8 }}>Exportar CSV</button>
-                    <button className="btn btn-danger eliminar-btn" onClick={eliminarTabla} style={{ marginLeft: 8 }}>Eliminar Tabla</button>
+                    <button className="btn btn-danger volver-btn" onClick={volver} style={{ marginLeft: 8 }}>Volver</button>
                     </div>
                     <table className="tabla-auxiliares">
                       <thead>

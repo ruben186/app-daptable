@@ -469,7 +469,7 @@ const handleNestedFieldChange = (index, fieldName, value) => {
     const handleDeletePiezaReal = async (id) => {
         const result = await Swal.fire({
             title:"¿Estás Seguro?", 
-            text: "¡No podrás recuperar este registro de pieza!", 
+            text: "¡Esto eliminara el registro del telefono y sus piezas!", 
             icon: "warning",
             showCancelButton: true,
             background: '#052b27ff',
@@ -720,7 +720,7 @@ const handleNestedFieldChange = (index, fieldName, value) => {
                 <Form>
                     {/* Nombre */}
                     <Form.Group className="mb-2">
-                        <Form.Label>Nombre de la Pieza</Form.Label>
+                        <Form.Label>Nombre del Celular</Form.Label>
                         <Form.Control
                             type="text"
                             name="nombre"
@@ -822,7 +822,7 @@ const handleNestedFieldChange = (index, fieldName, value) => {
                         
                         {/* 2. SECCIÓN PIEZAS  */}
                         <DataCard
-                            title="Piezas"
+                            title="Celulares y Partes"
                             icon={IconoPieza}
                             data={piezas}
                             searchQuery={searchQueryPiezas}

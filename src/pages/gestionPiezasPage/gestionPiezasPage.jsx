@@ -249,8 +249,46 @@ function GestionPiezasPage() {
     };
     
     const handleSearch = (e) => setSearchTerm(e.target.value);
-    const handleNuevo = () => navigate('/TablaCel'); // Nueva ruta para crear piezas
-    const handleEliminar = async (id) => { /* Lógica de eliminación de pieza (documento completo) */ }; // Implementación pendiente
+    const handleNuevo = () => navigate('/TablaCel'); 
+    const handleEliminar = async (id) => {  
+        const result = await Swal.fire({
+            title:"¿Estás Seguro?", 
+            text: "¡Esto eliminara el registro del telefono y sus piezas!", 
+            icon: "warning",
+            showCancelButton: true,
+            background: '#052b27ff',
+            color: '#ffdfdfff',
+            confirmButtonColor: '#07433E',
+            cancelButtonColor: 'rgba(197, 81, 35, 1)',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await deleteDoc(doc(db, 'tablas', id)); // Asumiendo que las Piezas están en la colección 'tablas'
+                setPiezas(piezas.filter(p => p.id !== id));
+                Swal.fire({
+                    title: 'Eliminado', 
+                    text: 'Registro de pieza eliminado correctamente.', 
+                    icon: 'success',
+                    background: '#052b27ff',
+                    color: '#ffdfdfff',
+                    confirmButtonColor: '#0b6860ff'
+                });
+            } catch (error) {
+                console.error("Error al eliminar pieza:", error);
+                Swal.fire({
+                    title:"Error", 
+                    text: "No se pudo eliminar el registro de pieza.", 
+                    icon: "error",
+                    background: '#052b27ff',
+                    color: '#ffdfdfff',
+                    confirmButtonColor: '#0b6860ff',
+                });
+            }
+        }
+    }; 
 
     // --- JSX ---
     return (
@@ -265,7 +303,7 @@ function GestionPiezasPage() {
                         <div className="header-tabla">
                             <div className="nombre-tabla">
                                 <img src={IconoPieza} width="44px" height="44px" />
-                                <h2>Piezas y Componentes</h2>
+                                <h2>Celulares y Partes</h2>
                             </div>
                             <div className="d-flex align-items-center">
                                 <div className="count-info2">
@@ -274,8 +312,8 @@ function GestionPiezasPage() {
                             </div>
                         </div>
                         <div className='header-tabla2'>
-                            <Button variant="success" className="btn-nuevo" onClick={handleNuevo}>
-                                <FaPlus className="plus-new"/> Nueva Pieza
+                            <Button variant="success" className="btn-nuevo" title='Ingresar nuevo Celular' onClick={handleNuevo}>
+                                <FaPlus className="plus-new" /> Nuevo
                             </Button>
                             <InputGroup className="search-input-group" style={{ maxWidth: '300px' }}>
                                 <Form.Control
@@ -314,6 +352,7 @@ function GestionPiezasPage() {
                                             <Button
                                                 variant="warning"
                                                 size="sm"
+                                                title='Editar pieza'
                                                 className="me-2"
                                                 onClick={() => handleEditPieza(item)}
                                             >
@@ -322,6 +361,7 @@ function GestionPiezasPage() {
                                             <Button
                                                 variant="danger"
                                                 size="sm"
+                                                title='Eliminar datos completos del celular'
                                                 onClick={() => handleEliminar(item.parentId)}
                                             >
                                                 <img src={IconoEliminar} alt="btn-eliminar" width="30px" height="30px" />

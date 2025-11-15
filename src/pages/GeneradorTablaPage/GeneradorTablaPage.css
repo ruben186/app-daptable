@@ -50,9 +50,8 @@
 .btn-success-light { background-color: #5cb85c; }
 .btn-gold { background-color: #93ad00 !important; transition: all 0.3s ease; color: white!important;}
 .btn-gold:hover{ background-color: #849200!important }
-.btn-danger { background-color: rgba(197, 81, 35, 1)!important; transition: all 0.3s ease;}
-.btn-danger:hover{ background-color: rgb(155, 62, 25)!important }
-
+.volver-btn{background-color: rgba(197, 81, 35, 1)!important; transition: all 0.3s ease;}
+.volver-btn:hover{background-color: rgb(119, 49, 21)!important;}
 
 .small-input { 
   padding: 8px; 
@@ -170,6 +169,9 @@
 .tabla-edicion-input:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgb(255, 255, 255);
+}
+.tabla-edicion-input::placeholder {
+  color: rgba(66,241,221,0.25);
 }
 .contenedor-otros-marca{
   padding: 5px;

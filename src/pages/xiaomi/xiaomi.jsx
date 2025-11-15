@@ -128,8 +128,8 @@ function Xiaomi() {
                         <div className='header-tabla2'>
 
                             <div className="nombre-tabla">
-                                className='mover-logo-xiaomi'
-                                <img src={IconologoXiami} width="54px" height="54px" alt="Logo de la aplicación" />
+                                
+                                <img src={IconologoXiami}className='mover-logo-xiaomi' width="54px" height="54px" alt="Logo de la aplicación" />
                                 < h5 className='texto-separado'>
 
                                     si un icono es <span style={{ color: 'red' }}>rojo</span> quiere decir que por el momento no hay informacion de Compatibilidad
