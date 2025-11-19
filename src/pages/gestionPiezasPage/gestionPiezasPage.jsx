@@ -14,9 +14,7 @@ import IconoEditar from '../../assets/Iconos/iconoEditar.png';
 import IconoEliminar from '../../assets/Iconos/iconoEliminar.png';
 import IconoPieza from '../../assets/Iconos/iconoPieza.png'; // Reemplazado por icono de Pieza
 
-// -----------------------------------------------------------
-// 💡 FUNCIÓN DE AYUDA CLAVE: APLANA DOCUMENTOS DE PIEZAS
-// -----------------------------------------------------------
+
 const flattenPiezas = (docs) => {
     let flattenedList = [];
     docs.forEach(doc => {
@@ -51,7 +49,7 @@ function GestionPiezasPage() {
     const [piezas, setPiezas] = useState([]); // Antes: usuarios
     const [piezasFiltradas, setPiezasFiltradas] = useState([]); // Antes: usuariosFiltrados
     const [showModal, setShowModal] = useState(false);
-    const [selectedItem, setSelectedItem] = useState(null); // Antes: selectedAux
+    const [selectedItem, setSelectedItem] = useState(null); 
     const [searchTerm, setSearchTerm] = useState('');
 
     // 1. OBTENCIÓN DE DATOS Y APLANAMIENTO
@@ -106,26 +104,24 @@ function GestionPiezasPage() {
     const handleEditPieza = (item) => {
         // Establecer el selectedItem con los datos de la fila aplanada
         // Estos datos incluyen el índice de array (campoIndex) y el ID del padre (parentId)
-        setSelectedItem({
-            id: item.parentId, // ID del documento principal en Firestore
-            parentId: item.parentId, 
-            campoIndexToUpdate: item.campoIndex, // Índice dentro del array 'campos'
-            nombre: item.nombre,
-            marca: item.marca,
-            modelo: item.modelo,
-            // Los campos anidados se envían como un array de 1 elemento para facilitar el manejo del modal
-            campos: [{ 
-                campo: item.campo, 
-                codigo: item.codigo, 
-                codigoCompatibilidad: item.codigoCompatibilidad 
-            }]
-        });
-        setShowModal(true);
-    };
+        const nombreCelular = item.nombre || ''; 
+        const modelo = item.modelo || '';     
 
-    // -----------------------------------------------------------
-    // LÓGICA DE GUARDADO (LA SOLUCIÓN AL PROBLEMA)
-    // -----------------------------------------------------------
+        const combinedQuery = `${nombreCelular} ${modelo}`.trim();
+
+        if (combinedQuery) {
+            
+            // Codificar la única cadena combinada
+            const queryTerm = encodeURIComponent(combinedQuery);
+
+            // 2. Navegar con UN SOLO parámetro de consulta: 'query'
+            navigate(`/TablaCel?query=${queryTerm}`);
+        } else {
+            console.error("No se pudo generar la cadena de búsqueda combinada.");
+            return;
+        }
+       
+    };
     const handleSaveChangesPieza = async () => {
         if (!selectedItem || !selectedItem.id) return;
         
@@ -179,7 +175,6 @@ function GestionPiezasPage() {
 
             await updateDoc(piezaRef, dataToUpdate);
 
-            // 💡 SOLUCIÓN: ACTUALIZACIÓN DEL ESTADO LOCAL DE PIEZAS
             setPiezas(prevPiezas => prevPiezas.map(p => {
                 // Verifica si la fila pertenece al documento que estamos editando
                 if (p.parentId === selectedItem.id) {

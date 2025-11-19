@@ -460,20 +460,6 @@ const handleNestedFieldChange = (index, fieldName, value) => {
         console.error("No se pudo generar la cadena de búsqueda combinada.");
         return;
     }
-    setSelectedItem({
-        id: flatPiezaItem.parentId, 
-        nombre: flatPiezaItem.nombre,
-        marca: flatPiezaItem.marca,
-        modelo: flatPiezaItem.modelo,
-
-        campos: [{ 
-            campo: flatPiezaItem.campo,
-            codigo: flatPiezaItem.codigo,
-            codigoCompatibilidad: flatPiezaItem.codigoCompatibilidad,
-        }],
-
-        campoIndexToUpdate: flatPiezaItem.campoIndex 
-    });
 };
     const handleDeletePiezaReal = async (id) => {
         const result = await Swal.fire({

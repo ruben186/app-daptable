@@ -30,6 +30,8 @@ function Xiaomi() {
     const [searchTerm, setSearchTerm] = useState(''); // Nuevo estado para la búsqueda
 
     useEffect(() => {
+
+        
         const fetchUsuarios = async () => {
             const querySnapshot = await getDocs(collection(db, 'tablas'));
             const data = querySnapshot.docs
@@ -41,7 +43,6 @@ function Xiaomi() {
                     const marca = user.marca?.toLowerCase();
                     const codigoCompatibilidad = user.codigoCompatibilidad?.toLowerCase();
                     return marca === 'redmi' || marca === 'xiaomi' || marca === '-' || codigoCompatibilidad === 'bn56' || codigoCompatibilidad === '-';
-                    ;
                 });
 
             setUsuarios(data);
@@ -55,10 +56,9 @@ function Xiaomi() {
         const results = usuarios.filter(user =>
             user.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.modelo?.toLowerCase().includes(searchTerm.toLowerCase())
-
         );
         setUsuariosFiltrados(results);
-    }, [searchTerm, usuarios]); // Se ejecuta cuando cambia el término de búsqueda o la lista original de usuarios
+    }, [searchTerm, usuarios]);
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
@@ -67,24 +67,62 @@ function Xiaomi() {
 
 
 
+
+    
+
     const handleSaveChanges = async () => {
         try {
             const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
             const soloNumeros = /^[0-9]+$/;
-            if (selectedAux.nombre === '' || selectedAux.Modelo === ''
-            ) {
-
+            if (selectedAux.nombre === '' || selectedAux.Modelo === '') {
                 return;
             }
 
 
+            // --- ⬇️ COLOQUE LA FUNCIÓN getIconoEstado AQUÍ ⬇️ ---
 
+    const getIconoEstado = (tipoPieza, aux) => {
+        let pieza;
 
+        switch (tipoPieza) {
+            case 'pantalla':
+                // Nota: Asegúrate de que 'aux.pantalla' sea la propiedad correcta
+                // que contiene el objeto con 'codigoCompatibilidad'.
+                pieza = aux.pantalla; 
+                break;
+            case 'bateria':
+                pieza = aux.bateria;
+                break;
+            case 'flexBotones':
+                pieza = aux.flexBotones;
+                break;
+            default:
+                return IconoPiezaA;
+        }
+
+        // Comprobación segura y concisa: 
+        const codigo = pieza?.codigoCompatibilidad ?? '';
+        const tieneCompatibilidad = codigo !== '';
+
+        // Asignación de ícono
+        if (tipoPieza === 'pantalla') {
+            return tieneCompatibilidad ? IconoPantallaV : IconoPantallaR;
+        }
+        if (tipoPieza === 'bateria') {
+            return tieneCompatibilidad ? IconoBateriaV : IconoBateriaR;
+        }
+        if (tipoPieza === 'flexBotones') {
+            return tieneCompatibilidad ? IconoFlexBotonesV : IconoFlexBotonesR;
+        }
+
+        return IconoPiezaA;
+    };
+
+    // --- ⬆️ FUNCIÓN getIconoEstado TERMINA AQUÍ ⬆️ ---
             const auxRef = doc(db, 'tablas', selectedAux.id);
             await updateDoc(auxRef, {
                 nombreCompleto: selectedAux.nombre,
                 modelo: selectedAux.modelo,
-
             });
 
             // Actualizar la lista de usuarios principal y la filtrada
@@ -103,12 +141,29 @@ function Xiaomi() {
         }
     };
 
+    // --- NUEVA FUNCIÓN PARA EL CLIC DEL BOTÓN/IMAGEN ---
+    const handleIconClick = (tipoPieza, aux) => {
+        // 'tipoPieza' será 'pantalla', 'bateria' o 'flexBotones'
+        // 'aux' contiene los datos de la fila (el dispositivo)
+        
+        // Aquí puedes ejecutar la acción que necesites, por ejemplo:
+        // 1. Mostrar un SweetAlert con la información específica:
+        Swal.fire({
+            title: `${tipoPieza.toUpperCase()} - ${aux.nombre} ${aux.modelo}`,
+            text: `Hiciste clic en el ícono de ${tipoPieza}. Aquí puedes mostrar
+                   la información de compatibilidad o llevar al usuario a otra página.`,
+            icon: 'info',
+            confirmButtonText: 'Cerrar'
+        });
+
+        // 2. Navegar a una ruta con los detalles (si tienes una ruta):
+        // navigate(`/detalles/${aux.id}/${tipoPieza}`);
+
+        console.log(`Clic en ${tipoPieza} para el dispositivo: ${aux.nombre}`);
+    };
 
     // Foto de usuario (si está logueado)
     const user = auth.currentUser;
-
-
-
 
     return (
         <>
@@ -172,42 +227,70 @@ function Xiaomi() {
                                         <td>{aux.nombre}</td>
                                         <td>{aux.modelo}</td>
 
-                                        <td>
-                                            <span className={`badge estado-badge `}>
-                                                {aux.estado || ''}
-
-                                                <img src={IconoPantallaV} width="22x" height="34px" alt="Logo de la aplicación"/>
-
-                                            </span>
+                                        {/* Columna Pantalla - Implementación como botón */}
+                                        <td style={{ textAlign: 'center' }}>
+                                            {/* Usamos Button para que actúe como botón */}
+                                            <Button
+                                                variant="link" // Usa variant="link" para quitar el fondo del botón de Bootstrap
+                                                onClick={() => handleIconClick('pantalla', aux)}
+                                                className="p-0 border-0" // Quita padding y borde del botón
+                                            >
+                                                <img
+                                                    src={IconoPantallaV} 
+                                                    width="22x" 
+                                                    height="34px" 
+                                                    alt="Ícono de Pantalla"
+                                                />
+                                            </Button>
                                         </td>
 
-                                        <td>
-                                            <span className={`badge estado-badge `}>
-                                                {aux.estado || ''}
-
-                                                <img src={IconoBateriaR} width="24px" height="34px" alt="Logo de la aplicación" />
-
-                                            </span>
+                                        {/* Columna Bateria - Implementación como botón */}
+                                        <td style={{ textAlign: 'center' }}>
+                                            <Button
+                                                variant="link" 
+                                                onClick={() => handleIconClick('bateria', aux)}
+                                                className="p-0 border-0"
+                                            >
+                                                <img
+                                                    src={IconoBateriaR} 
+                                                    width="24px" 
+                                                    height="34px" 
+                                                    alt="Ícono de Batería" 
+                                                />
+                                            </Button>
                                         </td>
-                                        <td>
-                                            <span className={`badge estado-badge `}>
-                                                {aux.estado || ''}
-
-                                                <img src={IconoFlexBotonesV} width="34px" height="34px" alt="Logo de la aplicación"/>
-
-                                            </span>
+                                        
+                                        {/* Columna Flex Botones - Implementación como botón */}
+                                        <td style={{ textAlign: 'center' }}>
+                                            <Button
+                                                variant="link" 
+                                                onClick={() => handleIconClick('flexBotones', aux)}
+                                                className="p-0 border-0"
+                                            >
+                                                <img
+                                                    src={IconoFlexBotonesV} 
+                                                    width="34px" 
+                                                    height="34px" 
+                                                    alt="Ícono de Flex de Botones"
+                                                />
+                                            </Button>
                                         </td>
-                                        <td>
-                                            <span className={`badge estado-badge `}>
-                                                {aux.estado || ''}
-
-                                                <img src={IconoPiezaA} width="34px" height="34px"alt="Logo de la aplicación" />
-
-                                            </span>
+                                        
+                                        {/* Columna Más (sin cambios, solo por si también quieres que sea botón) */}
+                                        <td style={{ textAlign: 'center' }}>
+                                            <Button
+                                                variant="link" 
+                                                onClick={() => handleIconClick('mas', aux)}
+                                                className="p-0 border-0"
+                                            >
+                                                <img 
+                                                    src={IconoPiezaA} 
+                                                    width="34px" 
+                                                    height="34px" 
+                                                    alt="Ícono Más" 
+                                                />
+                                            </Button>
                                         </td>
-
-
-
                                     </tr>
                                 ))}
                             </tbody>
