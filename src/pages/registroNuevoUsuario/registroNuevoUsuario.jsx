@@ -13,6 +13,8 @@ function RegistroNuevoUsuario() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [sexoOpen, setSexoOpen] = useState(false);
+  const [estadoOpen, setEstadoOpen] = useState(false);
+  const [rolOpen, setRolOpen] = useState(false);
   const [formData, setFormData] = useState({
     nombreCompleto: '',
     fechaNacimiento: '',
@@ -226,14 +228,14 @@ function RegistroNuevoUsuario() {
 
           <div className="mb-3">
             <label className="form-label">Estado</label>
-            <div className={`select-wrapper ${sexoOpen ? 'open' : ''}`}>
+            <div className={`select-wrapper ${estadoOpen ? 'open' : ''}`}>
               <select
                 className="form-control2"
                 name="estado"
                 value={formData.estado}
                 onChange={handleChange}
-                onBlur={() => setSexoOpen(false)}
-                onClick={() => setSexoOpen(prev => !prev)}
+                onBlur={() => setEstadoOpen(false)}
+                onClick={() => setEstadoOpen(prev => !prev)}
               >
                 <option value="">Seleccionar</option>
                 <option>Pendiente</option>
@@ -246,14 +248,14 @@ function RegistroNuevoUsuario() {
 
           <div className="mb-3">
             <label className="form-label">Rol</label>
-            <div className={`select-wrapper ${sexoOpen ? 'open' : ''}`}>
+            <div className={`select-wrapper ${rolOpen ? 'open' : ''}`}>
               <select
                 className="form-control2"
                 name="rol"
                 value={formData.rol}
                 onChange={handleChange}
-                onBlur={() => setSexoOpen(false)}
-                onClick={() => setSexoOpen(prev => !prev)}
+                onBlur={() => setRolOpen(false)}
+                onClick={() => setRolOpen(prev => !prev)}
               >
                 <option value="">Seleccionar</option>
                 <option>Usuario</option>

@@ -5,6 +5,8 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import { db } from '../../firebase'; // Asegúrate de que esta ruta sea correcta
 import './GeneradorTablaPage.css';
 import NavBar from '../components/NavBarPage';
+import Swal from 'sweetalert2';
+import { FaPlus } from 'react-icons/fa';
 
 const GeneradorTabla = () => {
   const [nombre, setNombre] = useState('');
@@ -12,7 +14,8 @@ const GeneradorTabla = () => {
   const [marca, setMarca] = useState(''); // Estado para la marca
   const [searchQuery, setSearchQuery] = useState('');
   const [tabla, setTabla] = useState([]);
-  const [modoEdicion, setModoEdicion] = useState(false);
+  const [modoEdicionLocal, setModoEdicionLocal] = useState(false);
+  const [modoEdicionAgregada, setModoEdicionAgregada] = useState(false);
   const [numCampos, setNumCampos] = useState(7);
   const [remoteTablas, setRemoteTablas] = useState([]);
   const [remoteLoading, setRemoteLoading] = useState(false);
@@ -27,7 +30,6 @@ const GeneradorTabla = () => {
   const [marcaSeleccionada, setMarcaSeleccionada] = useState('');
   const [mostrarModal, setMostrarModal] = useState(false);
   const [nuevaMarcaInput, setNuevaMarcaInput] = useState('');
-  const [originalAggregatedRows, setOriginalAggregatedRows] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -72,7 +74,7 @@ const GeneradorTabla = () => {
 
           setShowResults(true); 
 
-          setModoEdicion(true);
+          setModoEdicionAgregada(true);
 
           setShowSuggestions(false);
         }
@@ -112,7 +114,7 @@ const GeneradorTabla = () => {
     // Usamos el spread operator para mantener las marcas existentes y añadir la nueva
     const nuevaMarcaNormalizada = nuevaMarcaInput.trim();
     
-    // Verificamos que no se esté agregando una marca duplicada (opcional, pero buena práctica)
+    // Verificamos que no se esté agregando una marca duplicada 
     if (marcasDisponibles.includes(nuevaMarcaNormalizada)) {
         alert("Esa marca ya existe en la lista.");
         setNuevaMarcaInput('');
@@ -188,9 +190,10 @@ const GeneradorTabla = () => {
     });
     setNuevoModeloInput('');
     setTabla(nuevaTabla);
-    setModoEdicion(false);
+    setModoEdicionLocal(false);
     setTableGenerated(true);
     setShowResults(true);
+    setModoEdicionAgregada(false);
   };
 
   // Helper para generar el ID del documento basado en Nombre y Modelo
@@ -344,7 +347,7 @@ const GeneradorTabla = () => {
     const found = [];
     const agg = [];
     remoteTablas.forEach((d) => {
-  // sugerencias: añadir hasta 6 documentos que coincidan
+    // sugerencias: añadir hasta 6 documentos que coincidan
       if (found.length < 6) {
         const docText = (extractText(d) + ' ' + (d._id || '')).toString().toLowerCase();
         const allTermsMatch = qlTerms.every(term => docText.includes(term));
@@ -354,7 +357,7 @@ const GeneradorTabla = () => {
         }
       }
 
-  // filas agregadas: para cada campo en el documento, si el texto combinado de la fila coincide, añadir a agg
+    // filas agregadas: para cada campo en el documento, si el texto combinado de la fila coincide, añadir a agg
       const campos = Array.isArray(d.campos) ? d.campos : [];
       campos.forEach((c) => {
       const combinedRow = {
@@ -385,7 +388,7 @@ const GeneradorTabla = () => {
       setAggregatedRows([]);
       setAggregatedMode(false);
     }
-   };
+  };
 
   const editarCodigo = (index, nuevoCodigo) => {
     const copia = [...tabla];
@@ -463,15 +466,22 @@ const GeneradorTabla = () => {
       fecha: new Date().toISOString(),
     });
 
-    alert(`Tabla guardada en Firebase con ID: ${docId}. Campos limpiados.`);
+    Swal.fire({
+      title:"¡Celular Guardado!", 
+      text: `Celular guardado correctamente en Firebase con ID: ${docId}.`, 
+      icon: "success",
+      background: '#052b27ff', // Color de fondo personalizado
+      color: '#ffffffff', // Color del texto personalizado
+      confirmButtonColor: '#0b6860ff',
+    })
 
     // 5. LIMPIAR TODOS LOS ESTADOS para una nueva tarea
     setNombre('');
     setModelo('');
     setMarca('');
     setTabla([]);
-    setModoEdicion(false);
-  setNumCampos(7);
+    setModoEdicionLocal(false);
+    setNumCampos(7);
 
   } catch (error) {
     console.error('Error al guardar en Firebase:', error);
@@ -506,19 +516,23 @@ const GeneradorTabla = () => {
         for (const docId of docIdsModificados) {
             const data = cambiosPorDoc[docId];
             const docRef = doc(db, 'tablas', docId);
-
-            // Nota: Aquí se está sobrescribiendo el arreglo 'campos' completo del documento, 
-            // aunque solo se hayan editado algunos 'codigoCompatibilidad'.
             await updateDoc(docRef, {
                 campos: data.campos,
                 fecha: new Date().toISOString(),
             });
         }
 
-        alert(`Se guardaron los cambios en ${docIdsModificados.length} documentos.`);
+        Swal.fire({
+          title:'Actualizado', 
+          text: 'Se guardaron los cambios', 
+          icon: 'success',
+          background: '#052b27ff',
+          color: '#ffdfdfff',
+          confirmButtonColor: '#0b6860ff'
+        });
 
         // 3. Opcional: Salir del modo edición después de guardar
-        setModoEdicion(false);
+        setModoEdicionAgregada(false);
 
     } catch (error) {
         console.error('Error al guardar cambios agregados:', error);
@@ -529,6 +543,78 @@ const GeneradorTabla = () => {
     setAggregatedRows(prevRows => {
         const newRows = [...prevRows];
         newRows[rowIndex].codigoCompatibilidad = newValue;
+        return newRows;
+    });
+};
+
+  const agregarFilaAgregada = () => {
+    // 1. Verificar si estamos en modo edición y si hay filas para usar como base
+    if (!modoEdicionAgregada || aggregatedRows.length === 0) {
+        alert("Primero debes entrar en modo edición y tener resultados de búsqueda.");
+        return;
+    }
+
+    // 2. Usar la primera fila como plantilla para los metadatos globales
+    const baseFila = aggregatedRows[0];
+    const docId = baseFila._id;
+
+    // 3. Contar los campos existentes para este documento específico
+    const camposExistentes = aggregatedRows.filter(fila => fila._id === docId);
+    const nuevoIndice = camposExistentes.length + 1; 
+
+    // 4. Generar el nuevo código 
+    const nombreForCode = (baseFila.nombre || '').toString().trim().toUpperCase();
+    const modeloForCode = (baseFila.modelo || '').toString().trim();
+    const nuevoCodigo = `${nombreForCode}-${modeloForCode}-${nuevoIndice}`;
+
+    // 5. Crear la nueva fila
+    const nuevaFila = {
+        _id: docId, // Crucial: mantiene el vínculo al documento
+        nombre: baseFila.nombre,
+        modelo: baseFila.modelo,
+        marca: baseFila.marca,
+        campo: `Pieza ${nuevoIndice}`, // Nombre de campo por defecto
+        codigo: nuevoCodigo, // Código recién generado
+        codigoCompatibilidad: '',
+        // Bandera opcional para identificar que esta fila es nueva
+        isNew: true, 
+    };
+
+    // 6. Actualizar el estado con la nueva fila
+    setAggregatedRows(prevRows => [...prevRows, nuevaFila]);
+};
+const editarCampoAgregado = (rowIndex, newValue) => {
+    const nuevoValorLimpio = newValue.trim().toUpperCase(); // Normalizar para la comparación
+    
+    // 1. Identificar el documento al que pertenece la fila actual
+    const docId = aggregatedRows[rowIndex]._id;
+
+    // 2. Filtrar las filas que pertenecen a este mismo documento
+    const filasDelMismoDoc = aggregatedRows.filter(fila => fila._id === docId);
+
+    // 3. Verificar duplicados 
+    const esDuplicado = filasDelMismoDoc.some((fila, index) => {
+        const campoExistenteLimpio = (fila.campo || '').trim().toUpperCase();
+        return index !== rowIndex && campoExistenteLimpio === nuevoValorLimpio;
+    });
+
+    // 4. Si es duplicado, notificar y NO actualizar el estado
+    if (esDuplicado) {
+        Swal.fire({
+          title:"Error", 
+          text: `La pieza "${nuevoValorLimpio}" ya existe en este modelo. Por favor, usa un nombre diferente.`, 
+          icon: "warning",
+          background: '#052b27ff', // Color de fondo personalizado
+          color: '#ffdfdfff', // Color del texto personalizado
+          confirmButtonColor: '#0b6860ff',
+        });
+        return; 
+    }
+
+    // 5. Si es único, procedemos a actualizar el estado
+    setAggregatedRows(prevRows => {
+        const newRows = [...prevRows];
+        newRows[rowIndex].campo = newValue; // Guardamos el valor tal cual lo ingresó (con mayúsculas/minúsculas)
         return newRows;
     });
 };
@@ -598,14 +684,24 @@ const GeneradorTabla = () => {
           <>
             {tableGenerated && (aggregatedMode ? aggregatedRows.length > 0 : tabla.filter((f) => matchesQuery(f)).length > 0) && (
             <div className="generador-actions">
-              <button className="btn btn-gold" onClick={() => { setModoEdicion(!modoEdicion); setAggregatedMode(false); }}>{modoEdicion ? 'Cancelar' : 'Editar'}</button>
-              {/* Brand select shown after generating the table */}
+               {modoEdicionLocal && (
+                <div className="num-campos">
+                  <label>Número de campos:</label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={numCampos}
+                    onChange={(e) => cambiarNumCampos(e.target.value)}
+                    className="small-input number-input"
+                  />
+                </div>
+              )}
+              <button className={`btn ${modoEdicionLocal ? 'cancelar-btn' : 'btn-gold'}`}  onClick={() => { setModoEdicionLocal(!modoEdicionLocal); setAggregatedMode(false); }}>{modoEdicionLocal ? 'Cancelar' : 'Editar'}</button>
               <div  className='select-marca' style={{ marginLeft: 12}}>
                 <div>
                   <label style={{ marginRight: 8 }}>Marca:</label>
                   <select
                     value={marca}
-                  // Necesitas reemplazar tu función inline con una lógica más compleja: 
                     onChange={(e) => {
                         const nuevaMarca = e.target.value;
                         if (nuevaMarca === 'Otros') {
@@ -626,9 +722,6 @@ const GeneradorTabla = () => {
                     ))}
                   </select>
                 </div>
-                
-
-                {/* 4. MODAL VISIBLE CONDICIONALMENTE */}
                 <Modal show={mostrarModal} onHide={() => {
                 // Función de cancelación completa
                 setMostrarModal(false); 
@@ -670,19 +763,6 @@ const GeneradorTabla = () => {
                 </Modal>
 
               </div>
-
-              {modoEdicion && (
-                <div className="num-campos">
-                  <label>Número de campos:</label>
-                  <input
-                    type="number"
-                    min={1}
-                    value={numCampos}
-                    onChange={(e) => cambiarNumCampos(e.target.value)}
-                    className="small-input number-input"
-                  />
-                </div>
-              )}
               <button onClick={() => { guardarTabla(); setAggregatedMode(false); }}>Guardar</button>
             </div>
             )}
@@ -701,27 +781,44 @@ const GeneradorTabla = () => {
                   return (
 
                     <>
-                    <div className='generador-actions'>
-                       {modoEdicion && (
+                      <div className='generador-actions'>
+                        {modoEdicionAgregada && (
+                        <>
+                          {/* botón nueva pieza */}
                           <button 
-                              className="btn btn-success" 
-                              onClick={guardarCambiosAgregados}
-                              style={{ marginLeft: '8px' }}
+                              className="btn btn-nuevo" 
+                              onClick={agregarFilaAgregada}
                           >
-                              Guardar Cambios
+                              <FaPlus className="plus-new"/>Añadir Pieza a este Celular
                           </button>
-                      )}
-                      <button 
-                          className={`btn ${modoEdicion ? 'volver-btn' : 'btn-gold'}`} 
-                          onClick={() => { setModoEdicion(!modoEdicion); }}
-                      >
-                          {modoEdicion ? 'Cancelar Edición' : 'Editar Tabla'}
-                      </button>
+                        </>
+                        )}
+
+                        {modoEdicionAgregada && (
+                        <button 
+                            className="btn btn-success" 
+                            onClick={guardarCambiosAgregados}
+                            style={{ marginLeft: '8px' }}
+                        >
+                            Guardar Cambios
+                        </button>
+                        )}
+                        <button 
+                        className={`btn ${modoEdicionAgregada ? 'cancelar-btn' : 'btn-gold'}`} 
+                        onClick={() => { 
+                          if (modoEdicionAgregada) {
+                            updateSuggestions(searchQuery); 
+                          }
+                          setModoEdicionAgregada(!modoEdicionAgregada); 
+                        }}
+                        >
+                          {modoEdicionAgregada ? 'Cancelar Edición' : 'Editar Tabla'}
+                        </button>
                      
                       
-                      <button className="btn btn-danger volver-btn" onClick={volver} style={{ marginLeft: 8 }}>Volver</button>
-                    </div>
-                    <table className="tabla-auxiliares">
+                        <button className="btn btn-danger volver-btn" onClick={volver} style={{ marginLeft: 8 }}>Volver</button>
+                        </div>
+                        <table className="tabla-auxiliares">
                       <thead>
                         
                         <tr>
@@ -743,12 +840,22 @@ const GeneradorTabla = () => {
                             <td>{fila.marca}</td>
                             
                                 
-                            <td>{fila.campo}</td>
+                            <td>{modoEdicionAgregada && fila.isNew ? (
+                                <input
+                                    type="text"
+                                    className='tabla-edicion-input'
+                                    value={fila.campo || ''}
+                                    onChange={(e) => editarCampoAgregado(index, e.target.value)}
+                                />
+                            ) : (
+                                // Si no es nueva o no está en modo edición, se muestra solo el texto
+                                fila.campo
+                            )}</td>
 
                             <td>{fila.codigo}</td>
 
                             <td>{
-                            modoEdicion ? (
+                            modoEdicionAgregada ? (
                               <input
                                 type="text"
                                 className='tabla-edicion-input'
@@ -775,7 +882,7 @@ const GeneradorTabla = () => {
                   <div style={{ padding: 20, textAlign: 'center'}}>
                     <div>No se encontraron resultados.</div>
                     <div style={{ marginTop: 12 }}>
-                      <label style={{ display: 'block', marginBottom: 6 }}>Ingrese el modelo del celular para generarlo:</label>
+                      <label style={{ display: 'block', marginBottom: 6 }}>Ingrese el modelo del celular para crear uno nuevo:</label>
                       <div style={{ display:'flex', justifyContent:'center'}}>
                         <input
                         type="text"
@@ -790,7 +897,7 @@ const GeneradorTabla = () => {
                         style={{ marginLeft: 8 }}
                         onClick={() => generarTablaConModeloManual(nuevoModeloInput)}
                       
-                      >Generar ahora</button>
+                      >Crear nuevo celular</button>
                       </div>
                     </div>
                   </div>
@@ -810,7 +917,7 @@ const GeneradorTabla = () => {
                     {rows.map((fila, index) => (
                       <tr key={index}>
                         <td>
-                          {modoEdicion ? (
+                          {modoEdicionLocal ? (
                             <input
                               type="text"
                               className='tabla-edicion-input'
@@ -822,7 +929,7 @@ const GeneradorTabla = () => {
                           )}
                         </td>
                         <td>
-                          {modoEdicion ? (
+                          {modoEdicionLocal ? (
                             <input
                               type="text"
                               className='tabla-edicion-input'
@@ -834,7 +941,7 @@ const GeneradorTabla = () => {
                           )}
                         </td>
                         <td>
-                          {modoEdicion ? (
+                          {modoEdicionLocal ? (
                             <input
                               type="text"
                               className='tabla-edicion-input'

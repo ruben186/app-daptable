@@ -57,7 +57,7 @@ CSS
 }
 .btn-nuevo {
     /* Botón "Nuevo" - Fondo de Dark Teal con borde de Neón */
-    background-color: #147068 !important; 
+    background-color:#147068 !important; 
     color: #42F1DD !important;
     border:none !important;
     border-radius: 23px !important; 
@@ -66,10 +66,10 @@ CSS
     display: flex; 
     align-items: center;
     margin-left: 10px;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease !important;
 }
 .btn-nuevo:hover {
-    background-color: #1a7a72 !important;
+    background-color: #12534d !important;
 }
 
 /* Grupo de Búsqueda */
@@ -307,11 +307,14 @@ div:where(.swal2-container).swal2-backdrop-show, div:where(.swal2-container).swa
     left: 24px;
     top: 80px;
     border: none;
-    color: #42F1DD;
-    background: transparent;
-    font-size: 25px;
+    background-color: rgb(35, 73, 197); 
+    color:white; 
+    transition: all 0.3s ease ; 
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 15px;
 }
-.btn-volver:hover { color: #9af3df; }
+.btn-volver:hover { background-color: rgb(21, 36, 119)}
 
 .bg-danger1{
     background-color: rgb(94, 9, 9);
@@ -330,6 +333,7 @@ div:where(.swal2-container).swal2-backdrop-show, div:where(.swal2-container).swa
     background-color: #147068 !important; 
     color: #42F1DD !important;
     border: none !important;
+    transition: all 0.3s ease !important;
 }
 .exportar-btn:hover{
     background-color: #12534d !important;

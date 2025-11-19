@@ -97,8 +97,6 @@ function RegisterPage() {
         estado: 'pendiente',// campo para activar o desactivar luego
         rol: 'usuario' 
       });
-
-      Swal.fire("¡Registro exitoso!", "Usuario registrado correctamente.", "success")
       Swal.fire({
                     title:"¡Registro exitoso!", 
                     text: "Usuario registrado correctamente.", 

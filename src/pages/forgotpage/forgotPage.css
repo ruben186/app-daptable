@@ -16,8 +16,14 @@ body, .bg-page {
     top: 20px;
     border: none;
     color: #42F1DD;
-    background: transparent;
+    background-color: #073532; 
+    transition: all 0.3s ease ; 
+    padding: 4px 7px;
+    border-radius: 6px;
     font-size: 20px;
+}
+.btn-outline-secondary:hover{
+    background-color: #09665E;
 }
 
 /* Tarjeta del formulario */

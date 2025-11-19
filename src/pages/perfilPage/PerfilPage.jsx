@@ -259,9 +259,6 @@ function PerfilPage() {
     <>  
         <NavBar/>
         <div className='body-perfil bg-gradient2'>
-            <button type="button" className="btn-outline-secondary" onClick={() => window.location.href = "/dashboard"}>
-                &lt; Volver
-            </button>
            <div className="perfil-container">
                 {/* Encabezado */}
                 <header className="perfil-header">
