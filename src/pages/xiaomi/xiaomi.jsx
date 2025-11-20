@@ -266,7 +266,7 @@ function Xiaomi() {
 
                                         {/* Columna Más */}
                                       <td style={{ textAlign: 'center' }}>
-                                          <Button variant="link"  onClick={() => { navigate('/BtnMasXiaomi'); }}1 
+                                          <Button variant="link"  onClick={() => { navigate('/BtnMasXiaomi'); }}
                                          className="p-0 border-0 icon-hover-effect"
                                         >
                                             <img 
