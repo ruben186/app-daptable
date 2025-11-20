@@ -23,6 +23,7 @@ import GestionPiezasPage from './pages/gestionPiezasPage/gestionPiezasPage.jsx';
 import Xiaomi from './pages/xiaomi/xiaomi.jsx';
 import RegNuevoUsuario from './pages/registroNuevoUsuario/registroNuevoUsuario';
 import SugerirPieza from './pages/sugerirPieza/sugerirPiezaPage.jsx';
+import btnMasXiaomi from './pages/xiaomi/btnMasXiaomi.jsx';
 
 function App() {
   return (
@@ -46,6 +47,13 @@ function App() {
         <Route path="/xiaomi" element={
           <ProtectedRoute allowedRoles={['admin', 'invitado', 'usuario']}>
             <Xiaomi/>
+          </ProtectedRoute>
+        } />
+
+        
+        <Route path="/btnMasXiaomi" element={
+          <ProtectedRoute allowedRoles={['admin', 'invitado', 'usuario']}>
+            <btnMasXiaomi/>
           </ProtectedRoute>
         } />
         

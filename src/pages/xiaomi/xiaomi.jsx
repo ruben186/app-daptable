@@ -1,12 +1,15 @@
+
+
 import { useEffect, useState } from 'react';
 import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
-import { Container, Table, Button, Form, InputGroup } from 'react-bootstrap';
+import { useNavigate,Link } from 'react-router-dom';
+import { Container,Nav, Table, Button, Form, InputGroup } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import { auth, db } from '../../firebase';
 import './xiaomi.css';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
+import logoxiami from '../../assets/logos/logoxiami.png'; 
 
 // Importación de Iconos e Imágenes
 import IconoBuscar from '../../assets/Iconos/iconoLupa.png';
@@ -110,7 +113,7 @@ function Xiaomi() {
                 iconoRojo = IconoFlexBotonesR;
                 break;
             default:
-                return IconoPiezaA;
+                
         }
 
         // Verificamos si existe info y si el código de compatibilidad no está vacío
@@ -262,11 +265,19 @@ function Xiaomi() {
                                         </td>
 
                                         {/* Columna Más */}
-                                        <td style={{ textAlign: 'center' }}>
-                                            <Button variant="link" onClick={() => handleIconClick('mas', aux)} className="p-0 border-0 icon-hover-effect">
-                                                <img src={IconoPiezaA} width="34px" height="34px" alt="Más detalles"  className="icon-hover-lift" />
-                                            </Button>
-                                        </td>
+                                      <td style={{ textAlign: 'center' }}>
+                                          <Button variant="link"  onClick={() => { navigate('/BtnMasXiaomi'); }}1 
+                                         className="p-0 border-0 icon-hover-effect"
+                                        >
+                                            <img 
+                                                src={IconoPiezaA} 
+                                                width="34px" 
+                                                height="34px" 
+                                                alt="Más detalles" 
+                                                className="icon-hover-lift" 
+                                            />
+                                        </Button>
+                                    </td>
                                     </tr>
                                 ))}
                             </tbody>
