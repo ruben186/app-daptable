@@ -119,7 +119,7 @@ function PersonasMenu({ navigate }) {
             <button className="personas-drawer-item" onClick={() => { navigate('/ayuda/donaciones'); setOpen(false); }}>
               Donaciones
             </button>
-            <button className="personas-drawer-item" onClick={() => { navigate('/ayuda/aumentar-bd'); setOpen(false); }}>
+            <button className="personas-drawer-item" onClick={() => { navigate('/sugerirPieza'); setOpen(false); }}>
               Aumentar base de datos
             </button>
           </ExpandableGroup>

@@ -6,3 +6,46 @@
    margin-left: 20px;
    
  }
+
+ /* Efecto Hover para los Iconos de la Tabla */
+.icon-hover-effect {
+    transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out;
+    border-radius: 50%; /* Opcional: si quieres que el área de clic sea redonda */
+    
+}
+
+.icon-hover-effect:hover {
+    transform: scale(1.25); /* Aumenta el tamaño un 25% */
+    filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3)); /* Agrega una sombra suave */
+    cursor: pointer;
+    
+    z-index: 10; /* Se asegura que quede por encima de otros elementos */
+}
+
+/* Opcional: Un efecto suave al presionar */
+.icon-hover-effect:active {
+    transform: scale(0.95); /* Se encoge un poco al hacer clic */
+}
+/* Clase para el efecto de levitación */
+.icon-hover-lift {
+    /* Suaviza el movimiento para que no se vea tosco */
+    transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), filter 0.25s;
+}
+
+.icon-hover-lift:hover {
+    /* 1. El icono sube 4 pixeles */
+     background-color: #4eb3aa; /* El color Verde Aguamarina */
+    transform: translateY(-4px) scale(1.1);
+    
+    /* 2. Proyecta una sombra difuminada que respeta la transparencia del PNG */
+    filter: drop-shadow(0 6px 4px rgba(0, 0, 0, 0.25));
+    
+    /* 3. Cambia el cursor para indicar clic */
+    cursor: pointer;
+}
+
+/* Efecto al hacer clic (se hunde) */
+.icon-hover-lift:active {
+    transform: translateY(0px) scale(0.95);
+    filter: none;
+}

@@ -22,6 +22,7 @@ import GestionUsuariosPage from './pages/gestionUsuarioPage/gestionUsuarioPage.j
 import GestionPiezasPage from './pages/gestionPiezasPage/gestionPiezasPage.jsx';
 import Xiaomi from './pages/xiaomi/xiaomi.jsx';
 import RegNuevoUsuario from './pages/registroNuevoUsuario/registroNuevoUsuario';
+import SugerirPieza from './pages/sugerirPieza/sugerirPiezaPage.jsx';
 
 function App() {
   return (
@@ -83,6 +84,12 @@ function App() {
          <Route path="/nuevoUsuario" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <RegNuevoUsuario/>
+          </ProtectedRoute>
+        } />
+
+         <Route path="/sugerirPieza" element={
+          <ProtectedRoute allowedRoles={['admin', 'usuario']}>
+            <SugerirPieza/>
           </ProtectedRoute>
         } />
 

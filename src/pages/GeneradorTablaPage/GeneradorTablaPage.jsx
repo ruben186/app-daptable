@@ -656,6 +656,7 @@ const editarCampoAgregado = (rowIndex, newValue) => {
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
               className="search-input"
             />
+            {/* Para cometarizar lineas seleccionadas se usa Shift + Alt + A
             {showSuggestions && suggestions && suggestions.length > 0 && (
               <div className="suggestions">
                 {suggestions.map((s) => (
@@ -676,7 +677,8 @@ const editarCampoAgregado = (rowIndex, newValue) => {
                   </div>
                 ))}
               </div>
-            )}
+            )} */}
+            <button className="btn btn-danger volver-btn" onClick={volver} style={{ marginLeft: 8 }}>Volver</button>
       </div>
         </div>
 
@@ -814,9 +816,6 @@ const editarCampoAgregado = (rowIndex, newValue) => {
                         >
                           {modoEdicionAgregada ? 'Cancelar Edición' : 'Editar Tabla'}
                         </button>
-                     
-                      
-                        <button className="btn btn-danger volver-btn" onClick={volver} style={{ marginLeft: 8 }}>Volver</button>
                         </div>
                         <table className="tabla-auxiliares">
                       <thead>

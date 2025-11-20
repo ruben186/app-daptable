@@ -332,9 +332,6 @@ function GestionPiezasPage() {
         <>
             <NavBar/>
             <main className="main-content-dashboard bg-gradient2">
-                <button type="button" className="btn-volver" onClick={() => navigate(-1)}>
-                    &lt; Volver
-                </button>
                 <Container className="mt-5 ">
                     <div className="table-container">
                         <div className="header-tabla">
@@ -355,6 +352,9 @@ function GestionPiezasPage() {
                             <Button className="btn-success exportar-btn" onClick={()=> exportToCSV(piezasFiltradas)}>
                                 Exportar CSV
                             </Button>
+                            <button type="button" className="btn-volver" onClick={() => navigate(-1)}>
+                                Volver
+                            </button>
                             <InputGroup className="search-input-group" style={{ maxWidth: '300px' }}>
                                 <Form.Control
                                     type="text"

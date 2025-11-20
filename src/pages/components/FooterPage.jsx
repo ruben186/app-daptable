@@ -6,7 +6,7 @@ function Footer(){
             {/* FOOTER */}
             <footer className="align-bottom">
                 <div className="footer-content">
-                <small>© 2025 RC Seguridad y Software. All rights reserved.</small>
+                <small>© 2025 RC Seguridad y Software.</small>
                 </div>
             </footer>
         </div>

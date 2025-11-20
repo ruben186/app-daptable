@@ -250,9 +250,7 @@ function GestionUsuariosPage() {
         <>
             <NavBar/>
             <main className="main-content-dashboard bg-gradient2">
-                <button type="button" className="btn-volver" onClick={() => navigate(-1)}>
-                    &lt; Volver
-                </button>
+                
                 <Container className="mt-5 ">
                     <div className="table-container">
                             <div className="header-tabla">
@@ -276,6 +274,9 @@ function GestionUsuariosPage() {
                             <Button variant="success" className="btn-nuevo" onClick={handleNuevo}>
                                 <FaPlus className="plus-new"/> Nuevo
                             </Button>
+                            <button type="button" className="btn-volver" onClick={() => navigate(-1)}>
+                                Volver
+                            </button>
                             {/* Búsqueda */}
                             <InputGroup className="search-input-group" style={{ maxWidth: '300px' }}>
                                 <Form.Control
