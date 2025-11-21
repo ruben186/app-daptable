@@ -1,0 +1,106 @@
+* Fondo general */
+.mover-logo-xiaomi {
+   margin-left: 20px;
+   
+ }
+/* Fondo general */
+.page-wrapper {
+    background-color: #080f13;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content-dashboard {
+    flex: 1;
+}
+
+/* Título */
+.section-title {
+    color: #4ff0d6; /* Cyan Neon */
+    font-weight: 400;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(79, 240, 214, 0.2);
+}
+
+/* Grid Layout */
+.parts-grid {
+    display: grid;
+    /* Se ajusta automáticamente al ancho con columnas mínimas de 160px */
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+    padding: 10px;
+    width: 100%;
+}
+
+/* Tarjeta (Card) - EL CONTENEDOR VERDE OSCURO */
+.xiaomi-card {
+    background-color: #0b3537; /* Verde oscuro */
+    border-radius: 12px;
+    padding: 15px;
+    height: 220px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-image-placeholder {
+    width: 100%;
+    height: 140px;
+    background-color: #05090c; /* Fondo negro */
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.part-icon {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.1));
+}
+
+.card-label {
+    color: #8abebf;
+    font-size: 0.95rem;
+    text-align: center;
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+/* Efectos Hover y Active */
+.xiaomi-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    background-color: #0e4042;
+}
+
+.xiaomi-card.active {
+    background-color: #5bfbd6; /* Cyan activo */
+    border-color: #ffffff;
+    box-shadow: 0 0 15px rgba(91, 251, 214, 0.5);
+    transform: scale(1.02);
+}
+
+.xiaomi-card.active .card-label {
+    color: #053d3f; /* Texto oscuro */
+    font-weight: 700;
+}
+
+.xiaomi-card.active .card-image-placeholder {
+    background-color: #081a20;
+}
+
+.loading-text {
+    margin-top: 50px;
+    font-size: 1.2rem;
+    color: #8abebf;
+}

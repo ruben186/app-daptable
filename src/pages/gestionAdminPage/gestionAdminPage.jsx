@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import { auth, db } from '../../firebase';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
+// Asegúrate de que las rutas de los iconos sean correctas en tu proyecto
 import IconoBuscar from '../../assets/Iconos/iconoLupa.png';
 import IconoEditar from '../../assets/Iconos/iconoEditar.png';
 import IconoEliminar from '../../assets/Iconos/iconoEliminar.png';
@@ -43,6 +44,7 @@ const normalizeString = (s) => {
           .trim()
           .replace(/\s+/g, ' ');
     } catch (e) {
+        // Fallback para entornos que no soportan \p{Diacritic}
         return String(s)
           .toLowerCase()
           .normalize('NFD')
@@ -93,6 +95,7 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
         return qlTerms.every(term => hayTexto.includes(term));
     });
 
+    // Determina si es una tarjeta de usuario para la visualización del nombre
     const isUserCard = collectionName === 'usuarios';
 
     const toggleSearch = () => {
@@ -117,7 +120,7 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
                 <div className="card-header-admin">
                     {/* Contenido del Header... */}
                     <div className="card-header-left">
-                        <span className="card-icon"><img src={icon} width="44px" height="44px" /></span> 
+                        <span className="card-icon"><img src={icon} width="44px" height="44px" alt={`${title} Icon`} /></span> 
                         <h3 className="card-titulo">{title}</h3>
                     </div>
                     
@@ -130,6 +133,7 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
                                  width="28px"
                                  height="28px"
                                  src={IconoBuscar}
+                                 alt="Buscar"
                              />
                         </button>
                     </div>
@@ -153,7 +157,14 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
                     {filteredData.slice(0, 4).map((item) => (
                         <div key={item.id} className="list-item">
                             <span className="item-text">
-                                {isUserCard ? (item.nombreCompleto || item.email || item.id) : `${item.nombre || item.id} ${item.campo ? ' - ' + item.campo : ''}`}
+                                {/* Lógica de visualización del texto del ítem */}
+                                {
+                                  collectionName === 'usuarios' ? (item.nombreCompleto || item.email || item.id) : 
+                                  collectionName === 'piezas' ? `${item.nombre || item.id} ${item.campo ? ' - ' + item.campo : ''}` :
+                                  // LÓGICA AGREGADA PARA COMPATIBILIDAD: Muestra el campo decorado 'displayText'
+                                  collectionName === 'compatibilidad' ? (item.displayText || item.id) : 
+                                  (item.nombre || item.id)
+                                }
                             </span> 
                             <div className="item-actions">
                                 <button className="btn-icon edit-btn" title="Editar" onClick={() => handleEdit(item)}>
@@ -164,7 +175,7 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
                                     height="30px"
                                     />
                                 </button>
-                                <button className="btn-icon delete-btn" title="Eliminar" onClick={() => handleDelete(item.parentId)}>
+                                <button className="btn-icon delete-btn" title="Eliminar" onClick={() => handleDelete(item.parentId || item.id)}>
                                     <img 
                                     src={IconoEliminar} 
                                     alt="btn-eliminar"
@@ -178,21 +189,17 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
                     {filteredData.length === 0 && <div className="list-item no-data">No hay {title.toLowerCase()} que coincidan.</div>}
                 </div>
                 
-                {/* ¡NOTA! El "Footer" y el "Contador" se han eliminado de aquí */}
-                
-            </div> {/* Fin de .admin-card */}
+            </div> 
 
 
-            {/* 💡 3. BLOQUE SEPARADO: PIE DE PÁGINA (Botón "Ver más") */}
-            {/* Este div tiene el fondo y el borde turquesa de la imagen */}
+            {/* 3. BLOQUE SEPARADO: PIE DE PÁGINA (Botón "Ver más") */}
             <div className="card-footer-admin">
                 <button className="btn-ver-mas" onClick={() => navigate(link)}>
                    <span className='chevM'/> Ver más
                 </button>
             </div>
 
-            {/* 💡 4. BLOQUE SEPARADO: CONTADOR DE REGISTROS */}
-            {/* Este div tiene el fondo oscuro y gestiona la alineación del contador */}
+            {/* 4. BLOQUE SEPARADO: CONTADOR DE REGISTROS */}
             <div className="count-info-box"> 
                  <div className="count-info">
                     <span className="count-number">{data.length}</span> {title} Registrados
@@ -214,18 +221,57 @@ function GestionAdminPage() {
     
     // Estados para otras colecciones
     const [piezas, setPiezas] = useState([]);
+    const [piezasNombre, setPiezasNombre] = useState([]);
+    const [marcaNames, setMarcaNames] = useState([]);
     const [searchQueryPiezas, setSearchQueryPiezas] = useState('');
 
-    const [estudios, setEstudios] = useState(Array(3).fill({ id: 1, nombre: 'Modelo A-2024' }));
-    const [compatibilidad, setCompatibilidad] = useState(Array(4).fill({ id: 1, nombre: 'Comp. Sugerida' }));
+    // ** [NUEVOS ESTADOS] **
+    const [estudios, setEstudios] = useState([]); // Array de datos de estudios
+    const [searchQueryEstudios, setSearchQueryEstudios] = useState('');
+    
+    const [compatibilidad, setCompatibilidad] = useState([]); // Array de datos de compatibilidad (sugerenciasPiezas)
+    const [searchQueryCompatibilidad, setSearchQueryCompatibilidad] = useState('');
+    // ESTADO PARA LA LISTA PROCESADA
+    const [decoratedCompatibilidad, setDecoratedCompatibilidad] = useState([]); 
+
 
     const [loading, setLoading] = useState(false);
     
     // Estados para Edición/Modal
     const [showModal, setShowModal] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null); // Almacena el item (usuario o pieza) a editar
-    const [itemType, setItemType] = useState(null); // 'usuario' o 'pieza'
+    const [itemType, setItemType] = useState(null); // 'usuario', 'pieza', 'estudio', o 'compatibilidad'
+
     
+    // Manejador genérico para cerrar el modal
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setSelectedItem(null);
+        setItemType(null);
+    };
+
+    // FUNCIÓN ASÍNCRONA PARA BUSCAR NOMBRE DE USUARIO (USADA EN COMPATIBILIDAD)
+    const fetchUserName = async (userId) => {
+    if (!userId) return 'Usuario Desconocido (ID no provisto)';
+    try {
+        // 1. Crea una referencia al documento en la colección 'usuarios'
+        const userDocRef = doc(db, 'usuarios', userId);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+            const data = userDoc.data();
+            // 2. Retorna el nombre, el email o el ID (como fallback)
+            return data.nombreCompleto || data.email || userId; 
+        } else {
+            return `Usuario Desconocido (${userId})`;
+        }
+    } catch (error) {
+        console.error(`Error al obtener usuario ${userId}:`, error);
+        return `Error al buscar usuario (${userId})`;
+    }
+};
+
+
     // 1. Carga de Usuarios
     useEffect(() => {
         const fetchUsuarios = async () => {
@@ -264,14 +310,14 @@ function GestionAdminPage() {
                     ...doc.data()
                 }));
             
-            // 💡 Nuevo paso: Aplanar la estructura de datos
+            // Nuevo paso: Aplanar la estructura de datos
             const flatPiezas = rawPiezas.flatMap(pieza => {
                 // Si 'campos' es un array válido y tiene elementos
                 if (Array.isArray(pieza.campos) && pieza.campos.length > 0) {
                     return pieza.campos.map((campoItem, index) => ({
                         // 1. Datos de nivel superior
                         id: `${pieza.id}-${index}`, // ID ÚNICO para la fila: ID_Documento-Indice_Array
-                        parentId: pieza.id,          // Referencia al ID del documento de Firestore
+                        parentId: pieza.id, // Referencia al ID del documento de Firestore
                         nombre: pieza.nombre || '',
                         marca: pieza.marca || '',
                         modelo: pieza.modelo || '',
@@ -297,30 +343,98 @@ function GestionAdminPage() {
                     campo: '', codigo: '', codigoCompatibilidad: '',
                     campoIndex: 0
                 }];
-            });
-
-            // ➡️ Ahora, 'flatPiezas' es el array que usará la lista.
+            }); 
             setPiezas(flatPiezas);
+            const uniquePieceNames = [...new Set(flatPiezas.map(p => p.campo))].filter(Boolean); // Filtrar valores vacíos
+            setPiezasNombre(uniquePieceNames);
+            const uniqueMarcaNames = [...new Set(flatPiezas.map(p => p.marca))].filter(Boolean);
+            setMarcaNames(uniqueMarcaNames);
         } catch (error) {
             console.error("Error al cargar piezas (tablas):", error);
             setPiezas([]); 
+            setPiezasNombre([]);
         } finally {
             setLoading(false);
         }
     };
     fetchPiezas();
 }, []);
-const handleNestedFieldChange = (index, fieldName, value) => {
-    setSelectedItem((prev) => {
-        const newCampos = [...prev.campos];
-        // El index debe ser 0 para la edición en el modal
-        newCampos[index] = { 
-            ...newCampos[index],
-            [fieldName]: value
+
+  
+    // 3. Carga de Estudios
+    useEffect(() => {
+        const fetchEstudios = async () => {
+            setLoading(true);
+            try {
+                // Asumo una colección 'estudios' con documentos que tienen un campo 'nombre' y 'descripcion'
+                const querySnapshot = await getDocs(collection(db, 'estudios'));
+                const data = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                setEstudios(data);
+            } catch (error) {
+                console.error("Error al cargar estudios:", error);
+                setEstudios([]);
+            } finally {
+                setLoading(false);
+            }
         };
-        return { ...prev, campos: newCampos };
-    });
-};
+        fetchEstudios();
+    }, []);
+
+    // 4. Carga de Compatibilidad (Datos crudos)
+    useEffect(() => {
+        const fetchCompatibilidad = async () => {
+            setLoading(true);
+            try {
+                // Colección 'sugerenciasPiezas'
+                const querySnapshot = await getDocs(collection(db, 'sugerenciasPiezas'));
+                const data = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                setCompatibilidad(data);
+            } catch (error) {
+                console.error("Error al cargar compatibilidad:", error);
+                setCompatibilidad([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCompatibilidad();
+    }, []);
+    
+
+    // 5. Proceso de Decoración de Compatibilidad
+    useEffect(() => {
+    const decorateCompatibilidad = async () => {
+        if (compatibilidad.length === 0) {
+            setDecoratedCompatibilidad([]);
+            return;
+        }
+
+        const decoratedData = await Promise.all(compatibilidad.map(async (item) => {
+            // Se asume que el campo es 'idUsuario' o 'userId'
+            const userId = item.idUsuario || item.userId; 
+            
+            // 1. Llama a la función para resolver el nombre
+            const nombreUsuario = await fetchUserName(userId);
+
+            // 2. Devuelve un nuevo objeto con el nombre y un campo de visualización
+            return {
+                ...item,
+                nombreUsuario: nombreUsuario, // Nuevo campo
+                // Este es el campo que se muestra en la DataCard
+                displayText: `${nombreUsuario} - ${item.nombreCelular || 'Celular Desconocido'} - ${item.modelo || 'Modelo Desconocido'}`,
+            };
+        }));
+        
+        setDecoratedCompatibilidad(decoratedData);
+    };
+
+    decorateCompatibilidad();
+}, [compatibilidad]);
     // ------------------------------------------------------------------
     // --- MANEJADORES DE USUARIO ---
     // ------------------------------------------------------------------
@@ -377,7 +491,7 @@ const handleNestedFieldChange = (index, fieldName, value) => {
     const handleSaveChangesUser = async () => {
         if (!selectedItem || itemType !== 'usuario') return;
 
-        // ... (Tu bloque de validaciones completo aquí)
+        // ... (Bloque de validaciones)
         try {
             const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
             const soloNumeros = /^[0-9]+$/;
@@ -401,7 +515,7 @@ const handleNestedFieldChange = (index, fieldName, value) => {
                     return;
                 }
             }
-            // ... (Fin de tu bloque de validaciones)
+            // ... (Fin de validaciones)
 
             const userRef = doc(db, 'usuarios', selectedItem.id);
             await updateDoc(userRef, {
@@ -430,7 +544,7 @@ const handleNestedFieldChange = (index, fieldName, value) => {
 
     const handleModalChangeUser = (e) => {
         const { name, value } = e.target;
-        setSelectedItem((prev) => {
+        setSelectedItem((prev) => { 
             const updated = { ...prev, [name]: value };
             if (name === 'fechaNacimiento') {
                 updated.edad = calcularEdad(value);
@@ -445,7 +559,7 @@ const handleNestedFieldChange = (index, fieldName, value) => {
     
    const handleEditPieza = (flatPiezaItem) => {
     const nombreCelular = flatPiezaItem.nombre || ''; 
-    const modelo = flatPiezaItem.modelo || '';     
+    const modelo = flatPiezaItem.modelo || '';     
 
     const combinedQuery = `${nombreCelular} ${modelo}`.trim();
 
@@ -477,8 +591,10 @@ const handleNestedFieldChange = (index, fieldName, value) => {
 
         if (result.isConfirmed) {
             try {
-                await deleteDoc(doc(db, 'tablas', id)); // Asumiendo que las Piezas están en la colección 'tablas'
-                setPiezas(piezas.filter(p => p.id !== id));
+                // Notar que el ID que recibe es el parentId (el ID del documento principal)
+                await deleteDoc(doc(db, 'tablas', id)); 
+                // Filtramos el estado local para eliminar todas las filas con ese parentId
+                setPiezas(piezas.filter(p => p.parentId !== id));
                 Swal.fire({
                     title: 'Eliminado', 
                     text: 'Registro de pieza eliminado correctamente.', 
@@ -501,108 +617,168 @@ const handleNestedFieldChange = (index, fieldName, value) => {
         }
     };
     
-    const handleSaveChangesPieza = async () => {
-    if (!selectedItem || itemType !== 'pieza') return;
-    const updatedCampo = selectedItem.campos && selectedItem.campos[0];
-    if (!selectedItem.nombre || !selectedItem.marca || !selectedItem.modelo || !updatedCampo || !updatedCampo.campo || !updatedCampo.codigo || !updatedCampo.codigoCompatibilidad) {
-        Swal.fire({ 
-            title: "Campos Incompletos", 
-            text: "Todos los campos deben ser llenados.", 
-            icon: "error", 
-            background: '#052b27ff', 
-            color: '#ffdfdfff', 
-            confirmButtonColor: '#0b6860ff' 
-        });
-        return;
-    }
+    // ------------------------------------------------------------------
+    // --- MANEJADORES DE ESTUDIO ---
+    // ------------------------------------------------------------------
     
-    try {
-        const piezaRef = doc(db, 'tablas', selectedItem.id);
-        
-        // 1. Obtener el documento actual de Firestore para obtener el array 'campos' completo
-        const docSnap = await getDoc(piezaRef);
-        if (!docSnap.exists()) {
-            throw new Error("El documento de la pieza no existe.");
+    // El 'item' es un documento completo de la colección 'estudios'
+    const handleEditEstudio = (item) => {
+        // Clonamos el objeto para evitar mutaciones directas del estado.
+        setSelectedItem({ ...item }); 
+        setItemType('estudio');
+        setShowModal(true);
+    };
+
+    const handleEliminarEstudio = async (id) => {
+        const result = await Swal.fire({
+            title:"¿Estás Seguro?", 
+            text: "¡Eliminarás este Material de Estudio!", 
+            icon: "warning",
+            showCancelButton: true,
+            background: '#052b27ff',
+            color: '#ffdfdfff',
+            confirmButtonColor: '#07433E',
+            cancelButtonColor: 'rgba(197, 81, 35, 1)',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await deleteDoc(doc(db, 'estudios', id));
+                setEstudios(estudios.filter(e => e.id !== id));
+                Swal.fire('Eliminado', 'Material de estudio eliminado correctamente.', 'success');
+            } catch (error) {
+                console.error("Error al eliminar estudio:", error);
+                Swal.fire('Error', 'No se pudo eliminar el material de estudio.', 'error');
+            }
         }
-        const currentData = docSnap.data();
-        const existingCampos = Array.isArray(currentData.campos) ? currentData.campos : [];
+    };
+    
+    const handleSaveChangesEstudio = async () => {
+        if (!selectedItem || itemType !== 'estudio') return;
 
-        // 2. Crear la nueva versión del campo a actualizar (viene del modal)
-        const updatedCampo = selectedItem.campos[0];
-        
-        // 3. Crear el array de campos actualizado
-        const newCampos = [...existingCampos];
-        
-        // 4. Actualizar el elemento en el índice correcto
-        const indexToUpdate = selectedItem.campoIndexToUpdate;
-
-        if (indexToUpdate >= 0 && indexToUpdate < newCampos.length) {
-            newCampos[indexToUpdate] = updatedCampo;
-        } else {
-            // Manejar error o si el elemento fue eliminado por otro admin, etc.
-            Swal.fire({
-                title:'Error', 
-                text: "Índice de campo no válido. El elemento no se pudo actualizar.", 
-                icon: 'error',
-                background: '#052b27ff',
-                color: '#ffdfdfff',
-                confirmButtonColor: '#0b6860ff',
-            });
+        if (!selectedItem.nombre || !selectedItem.descripcion) {
+            Swal.fire({ title:"Campos incompletos", text: "Todos los campos deben ser llenados.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff', });
             return;
         }
 
-        // 5. Objeto final a actualizar en Firebase
-        const dataToUpdate = {
-            nombre: selectedItem.nombre || '',
-            marca: selectedItem.marca || '',
-            modelo: selectedItem.modelo || '',
-            campos: newCampos, // Guardamos el array completo y corregido
-        };
+        try {
+            const estudioRef = doc(db, 'estudios', selectedItem.id);
+            await updateDoc(estudioRef, {
+                nombre: selectedItem.nombre,
+                descripcion: selectedItem.descripcion,
+                // Agrega otros campos relevantes
+            });
 
-        setPiezas(prevPiezas => prevPiezas.map(p => {
-            // Verifica si la fila pertenece al documento que acabamos de editar
-            if (p.parentId === selectedItem.id) {
-                
-                // Actualiza los campos de nivel superior para todas las filas de este documento
-                let updatedRow = { 
-                    ...p, 
-                    nombre: dataToUpdate.nombre, 
-                    marca: dataToUpdate.marca, 
-                    modelo: dataToUpdate.modelo 
-                };
-                
-                // Si esta es la fila específica editada (coincide el índice)
-                if (p.campoIndex === indexToUpdate) {
-                    // Actualiza también los campos anidados de ESA fila específica
-                    updatedRow = {
-                        ...updatedRow,
-                        campo: updatedCampo.campo,
-                        codigo: updatedCampo.codigo,
-                        codigoCompatibilidad: updatedCampo.codigoCompatibilidad,
-                    };
-                }
-                return updatedRow;
+            // Actualiza el estado local
+            setEstudios(estudios.map(e =>
+                e.id === selectedItem.id ? selectedItem : e
+            ));
+
+            handleCloseModal();
+            Swal.fire('Actualizado', 'Los datos del estudio fueron actualizados.', 'success');
+        } catch (error) {
+            console.error(error);
+            Swal.fire('Error', 'No se pudo actualizar el estudio.', 'error');
+        }
+    };
+
+    const handleModalChangeEstudio = (e) => {
+        const { name, value } = e.target;
+        setSelectedItem((prev) => ({ ...prev, [name]: value }));
+    };
+
+    // ------------------------------------------------------------------
+    // --- MANEJADORES DE COMPATIBILIDAD ---
+    // ------------------------------------------------------------------
+    const handleModalChangeCompatibilidad = (e) => {
+        const { name, value } = e.target;
+        setSelectedItem((prev) => ({ ...prev, [name]: value }));
+    };
+    // El 'item' es un documento completo de la colección 'compatibilidad'
+    const handleEditCompatibilidad = (item) => {
+        setSelectedItem({ ...item }); 
+        setItemType('compatibilidad');
+        setShowModal(true);
+        
+    };
+
+    const handleEliminarCompatibilidad = async (id) => {
+        const result = await Swal.fire({
+            title:"¿Estás Seguro?", 
+            text: "¡Eliminarás este registro de Compatibilidad!", 
+            icon: "warning",
+            showCancelButton: true,
+            background: '#052b27ff',
+            color: '#ffdfdfff',
+            confirmButtonColor: '#07433E',
+            cancelButtonColor: 'rgba(197, 81, 35, 1)',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                // Asumiendo que la colección es 'sugerenciasPiezas'
+                await deleteDoc(doc(db, 'sugerenciasPiezas', id));
+                // Actualizamos ambos estados
+                setCompatibilidad(compatibilidad.filter(c => c.id !== id));
+                setDecoratedCompatibilidad(decoratedCompatibilidad.filter(c => c.id !== id));
+                Swal.fire('Eliminado', 'Registro de compatibilidad eliminado correctamente.', 'success');
+            } catch (error) {
+                console.error("Error al eliminar compatibilidad:", error);
+                Swal.fire('Error', 'No se pudo eliminar el registro de compatibilidad.', 'error');
             }
-            return p; // Deja las otras piezas sin cambios
-        }));
+        }
+    };
+    
+   const handleSaveChangesCompatibilidad = async () => {
+        if (!selectedItem || itemType !== 'compatibilidad') return;
 
-        await updateDoc(piezaRef, dataToUpdate);
-        
-        // ... (Actualización del estado local y mensajes de éxito) ...
-        setShowModal(false);
-        Swal.fire('Actualizado', 'Los datos de la pieza fueron actualizados.', 'success');
-        
-    } catch (error) {
-        console.error("Error al guardar cambios de pieza:", error);
-        Swal.fire('Error', 'No se pudo actualizar la pieza.', 'error');
-    }
-};
+        // Aquí podrías agregar validaciones si son necesarias
 
-   const handleModalChangePieza = (e) => {
-    const { name, value } = e.target;
-    // La modificación del estado temporal es sencilla ya que los campos están planos
-    setSelectedItem((prev) => ({ ...prev, [name]: value }));
-};
+        try {
+            const compatibilidadRef = doc(db, 'sugerenciasPiezas', selectedItem.id);
+            
+            // 💡 CAMBIO: Definir los campos que se van a actualizar (excluyendo userId, urlImage y fechaSugerencia)
+            const updateData = {
+                adaptableMarca: selectedItem.adaptableMarca || '',
+                adaptableModelo: selectedItem.adaptableModelo || '',
+                comentarios: selectedItem.comentarios || '',
+                estado: selectedItem.estado || 'pendiente',
+                marca: selectedItem.marca || '',
+                modelo: selectedItem.modelo || '',
+                nombreCelular: selectedItem.nombreCelular || '',
+                pieza: selectedItem.pieza || '',
+            };
+            
+            await updateDoc(compatibilidadRef, updateData);
+
+            // Actualizar el estado local (decoratedCompatibilidad) para reflejar los cambios en la UI
+            const updatedDecoratedItem = {
+                ...selectedItem,
+                ...updateData, // Asegura que los campos actualizados se incluyan
+                // Regenerar el displayText por si cambia el modelo/nombreCelular
+                displayText: `${selectedItem.nombreUsuario || selectedItem.userId} - ${updateData.nombreCelular || 'Celular Desconocido'} - ${updateData.modelo || 'Modelo Desconocido'}`,
+            };
+            
+            setDecoratedCompatibilidad(prev => prev.map(c => 
+                c.id === selectedItem.id ? updatedDecoratedItem : c
+            ));
+            
+            // Actualizar el estado crudo (compatibilidad)
+            setCompatibilidad(prev => prev.map(c => 
+                c.id === selectedItem.id ? { ...c, ...updateData } : c
+            ));
+
+            handleCloseModal();
+            Swal.fire('Actualizado', 'Los datos de compatibilidad fueron actualizados.', 'success');
+        } catch (error) {
+            console.error(error);
+            Swal.fire('Error', 'No se pudo actualizar el registro de compatibilidad.', 'error');
+        }
+    };
     
     // ------------------------------------------------------------------
     // --- RENDERIZADO DEL MODAL ---
@@ -610,6 +786,15 @@ const handleNestedFieldChange = (index, fieldName, value) => {
 
     const renderModalBody = () => {
         if (!selectedItem) return null;
+        const pieceOptions = piezasNombre;
+        const isRegisteredPiece = pieceOptions.some(p => p === selectedItem.pieza);
+    
+        const isCustomPiece = selectedItem.pieza && 
+                            selectedItem.pieza !== 'Seleccionar' && 
+                            selectedItem.pieza !== 'Otro' &&
+                            !isRegisteredPiece;
+
+        const selectPieceValue = isCustomPiece ? 'Otro' : (selectedItem.pieza || 'Seleccionar');
 
         if (itemType === 'usuario') {
             return (
@@ -641,6 +826,7 @@ const handleNestedFieldChange = (index, fieldName, value) => {
                             type="email"
                             name="email"
                             value={selectedItem.email || ''}
+                            onChange={handleModalChangeUser}
                             disabled 
                         />
                     </Form.Group>
@@ -708,14 +894,269 @@ const handleNestedFieldChange = (index, fieldName, value) => {
                     </Form.Group>
                 </Form>
             );
+        } else if (itemType === 'estudio') {
+             return (
+                <Form>
+                    <Form.Group className="mb-2">
+                        <Form.Label>Nombre del Estudio</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="nombre"
+                            value={selectedItem.nombre || ''}
+                            onChange={handleModalChangeEstudio}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-2">
+                        <Form.Label>Descripción</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            rows={3}
+                            name="descripcion"
+                            value={selectedItem.descripcion || ''}
+                            onChange={handleModalChangeEstudio}
+                        />
+                    </Form.Group>
+                    {/* Agrega más campos si es necesario */}
+                </Form>
+            );
+        }else if (itemType === 'compatibilidad') {
+         const formatFecha = (timestamp) => {
+        if (!timestamp) return 'N/A';
+        
+        let dateValue;
+
+        if (typeof timestamp === 'string' && timestamp.startsWith('Timestamp(seconds=')) {
+            const match = timestamp.match(/seconds=(\d+)/); 
+            if (match && match[1]) {
+                const seconds = parseInt(match[1], 10);
+                dateValue = new Date(seconds * 1000); 
+            }
+        } else if (timestamp.seconds !== undefined) {
+             dateValue = new Date(timestamp.seconds * 1000);
+        } else {
+            const numericTimestamp = parseFloat(timestamp);
+            if (!isNaN(numericTimestamp) && numericTimestamp > 1000000000) { 
+                const ms = Math.floor(numericTimestamp * 1000);
+                dateValue = new Date(ms);
+            } else if (typeof timestamp === 'string') {
+                dateValue = new Date(timestamp);
+            } else {
+                 return String(timestamp);
+            }
+        }
+
+        // 4. Validación y Formato
+        if (dateValue && !isNaN(dateValue.getTime())) {
+            
+            // CAMBIO CRÍTICO AQUÍ: Definir opciones para el formato DD/MM/AAAA H:MM
+            const dateOptions = {
+                day: '2-digit',      // DD
+                month: '2-digit',    // MM
+                year: 'numeric',     // AAAA
+                hour: 'numeric',     // H
+                minute: '2-digit',   // MM
+                hour12: true     
+            };
+            return dateValue.toLocaleDateString('es-ES', dateOptions); 
+        }
+
+        return String(timestamp); 
+    };
+    
+    const fechaFormateada = formatFecha(selectedItem.fechaSugerencia);
+
+        const marcaOptions = marcaNames; // o el estado que uses para las marcas
+        
+        // 1. Verificar si la marca cargada está registrada
+        const isRegisteredMarca = marcaOptions.some(m => m === selectedItem.marca);
+        
+        // 2. Determinar si es una marca personalizada/no registrada
+        const isCustomMarca = selectedItem.marca && 
+                              selectedItem.marca !== 'Seleccionar' && 
+                              selectedItem.marca !== 'Otro' &&
+                              !isRegisteredMarca;
+
+        // 3. Determinar el valor que debe tener el SELECT
+        const selectMarcaValue = isCustomMarca ? 'Otro' : (selectedItem.marca || 'Seleccionar');
+            return (
+                <Form>
+                    {/* Campos de Solo Lectura */}
+                    <h6 className="mt-3 mb-2">Detalles de la Sugerencia</h6>
+                    <div className="d-flex justify-content-between mb-3">
+                        <Form.Group className="mb-2">
+                            <Form.Label>Usuario Sugerente</Form.Label>
+                            <Form.Control 
+                                type="text" 
+                                // Muestra el nombre resuelto o el ID
+                                value={selectedItem.nombreUsuario || selectedItem.userId || ''} 
+                                disabled 
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-2">
+                            <Form.Label>Fecha Sugerencia</Form.Label>
+                            <Form.Control 
+                                type="text" 
+                                value={fechaFormateada} 
+                                disabled
+                            />
+                        </Form.Group>
+                    </div>
+
+                    <hr/>
+                    <h6 className="mt-3 mb-2">Datos Editables</h6>
+                    
+                    {/* Estado */}
+                    <Form.Group className="mb-2">
+                        <Form.Label>Estado</Form.Label>
+                        <Form.Select
+                            name="estado"
+                            value={selectedItem.estado || 'pendiente'}
+                            onChange={handleModalChangeCompatibilidad}
+                        >
+                            <option value="pendiente">Pendiente</option>
+                            <option value="aceptado">Aceptado</option>
+                            <option value="rechazado">Rechazado</option>
+                            <option value="en_revision">En Revisión</option>
+                        </Form.Select>
+                    </Form.Group>
+
+                    {/* Nombre Celular y Marca (Original) */}
+                    <div className="d-flex justify-content-between">
+                        <Form.Group className="mb-2 w-50 pe-2">
+                            <Form.Label>Nombre Celular (Original)</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="nombreCelular"
+                                value={selectedItem.nombreCelular || ''}
+                                onChange={handleModalChangeCompatibilidad}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-2 w-50 ps-2">
+                        <Form.Label>Marca (Original)</Form.Label>
+                        <Form.Select
+                            name="marca" // Importante mantener 'marca'
+                            value={selectMarcaValue} // Usamos el valor calculado
+                            onChange={handleModalChangeCompatibilidad}
+                        >
+                            <option value="Seleccionar">Seleccionar</option>
+                            {/* Renderizar opciones desde la BD (uniqueMarcaNames) */}
+                            {marcaOptions.map((marcaName, index) => (
+                                <option key={index} value={marcaName}>
+                                    {marcaName}
+                                </option>
+                            ))}
+                            <option value="Otro">Otro (Especifique)</option>
+                        </Form.Select>
+
+                        {/* Campo de texto condicional para "Otro" o marca no registrada */}
+                        {(selectMarcaValue === 'Otro' || isCustomMarca) && (
+                            <Form.Control
+                                className="mt-2"
+                                type="text"
+                                name="marca" // Importante: mantiene el nombre para actualizar el mismo campo
+                                // Mostrar el valor real o vacío si recién se selecciona "Otro"
+                                value={selectedItem.marca === 'Otro' ? '' : selectedItem.marca || ''}
+                                placeholder="Escriba el nombre de la marca no registrada"
+                                onChange={handleModalChangeCompatibilidad}
+                            />
+                        )}
+                    </Form.Group>
+                    </div>
+                    
+                    {/* Modelo y Pieza (Original) */}
+                    <div className="d-flex justify-content-between">
+                        <Form.Group className="mb-2 w-50 pe-2">
+                            <Form.Label>Modelo (Original)</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="modelo"
+                                value={selectedItem.modelo || ''}
+                                onChange={handleModalChangeCompatibilidad}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-2 w-50 ps-2">
+                        <Form.Label>Pieza (Original)</Form.Label>
+                        <Form.Select
+                            name="pieza"
+                            value={selectPieceValue} // Usamos el valor calculado
+                            onChange={handleModalChangeCompatibilidad}
+                        >
+                            <option value="Seleccionar">Seleccionar</option>
+                            {/* Renderizar opciones desde la BD (usando pieceOptions) */}
+                            {pieceOptions.map((pieceName, index) => (
+                                <option key={index} value={pieceName}>
+                                    {pieceName}
+                                </option>
+                            ))}
+                            <option value="Otro">Otro (Especifique)</option>
+                        </Form.Select>
+
+                        {/* Campo de texto condicional para "Otro" o pieza no registrada */}
+                        {(selectPieceValue === 'Otro' || isCustomPiece) && (
+                            <Form.Control
+                                className="mt-2"
+                                type="text"
+                                name="pieza" 
+                                value={selectedItem.pieza === 'Otro' ? '' : selectedItem.pieza || ''}
+                                placeholder="Escriba el nombre de la pieza no registrada"
+                                onChange={handleModalChangeCompatibilidad}
+                            />
+                        )}
+                    </Form.Group>
+                    </div>
+                    
+                    <hr/>
+                    <h6 className="mt-3 mb-2" >Datos de Adaptabilidad (Compatible)</h6>
+
+                    {/* Adaptable Marca/Modelo */}
+                    <div className="d-flex justify-content-between">
+                        <Form.Group className="mb-2 w-50 pe-2">
+                            <Form.Label>Adaptable Marca</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="adaptableMarca"
+                                value={selectedItem.adaptableMarca || ''}
+                                onChange={handleModalChangeCompatibilidad}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-2 w-50 ps-2">
+                            <Form.Label>Adaptable Modelo</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="adaptableModelo"
+                                value={selectedItem.adaptableModelo || ''}
+                                onChange={handleModalChangeCompatibilidad}
+                            />
+                        </Form.Group>
+                    </div>
+
+                    {/* Comentarios */}
+                    <Form.Group className="mb-2">
+                        <Form.Label>Comentarios</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            rows={2}
+                            name="comentarios"
+                            value={selectedItem.comentarios || ''}
+                            onChange={handleModalChangeCompatibilidad}
+                        />
+                    </Form.Group>
+                </Form>
+            );
         }
         return null;
     };
     
+    // Asignación dinámica de la función de guardado
     const handleSave = itemType === 'usuario' ? handleSaveChangesUser : 
+                       itemType === 'estudio' ? handleSaveChangesEstudio :
+                       itemType === 'compatibilidad' ? handleSaveChangesCompatibilidad :
                        () => alert('Función de guardado no definida');
                        
+    // Asignación dinámica del título del modal
     const modalTitle = itemType === 'usuario' ? 'Editar Usuario': 
+                       itemType === 'estudio' ? 'Editar Material de Estudio' :
+                       itemType === 'compatibilidad' ? 'Editar Registro de Compatibilidad' :
                        'Editar Registro';
 
 
@@ -744,7 +1185,7 @@ const handleNestedFieldChange = (index, fieldName, value) => {
                             linkNuevo={'/nuevoUsuario'}
                         />
                         
-                        {/* 2. SECCIÓN PIEZAS  */}
+                        {/* 2. SECCIÓN PIEZAS  */}
                         <DataCard
                             title="Celulares y Partes"
                             icon={IconoPieza}
@@ -758,59 +1199,55 @@ const handleNestedFieldChange = (index, fieldName, value) => {
                             linkNuevo={'/TablaCel'}
                         />
                         
-                        {/* 3. SECCIÓN M. ESTUDIO  */}
+                        {/* 3. SECCIÓN M. ESTUDIO  */}
                         <DataCard
                             title="M. Estudio"
                             icon={IconoLibro}
-                            data={estudios}
-                            searchQuery={''}
-                            setSearchQuery={() => {}} 
+                            data={estudios} 
+                            searchQuery={searchQueryEstudios}
+                            setSearchQuery={setSearchQueryEstudios}
                             collectionName="estudios"
-                            handleEdit={() => alert('Implementar edición de M. Estudio')}
-                            handleDelete={() => alert('Implementar eliminación de M. Estudio')}
-                            link={'/registroEstudios'}
-                            linkNuevo={'/nuevoEstudio'}
+                            handleEdit={handleEditEstudio} 
+                            handleDelete={handleEliminarEstudio} 
+                            link={'/gestionEstudios'}
+                            linkNuevo={'/nuevoEstudio'} 
                         />
-                        
-                        {/* 4. SECCIÓN COMPATIBILIDAD SUGERIDA */}
                         <div className="grid-full-width">
-                            <DataCard
-                                title="Compatibilidad Sugerida"
-                                icon={IconoPieza}
-                                data={compatibilidad}
-                                searchQuery={''}
-                                setSearchQuery={() => {}} 
-                                collectionName="compatibilidad"
-                                handleEdit={() => alert('Implementar edición de Compatibilidad')}
-                                handleDelete={() => alert('Implementar eliminación de Compatibilidad')}
-                                link={'/registroCompatibilidad'}
-                                linkNuevo={'/nuevaCompatibilidad'}
-                            />
-
+                        {/* 4. SECCIÓN COMPATIBILIDAD  */}
+                        <DataCard
+                            title="Compatibilidad Sugerida"
+                            icon={IconoPieza} 
+                            data={decoratedCompatibilidad} 
+                            searchQuery={searchQueryCompatibilidad}
+                            setSearchQuery={setSearchQueryCompatibilidad}
+                            collectionName="compatibilidad"
+                            handleEdit={handleEditCompatibilidad} 
+                            handleDelete={handleEliminarCompatibilidad} 
+                            link={'/gestionCompatibilidad'}
+                        />
                         </div>
                     </div>
                 </div>
             </main>
+            <Footer/>
 
-            {/* MODAL EDICIÓN (REUTILIZADO) */}
-            <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-                <Modal.Header closeButton className="modal-header-custom">
+            {/* Modal de Edición Universal */}
+            <Modal show={showModal} onHide={handleCloseModal} centered>
+                <Modal.Header closeButton>
                     <Modal.Title>{modalTitle}</Modal.Title>
                 </Modal.Header>
-                <Modal.Body className="modal-body-custom">
+                <Modal.Body>
                     {renderModalBody()}
                 </Modal.Body>
-                <Modal.Footer className="modal-footer-custom">
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>
-                        Cancelar
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                        Cerrar
                     </Button>
                     <Button variant="primary" onClick={handleSave}>
                         Guardar Cambios
                     </Button>
                 </Modal.Footer>
             </Modal>
-            
-            <Footer/>
         </>
     );
 }
