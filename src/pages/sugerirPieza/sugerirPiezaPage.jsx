@@ -232,7 +232,7 @@ function SugerirPiezaPage() {
                 urlImagen: urlImagen,
                 userId: user.uid,
                 fechaSugerencia: new Date(),
-                estado: 'pendiente'
+                estado: 'Pendiente'
             };
             
             await addDoc(collection(db, 'sugerenciasPiezas'), suggestionData);

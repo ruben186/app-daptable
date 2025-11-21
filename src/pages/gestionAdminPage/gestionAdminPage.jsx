@@ -83,7 +83,7 @@ const extractTextForSearch = (value) => {
 
 // Componente reutilizable para cada sección del dashboard
 
-const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionName, handleEdit, handleDelete, link, linkNuevo }) => {
+const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionName, handleEdit, handleDelete, link, linkNuevo, showNewButton }) => {
     
     const [isSearchVisible, setIsSearchVisible] = useState(false); 
 
@@ -125,9 +125,12 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
                     </div>
                     
                     <div className="card-header-right">
+                        {showNewButton && (
                         <button className="new-btn" onClick={() => navigate(linkNuevo)}>
                             <FaPlus className="plus-new" /> Nuevo
                         </button>
+                        )}
+                        
                         <button className={`btn-icon search-toggle-btn ${isSearchVisible ? 'active-search' : ''}`} onClick={toggleSearch}>
                              <img 
                                  width="28px"
@@ -535,7 +538,14 @@ function GestionAdminPage() {
             ));
 
             setShowModal(false);
-            Swal.fire('Actualizado', 'Los datos del usuario fueron actualizados.', 'success');
+            Swal.fire({
+                title: '¡Actualizado!',
+                text: 'Los datos del usuario fueron actualizados.',
+                icon: 'success',
+                background: '#052b27ff',
+                color: '#ffff',
+                confirmButtonColor: '#07433E',
+            });
         } catch (error) {
             console.error(error);
             Swal.fire('Error', 'No se pudo actualizar el usuario.', 'error');
@@ -736,7 +746,33 @@ function GestionAdminPage() {
    const handleSaveChangesCompatibilidad = async () => {
         if (!selectedItem || itemType !== 'compatibilidad') return;
 
-        // Aquí podrías agregar validaciones si son necesarias
+        const requiredFields = [
+             { key: 'nombreCelular', label: 'Nombre del Celular' },
+             { key: 'modelo', label: 'Modelo' },
+             { key: 'pieza', label: 'Pieza' },
+             { key: 'marca', label: 'Marca' },
+             { key: 'adaptableMarca', label: 'Marca Adaptable' },
+             { key: 'adaptableModelo', label: 'Modelo Adaptable' },
+             { key: 'estado', label: 'Estado' },
+        ];
+
+        const missingField = requiredFields.find(field => {
+             // Verificamos si el campo está vacío, nulo o solo contiene espacios
+             const value = selectedItem[field.key];
+             return !value || (typeof value === 'string' && value.trim() === '');
+        });
+
+        if (missingField) {
+             Swal.fire({ 
+                 title:"Campos incompletos", 
+                 text: `El campo '${missingField.label}' es obligatorio y no debe estar vacío.`, 
+                 icon: "error", 
+                 background: '#052b27ff', 
+                 color: '#ffdfdfff', 
+                 confirmButtonColor: '#0b6860ff', 
+             });
+             return; // Detiene la ejecución si falta un campo
+        }
 
         try {
             const compatibilidadRef = doc(db, 'sugerenciasPiezas', selectedItem.id);
@@ -773,7 +809,14 @@ function GestionAdminPage() {
             ));
 
             handleCloseModal();
-            Swal.fire('Actualizado', 'Los datos de compatibilidad fueron actualizados.', 'success');
+            Swal.fire({
+                title: '¡Guardado!',
+                text: 'Sugerencia actualizada y lista para procesamiento.',
+                icon: 'success',
+                background: '#052b27ff',
+                color: '#ffff',
+                confirmButtonColor: '#07433E',
+            });
         } catch (error) {
             console.error(error);
             Swal.fire('Error', 'No se pudo actualizar el registro de compatibilidad.', 'error');
@@ -978,13 +1021,26 @@ function GestionAdminPage() {
 
         // 3. Determinar el valor que debe tener el SELECT
         const selectMarcaValue = isCustomMarca ? 'Otro' : (selectedItem.marca || 'Seleccionar');
+
+        const isRegisteredAdaptableMarca = marcaOptions.some(m => m === selectedItem.adaptableMarca);
+
+        // 2. Determinar si es una marca adaptable personalizada/no registrada
+        const isCustomAdaptableMarca = selectedItem.adaptableMarca && 
+                            selectedItem.adaptableMarca !== 'Seleccionar' && 
+                            selectedItem.adaptableMarca !== 'Otro' &&
+                            !isRegisteredAdaptableMarca;
+
+        // 3. Determinar el valor que debe tener el SELECT de Marca Adaptable
+        const selectAdaptableMarcaValue = isCustomAdaptableMarca 
+            ? 'Otro' 
+            : (selectedItem.adaptableMarca || 'Seleccionar');
             return (
                 <Form>
                     {/* Campos de Solo Lectura */}
                     <h6 className="mt-3 mb-2">Detalles de la Sugerencia</h6>
                     <div className="d-flex justify-content-between mb-3">
                         <Form.Group className="mb-2">
-                            <Form.Label>Usuario Sugerente</Form.Label>
+                            <Form.Label>Sugerencia Por:</Form.Label>
                             <Form.Control 
                                 type="text" 
                                 // Muestra el nombre resuelto o el ID
@@ -1000,10 +1056,23 @@ function GestionAdminPage() {
                                 disabled
                             />
                         </Form.Group>
+                        
                     </div>
+                    {/* Comentarios */}
+                    <Form.Group className="mb-2">
+                        <Form.Label>Comentarios</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            rows={2}
+                            name="comentarios"
+                            value={selectedItem.comentarios || ''}
+                            onChange={handleModalChangeCompatibilidad}
+                            disabled
+                        />
+                    </Form.Group>
 
                     <hr/>
-                    <h6 className="mt-3 mb-2">Datos Editables</h6>
+                    <h6 className="mt-3 mb-2">Datos Editables de la pieza sugerida</h6>
                     
                     {/* Estado */}
                     <Form.Group className="mb-2">
@@ -1023,7 +1092,7 @@ function GestionAdminPage() {
                     {/* Nombre Celular y Marca (Original) */}
                     <div className="d-flex justify-content-between">
                         <Form.Group className="mb-2 w-50 pe-2">
-                            <Form.Label>Nombre Celular (Original)</Form.Label>
+                            <Form.Label>Nombre Celular </Form.Label>
                             <Form.Control
                                 type="text"
                                 name="nombreCelular"
@@ -1032,7 +1101,7 @@ function GestionAdminPage() {
                             />
                         </Form.Group>
                         <Form.Group className="mb-2 w-50 ps-2">
-                        <Form.Label>Marca (Original)</Form.Label>
+                        <Form.Label>Marca </Form.Label>
                         <Form.Select
                             name="marca" // Importante mantener 'marca'
                             value={selectMarcaValue} // Usamos el valor calculado
@@ -1045,7 +1114,7 @@ function GestionAdminPage() {
                                     {marcaName}
                                 </option>
                             ))}
-                            <option value="Otro">Otro (Especifique)</option>
+                            <option value="Otro">Otro</option>
                         </Form.Select>
 
                         {/* Campo de texto condicional para "Otro" o marca no registrada */}
@@ -1056,7 +1125,7 @@ function GestionAdminPage() {
                                 name="marca" // Importante: mantiene el nombre para actualizar el mismo campo
                                 // Mostrar el valor real o vacío si recién se selecciona "Otro"
                                 value={selectedItem.marca === 'Otro' ? '' : selectedItem.marca || ''}
-                                placeholder="Escriba el nombre de la marca no registrada"
+                                placeholder="Escriba la marca aqui"
                                 onChange={handleModalChangeCompatibilidad}
                             />
                         )}
@@ -1066,7 +1135,7 @@ function GestionAdminPage() {
                     {/* Modelo y Pieza (Original) */}
                     <div className="d-flex justify-content-between">
                         <Form.Group className="mb-2 w-50 pe-2">
-                            <Form.Label>Modelo (Original)</Form.Label>
+                            <Form.Label>Modelo </Form.Label>
                             <Form.Control
                                 type="text"
                                 name="modelo"
@@ -1075,7 +1144,7 @@ function GestionAdminPage() {
                             />
                         </Form.Group>
                         <Form.Group className="mb-2 w-50 ps-2">
-                        <Form.Label>Pieza (Original)</Form.Label>
+                        <Form.Label>Pieza</Form.Label>
                         <Form.Select
                             name="pieza"
                             value={selectPieceValue} // Usamos el valor calculado
@@ -1088,7 +1157,7 @@ function GestionAdminPage() {
                                     {pieceName}
                                 </option>
                             ))}
-                            <option value="Otro">Otro (Especifique)</option>
+                            <option value="Otro">Otro</option>
                         </Form.Select>
 
                         {/* Campo de texto condicional para "Otro" o pieza no registrada */}
@@ -1098,7 +1167,7 @@ function GestionAdminPage() {
                                 type="text"
                                 name="pieza" 
                                 value={selectedItem.pieza === 'Otro' ? '' : selectedItem.pieza || ''}
-                                placeholder="Escriba el nombre de la pieza no registrada"
+                                placeholder="Escriba la pieza aqui"
                                 onChange={handleModalChangeCompatibilidad}
                             />
                         )}
@@ -1106,21 +1175,42 @@ function GestionAdminPage() {
                     </div>
                     
                     <hr/>
-                    <h6 className="mt-3 mb-2" >Datos de Adaptabilidad (Compatible)</h6>
+                    <h6 className="mt-3 mb-2" >Compatible con:</h6>
 
                     {/* Adaptable Marca/Modelo */}
                     <div className="d-flex justify-content-between">
                         <Form.Group className="mb-2 w-50 pe-2">
-                            <Form.Label>Adaptable Marca</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="adaptableMarca"
-                                value={selectedItem.adaptableMarca || ''}
+                            <Form.Label>Marca</Form.Label>
+                            <Form.Select
+                                name="adaptableMarca" // Importante: actualiza el campo correcto
+                                value={selectAdaptableMarcaValue}
                                 onChange={handleModalChangeCompatibilidad}
-                            />
+                            >
+                                <option value="Seleccionar">Seleccionar</option>
+                                {/* Renderizar opciones desde la BD (uniqueMarcaNames) */}
+                                {marcaOptions.map((marcaName, index) => (
+                                    <option key={index} value={marcaName}>
+                                        {marcaName}
+                                    </option>
+                                ))}
+                                <option value="Otro">Otro </option>
+                            </Form.Select>
+
+                            {/* Campo de texto condicional para "Otro" o marca no registrada */}
+                            {(selectAdaptableMarcaValue === 'Otro' || isCustomAdaptableMarca) && (
+                                <Form.Control
+                                    className="mt-2"
+                                    type="text"
+                                    name="adaptableMarca" // ¡Actualiza el campo adaptableMarca!
+                                    // Mostrar el valor real o vacío si recién se selecciona "Otro"
+                                    value={selectedItem.adaptableMarca === 'Otro' ? '' : selectedItem.adaptableMarca || ''}
+                                    placeholder="Escriba la marca aqui"
+                                    onChange={handleModalChangeCompatibilidad}
+                                />
+                            )}
                         </Form.Group>
                         <Form.Group className="mb-2 w-50 ps-2">
-                            <Form.Label>Adaptable Modelo</Form.Label>
+                            <Form.Label>Modelo</Form.Label>
                             <Form.Control
                                 type="text"
                                 name="adaptableModelo"
@@ -1130,17 +1220,7 @@ function GestionAdminPage() {
                         </Form.Group>
                     </div>
 
-                    {/* Comentarios */}
-                    <Form.Group className="mb-2">
-                        <Form.Label>Comentarios</Form.Label>
-                        <Form.Control
-                            as="textarea"
-                            rows={2}
-                            name="comentarios"
-                            value={selectedItem.comentarios || ''}
-                            onChange={handleModalChangeCompatibilidad}
-                        />
-                    </Form.Group>
+                    
                 </Form>
             );
         }
@@ -1183,6 +1263,7 @@ function GestionAdminPage() {
                             handleDelete={handleEliminarUser}
                             link={'/gestionUsuarios'}
                             linkNuevo={'/nuevoUsuario'}
+                            showNewButton={true}
                         />
                         
                         {/* 2. SECCIÓN PIEZAS  */}
@@ -1197,6 +1278,7 @@ function GestionAdminPage() {
                             handleDelete={handleDeletePiezaReal}
                             link={'/gestionPiezas'}
                             linkNuevo={'/TablaCel'}
+                            showNewButton={true}
                         />
                         
                         {/* 3. SECCIÓN M. ESTUDIO  */}
@@ -1211,11 +1293,12 @@ function GestionAdminPage() {
                             handleDelete={handleEliminarEstudio} 
                             link={'/gestionEstudios'}
                             linkNuevo={'/nuevoEstudio'} 
+                            showNewButton={true}
                         />
                         <div className="grid-full-width">
                         {/* 4. SECCIÓN COMPATIBILIDAD  */}
                         <DataCard
-                            title="Compatibilidad Sugerida"
+                            title="Sugerencias de Compatibilidad"
                             icon={IconoPieza} 
                             data={decoratedCompatibilidad} 
                             searchQuery={searchQueryCompatibilidad}
@@ -1223,7 +1306,8 @@ function GestionAdminPage() {
                             collectionName="compatibilidad"
                             handleEdit={handleEditCompatibilidad} 
                             handleDelete={handleEliminarCompatibilidad} 
-                            link={'/gestionCompatibilidad'}
+                            link={'/gestionSugerencias'}
+                            showNewButton={false}
                         />
                         </div>
                     </div>
