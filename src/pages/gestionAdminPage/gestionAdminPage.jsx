@@ -747,31 +747,34 @@ function GestionAdminPage() {
         if (!selectedItem || itemType !== 'compatibilidad') return;
 
         const requiredFields = [
-             { key: 'nombreCelular', label: 'Nombre del Celular' },
-             { key: 'modelo', label: 'Modelo' },
-             { key: 'pieza', label: 'Pieza' },
-             { key: 'marca', label: 'Marca' },
-             { key: 'adaptableMarca', label: 'Marca Adaptable' },
-             { key: 'adaptableModelo', label: 'Modelo Adaptable' },
-             { key: 'estado', label: 'Estado' },
+               { name: 'estado', label: 'Estado', minLength: 1 },
+            { name: 'nombreCelular', label: 'Nombre Celular', minLength: 3 },
+            { name: 'marca', label: 'Marca (Origen)', minLength: 2 },
+            { name: 'modelo', label: 'Modelo (Origen)', minLength: 1 },
+            { name: 'pieza', label: 'Pieza', minLength: 3 },
+            { name: 'adaptableMarca', label: 'Marca (Adaptable)', minLength: 2 },
+            { name: 'adaptableModelo', label: 'Modelo (Adaptable)', minLength: 1 },
         ];
-
-        const missingField = requiredFields.find(field => {
-             // Verificamos si el campo está vacío, nulo o solo contiene espacios
-             const value = selectedItem[field.key];
-             return !value || (typeof value === 'string' && value.trim() === '');
+        let missingFields = [];
+        requiredFields.forEach(field => {
+            const value = selectedItem[field.name] ? String(selectedItem[field.name]).trim() : '';
+            
+            // Criterio de "vacío" o "seleccionar"
+            if (!value || value === 'Seleccionar' || value === 'Otro' || value.length < field.minLength) {
+                missingFields.push(field.label);
+            }
         });
 
-        if (missingField) {
-             Swal.fire({ 
-                 title:"Campos incompletos", 
-                 text: `El campo '${missingField.label}' es obligatorio y no debe estar vacío.`, 
-                 icon: "error", 
-                 background: '#052b27ff', 
-                 color: '#ffdfdfff', 
-                 confirmButtonColor: '#0b6860ff', 
-             });
-             return; // Detiene la ejecución si falta un campo
+        if (missingFields.length > 0) {
+            Swal.fire({ 
+                title:"Campos incompletos", 
+                text: `Por favor, llenar todos los campos necesarios`, 
+                icon: "error", 
+                background: '#052b27ff', 
+                color: '#ffdfdfff', 
+                confirmButtonColor: '#0b6860ff', 
+            });
+            return; // Detiene la ejecución si falta un campo
         }
 
         try {

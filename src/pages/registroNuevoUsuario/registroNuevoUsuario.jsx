@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Swal from 'sweetalert2';
 import { auth } from '../../firebase';
 import { db } from '../../firebase';
+import { createUserWithEmailAndPassword, signOut} from 'firebase/auth'; 
 import { doc, setDoc, addDoc, collection} from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logos/App-Daptable-Cel.png';
@@ -62,6 +63,17 @@ function RegistroNuevoUsuario() {
                   });
       return;
     }
+    if(formData.password.length < 6 ){
+          Swal.fire({
+                        title:"Error", 
+                        text: "la contraseña debe tener como minimo 6 caracteres.", 
+                        icon: "error",
+                        background: '#052b27ff', // Color de fondo personalizado
+                        color: '#ffdfdfff', // Color del texto personalizado
+                        confirmButtonColor: '#0b6860ff',
+                      });
+          return;
+      }
 
     if (formData.password !== formData.confirmPassword) {
       Swal.fire({
@@ -75,16 +87,18 @@ function RegistroNuevoUsuario() {
       return;
     }
 
+    
     try {
-        const postCollection = collection(db, 'usuarios');
-      // Guardar datos adicionales en Firestore
-        await addDoc(postCollection, {
+    const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+    const user = userCredential.user;
+    await signOut(auth);
+        await setDoc(doc(db, 'usuarios', user.uid),{
         nombreCompleto: formData.nombreCompleto,
         fechaNacimiento: formData.fechaNacimiento,
         sexo: formData.sexo,
         telefono: formData.telefono,
         email: formData.email,
-        estado: formData.estado,// campo para activar o desactivar luego
+        estado: formData.estado,
         rol: formData.rol
       });
 
@@ -102,23 +116,23 @@ function RegistroNuevoUsuario() {
     } catch (error) {
       if (error.code === 'auth/email-already-in-use') {
         Swal.fire({
-                      title:"Error", 
-                      text: "Este correo ya está registrado.", 
-                      icon: "error",
-                      background: '#052b27ff', // Color de fondo personalizado
-                      color: '#ffdfdfff', // Color del texto personalizado
-                      confirmButtonColor: '#0b6860ff',
-                    });
+          title:"Error", 
+          text: "Este correo ya está registrado.", 
+          icon: "error",
+          background: '#052b27ff', // Color de fondo personalizado
+          color: '#ffdfdfff', // Color del texto personalizado
+          confirmButtonColor: '#0b6860ff',
+        });
       } else {
         console.error(error);
         Swal.fire({
-                      title:"Error", 
-                      text: "No se pudo registrar el usuario.", 
-                      icon: "error",
-                      background: '#052b27ff', // Color de fondo personalizado
-                      color: '#ffdfdfff', // Color del texto personalizado
-                      confirmButtonColor: '#0b6860ff',
-                    });
+          title:"Error", 
+          text: "No se pudo registrar el usuario.", 
+          icon: "error",
+          background: '#052b27ff', // Color de fondo personalizado
+          color: '#ffdfdfff', // Color del texto personalizado
+          confirmButtonColor: '#0b6860ff',
+        });
       }
     }
   };

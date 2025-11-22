@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import menuIcon from '../../assets/Iconos/IconoMenu.png';
+import { useUserRole } from '../hooks/useUserRole';
+
 
 // Componente local: grupo expandible accesible
 function ExpandableGroup({ title, id, children, drawerOpen }) {
@@ -37,9 +39,12 @@ function ExpandableGroup({ title, id, children, drawerOpen }) {
   );
 }
 
-function PersonasMenu({ navigate }) {
+function MenuNavbar({ navigate }) {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef(null);
+  const { userRole, isRoleLoading } = useUserRole();
+
+  const isAuthenticatedUser = userRole && userRole !== 'invitado';
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -57,6 +62,7 @@ function PersonasMenu({ navigate }) {
       document.removeEventListener('keydown', handleEsc);
     };
   }, []);
+  
 
   // Drawer lateral: muestra overlay y panel que se desliza desde la izquierda
   return (
@@ -92,13 +98,25 @@ function PersonasMenu({ navigate }) {
         <div className="personas-drawer-list">
           {/* Top-level items */}
           <div className="espacios-menu" />
-          <button className="personas-drawer-item" onClick={() => { navigate('/perfil'); setOpen(false); }}>
-            Mi Perfil
+         <button 
+             className="personas-drawer-item" 
+            onClick={() => { 
+                navigate(isAuthenticatedUser ? '/perfil' : '/'); 
+                setOpen(false); 
+             }}
+          >
+             {isAuthenticatedUser? 'Mi Perfil' : 'Iniciar Sesión'}
           </button>
           <div className="espacios-menu" />
-          <button className="personas-drawer-item" onClick={() => { navigate('/opinion'); setOpen(false); }}>
+          
+          
+          {(userRole === 'admin' || userRole === 'usuario') && (
+            <>
+            <button className="personas-drawer-item" onClick={() => { navigate('/opinion'); setOpen(false); }}>
             Nos interesa tu opinión
-          </button>
+            </button>
+            </>
+          )}
           <div className="espacios-menu" />
           <button className="personas-drawer-item" onClick={() => { navigate('/noticias'); setOpen(false); }}>
             Noticias
@@ -115,7 +133,9 @@ function PersonasMenu({ navigate }) {
           </ExpandableGroup>
             <div className="espacios-menu" />
           {/* Group: Ayúdanos (expandable) */}
-          <ExpandableGroup title="Ayúdanos" id="ayudanos" className="personas-drawer-item" drawerOpen={open}>
+          {(userRole === 'admin' || userRole === 'usuario') &&(
+            <>
+            <ExpandableGroup title="Ayúdanos" id="ayudanos" className="personas-drawer-item" drawerOpen={open}>
             <button className="personas-drawer-item" onClick={() => { navigate('/ayuda/donaciones'); setOpen(false); }}>
               Donaciones
             </button>
@@ -123,18 +143,25 @@ function PersonasMenu({ navigate }) {
               Aumentar base de datos
             </button>
           </ExpandableGroup>
+            </>
+          )}
+          
 
           {/* Admin quick links (original Personas options) */}
           <div className="espacios-menu" />
-          <button className="personas-drawer-item" onClick={() => { navigate('/TablaCel'); setOpen(false); }}>
-            Generar Tabla (tabla)
-          </button>
-          <button className="personas-drawer-item" onClick={() => { navigate('/gestionAdmin'); setOpen(false); }}>
-            Gestión de Administrador
-          </button>
+          {userRole === 'admin' && (
+            <>
+            <button className="personas-drawer-item" onClick={() => { navigate('/TablaCel'); setOpen(false); }}>
+              Generar Tabla (tabla)
+            </button>
+            <button className="personas-drawer-item" onClick={() => { navigate('/gestionAdmin'); setOpen(false); }}>
+              Gestión de Administrador
+            </button>
+            </>
+          )}
         </div>
       </aside>
     </div>
   );
 }
-export default PersonasMenu;
+export default MenuNavbar;

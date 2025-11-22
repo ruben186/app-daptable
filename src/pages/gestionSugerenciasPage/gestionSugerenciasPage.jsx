@@ -108,7 +108,7 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
             const value = formData[field.name] ? String(formData[field.name]).trim() : '';
             
             // Criterio de "vacío" o "seleccionar"
-            if (!value || value === 'Seleccionar' || value.length < field.minLength) {
+            if (!value || value === 'Seleccionar' || value === 'Otro' || value.length < field.minLength) {
                 missingFields.push(field.label);
             }
         });

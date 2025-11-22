@@ -183,7 +183,14 @@ function GestionUsuariosPage() {
              ));
 
              setShowModal(false);
-             Swal.fire('Actualizado', 'Los datos fueron actualizados.', 'success');
+             Swal.fire({
+                title: '¡Actualizado!',
+                text: 'Los datos del usuario fueron actualizados.',
+                icon: 'success',
+                background: '#052b27ff',
+                color: '#ffff',
+                confirmButtonColor: '#07433E',
+            });
          } catch (error) {
              console.error(error);
              Swal.fire('Error', 'No se pudo actualizar.', 'error');

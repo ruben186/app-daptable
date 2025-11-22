@@ -71,6 +71,18 @@ function RegisterPage() {
       return;
     }
 
+    if(formData.password.length < 6){
+              Swal.fire({
+                      title:"Error", 
+                      text: "la contraseña debe tener como minimo 6 caracteres.", 
+                      icon: "error",
+                      background: '#052b27ff', // Color de fondo personalizado
+                      color: '#ffdfdfff', // Color del texto personalizado
+                      confirmButtonColor: '#0b6860ff',
+                    });
+        return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       Swal.fire({
                     title:"Contraseña", 
