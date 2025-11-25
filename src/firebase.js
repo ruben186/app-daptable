@@ -16,6 +16,7 @@ const firebaseConfig = {
 };
 
 
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -25,4 +26,10 @@ googleProvider.setCustomParameters({
   prompt: 'select_account' 
 });
 
-export {auth, googleProvider,db, signOut}
+
+// al final de src/firebase.js (ya existente)
+export const APP_ID = firebaseConfig.projectId || firebaseConfig.appId || 'default-app-id';
+export { auth, googleProvider, db, signOut };
+
+
+
