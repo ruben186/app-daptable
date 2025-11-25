@@ -9,24 +9,29 @@ import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 
 // Importación de Iconos e Imágenes
+import IconologoXiami from '../../assets/logos/logoxiaomiverde2.png';
 import IconoPantallaV from '../../assets/Iconos/iconoPantallaVerde.png';
 import IconoBateriaV from '../../assets/Iconos/IconoBateriaV.png';
 import IconoFlexBotonesV from '../../assets/Iconos/flexBotonesV.png';
 import IconoPiezaA from '../../assets/Iconos/IconoPiezaA.png'; 
-
+import IconoflexcargaV from '../../assets/Iconos/flexdeCargaV.png'; 
+import IconoflexcargaR from '../../assets/Iconos/flexCargaR.png'; 
+import IconopuertocargaV from '../../assets/Iconos/pindecargaV.png'; 
+import IconovidrioTV from '../../assets/Iconos/vidrioTV.png'; 
+import IconovidrioTR from '../../assets/Iconos/vidrioTR.png'; 
+import IconovisorV from '../../assets/Iconos/visorV.png'; 
 // --- LISTA DE RESPALDO (GARANTIZA LA VISIBILIDAD DE LAS 10 CARDS) ---
 // Si Firebase no devuelve datos, esta lista se usa para que las tarjetas siempre estén visibles.
 const DEFAULT_PARTES = [
-    { id: 'def1', name: "Logica de carga" },
+    { id: 'def1', name: "puerto de carga" },
     { id: 'def2', name: "Bateria" },
     { id: 'def3', name: "Pantalla" },
     { id: 'def4', name: "Flex de carga" },
-    { id: 'def5', name: "Botones" },
+
     { id: 'def6', name: "Flex de Botones" },
     { id: 'def7', name: "Vidrio templado" },
     { id: 'def8', name: "Visor" },
-    { id: 'def9', name: "Forro" },
-    { id: 'def10', name: "Microfono" },
+   
 ];
 
 function BtnMasXiaomi() {
@@ -80,8 +85,11 @@ function BtnMasXiaomi() {
         
         if (nombre.includes('bateria')) return IconoBateriaV;
         if (nombre.includes('pantalla')) return IconoPantallaV;
-        if (nombre.includes('flex')) return IconoFlexBotonesV;
-        
+        if (nombre.includes('flex de botones')) return IconoFlexBotonesV;
+        if (nombre.includes('flex de carga')) return IconoflexcargaV;
+        if (nombre.includes('puerto de carga')) return IconopuertocargaV;
+        if (nombre.includes('vidrio templado')) return IconovidrioTV;
+         if (nombre.includes('visor')) return IconovisorV;
         // --- RESGUARDO: LOGO DE CAJA AMARILLA POR DEFECTO ---
         return IconoPiezaA; 
     };
