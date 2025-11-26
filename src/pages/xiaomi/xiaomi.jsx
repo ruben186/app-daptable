@@ -133,8 +133,11 @@ function Xiaomi() {
         const piezaInfoActual = getPiezaInfo(userActual, nombreCampoBD);
         const codigoCompatibilidad = piezaInfoActual?.codigoCompatibilidad;
 
+        // Normalizador para comparar códigos de forma exacta (trim + lower)
+        const normalizeCode = (c) => (c === undefined || c === null) ? '' : String(c).trim().toLowerCase();
+
         // Si no hay código, mostramos error y salimos
-        if (!codigoCompatibilidad || codigoCompatibilidad.trim() === '') {
+        if (!codigoCompatibilidad || normalizeCode(codigoCompatibilidad) === '') {
             Swal.fire({
                 icon: 'error',
                 title: 'Sin Información',
@@ -144,31 +147,44 @@ function Xiaomi() {
         }
 
         // 3. BUSCAR HERMANOS: Filtrar todos los usuarios para ver quiénes comparten ese código
+        const normTarget = normalizeCode(codigoCompatibilidad);
         const modelosCompatibles = usuarios.filter(u => {
             const infoPiezaUsuario = getPiezaInfo(u, nombreCampoBD);
-            // Compara si el código es igual al del usuario actual (y que no sea nulo)
-            return infoPiezaUsuario?.codigoCompatibilidad === codigoCompatibilidad;
+            const codigo = infoPiezaUsuario?.codigoCompatibilidad;
+            // Comparamos codigo normalizado de forma estricta
+            return normalizeCode(codigo) === normTarget;
         });
 
         // 4. Generar la lista HTML para mostrar en la Alerta
-        // Usamos .map para crear una lista de items <li>
         const listaModelosHTML = modelosCompatibles.length > 0 
-            ? modelosCompatibles.map(m => `<li style="text-align: left; margin-bottom: 5px;">📱 ${m.nombre} - <strong>${m.modelo}</strong></li>`).join('')
+            ? modelosCompatibles.map(m => `<li style="text-align: left; margin-bottom: 5px;">📱 ${m.nombre || ''} - <strong>${m.modelo || ''}</strong></li>`).join('')
             : '<li>No se encontraron otros modelos.</li>';
 
-        // 5. Mostrar la Alerta con la lista
+        // 5. Mostrar la Alerta con el logo y la lista
+        const headerHtml = `
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                <img src="${IconologoXiami}" width="48" height="48" style="border-radius:6px;" alt="Logo Xiaomi" />
+                <div style="line-height:1;">
+                    <div style="font-weight:600">${userActual.nombre || ''}</div>
+                    <div style="font-size:0.95em;color:#cfe9e4">Modelo: <strong>${userActual.modelo || ''}</strong></div>
+                </div>
+            </div>
+        `;
+
         Swal.fire({
             title: `Compatibilidad: ${nombreCampoBD}`,
             html: `
-                <div style="font-size: 1em;">
+                ${headerHtml}
+                <div style="font-size: 0.95em;">
                     <p style="margin-bottom: 10px;">El código <strong>${codigoCompatibilidad}</strong> es compatible con:</p>
-                    <ul style="list-style: none; padding: 0; max-height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 10px;">
+                    <ul style="list-style: none; padding: 0; max-height: 260px; overflow-y: auto; border: 1px solid #eee; padding: 10px;">
                         ${listaModelosHTML}
                     </ul>
                 </div>
             `,
             icon: 'success',
-            confirmButtonText: 'Genial'
+            confirmButtonText: 'Cerrar',
+            width: 680
         });
     };
 

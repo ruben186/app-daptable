@@ -39,6 +39,76 @@
   font-size: 1.1rem;
   line-height: 1;
 }
+
+.nav-dropdown-pill .dropdown-toggle {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+.nav-dropdown-pill .dropdown-toggle::after {
+  display: none; /* ocultar la flecha default para controlar el layout */
+}
+
+.dropdown-menu[data-bs-popper]{
+  left: -20% !important; /* ajustar posición del menú desplegable */
+}
+
+ 
+
+.nav-dropdown-pill .pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* mantener padding y border-radius similar a otras pills */
+  padding: 8px 18px;
+  border-radius: 24px;
+}
+
+.nav-dropdown-pill .dropdown-menu {
+  background: #064e49  !important;
+  border-radius: 0 0 20px 20px;
+  border: none !important;
+  box-shadow: none !important;
+  margin-top: 6px;
+  min-width: 160px;
+}
+
+.nav-dropdown-pill .dropdown-item {
+  color: inherit !important;
+  background: transparent !important;
+  border-radius: 8px;
+  margin: 4px 8px;
+}
+
+.nav-dropdown-pill .dropdown-item:hover {
+  background: rgba(255,255,255,0.02) !important;
+  text-decoration: none !important;
+}
+
+.nav-dropdown-pill .dropdown-item .pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 18px;
+  border-radius: 24px;
+  background: #09665E;
+  color: #3BD5C4;
+  width: 160px; /* ancho controlado para consistencia */
+ 
+}
+
+.nav-dropdown-pill .dropdown-item .pill:hover {
+  background: #15CABB;
+  color: #001b19;
+  transform: translateY(-2px);
+}
+
+/* Asegurar que la clase pill-link alinee el toggle correctamente */
+.pill-link.nav-dropdown-pill {
+  display: inline-flex;
+  align-items: center;
+}
  
 /* NAVBAR internal */
 .navbar-center {

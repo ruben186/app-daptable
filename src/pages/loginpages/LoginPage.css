@@ -334,12 +334,12 @@ a:hover {
     margin-bottom: 8px;
 }
 
-.login-invited a {
+.login-invited button{
     color: #42F1DD;
     font-size: 1rem;
     text-decoration: none;
 }
 
-.login-invited a:hover {
+.login-invited button:hover {
     text-decoration: underline;
 }

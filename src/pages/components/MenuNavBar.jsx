@@ -151,9 +151,6 @@ function MenuNavbar({ navigate }) {
           <div className="espacios-menu" />
           {userRole === 'admin' && (
             <>
-            <button className="personas-drawer-item" onClick={() => { navigate('/TablaCel'); setOpen(false); }}>
-              Generar Tabla (tabla)
-            </button>
             <button className="personas-drawer-item" onClick={() => { navigate('/gestionAdmin'); setOpen(false); }}>
               Gestión de Administrador
             </button>

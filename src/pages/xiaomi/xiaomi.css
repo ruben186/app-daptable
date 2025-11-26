@@ -139,3 +139,25 @@
 @media (max-width:600px){
     .parts-grid, .admin-part-grid{grid-template-columns: repeat(2, 1fr);}
 }
+
+/* Visuals for missing pieces */
+.xiaomi-card.missing { border-color: rgba(220,40,40,0.25); }
+.xiaomi-card.missing .card-image-placeholder { background: linear-gradient(180deg,#2b0a0a,#0f0505); }
+.xiaomi-card.missing .card-label { background: linear-gradient(180deg, rgba(200,20,20,0.08) 0%, rgba(120,10,10,0.95) 100%); color: #ffecec; }
+.part-icon.tinted-missing { filter: grayscale(0.9) sepia(0.9) hue-rotate(-30deg) saturate(4) brightness(0.9); }
+.compat-badge { margin-top:8px; font-size:12px; color:#b7fff0; opacity:0.95; }
+.missing-text { margin-top:6px; font-size:12px; color:#ffd6d6; opacity:0.95; }
+
+/* Header for BtnMasXiaomi page */
+.parts-header{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-bottom:20px;
+}
+.parts-header-left{flex:0 0 auto}
+.parts-header-logo{width:56px;height:56px;object-fit:cover;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.45);}
+.parts-header-right{display:flex;flex-direction:column}
+.parts-header-title{color:#bfffe9;font-size:18px;font-weight:700}
+.parts-header-subtitle{color:#cbeee6;font-size:16px;margin-top:4px}
+.parts-header-subtitle .muted{color:#89d6c9;font-weight:600}

@@ -1,17 +1,20 @@
 import { useNavigate } from 'react-router-dom';
-import { Navbar, Nav, Container } from 'react-bootstrap';
+import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
 import { auth, db } from '../../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState, useRef } from 'react';
 import logo from '../../assets/logos/logoapp-daptable.jpeg';
-// ...existing assets imports...
 import logoxiami from '../../assets/logos/logoxiami.png'; 
 import logosamgsumg from '../../assets/logos/logosamgsumg.png'; 
 import logohuawei from '../../assets/logos/logohuawei.png'; 
 import logomotorola from '../../assets/logos/logomotorola.png';
 import PersonasMenu from './MenuNavBar';
 import IconoBuscar from '../../assets/Iconos/iconoLupa.png';
+import logoOppo from '../../assets/logos/OPPOLogo.png';
+import logoRealme from '../../assets/logos/Realme_logo.png';
+import logoVivo from '../../assets/logos/VivoLogo.png';
+import logoZTE from '../../assets/logos/zteLogo.png';
 
 // SweetAlert se usa en otras partes; eliminado aquí para evitar warnings si no se usa.
 
@@ -79,11 +82,33 @@ function NavBar() {
                   </div>
                 </Nav.Link>
 
-                <Nav.Link onClick={() => navigate('/otros')} className="pill-link">
-                  <div className="pill">
-                    <small>Otros..</small>
-                  </div>
-                </Nav.Link>
+                <NavDropdown
+                  title={<div className="pill"><small>Otros..</small></div>}
+                  id="nav-dropdown-otros"
+                  className="pill-link nav-dropdown-pill"
+                  renderMenuOnMount={true}
+                >
+                  <NavDropdown.Item onClick={() => navigate('/Oppo')} className="dropdown-item">
+                    <div className="pill">
+                      <img src={logoOppo} alt="Oppo" className="pill-icon" width="80px" height="80px" style={{borderRadius: '20px'}} />
+                    </div>
+                  </NavDropdown.Item>
+                  <NavDropdown.Item onClick={() => navigate('/Realme')} className="dropdown-item">
+                    <div className="pill">
+                      <img src={logoRealme} alt="Realme" className="pill-icon" width="100px" height="100px" style={{borderRadius: '20px'}} />
+                    </div>
+                  </NavDropdown.Item>
+                  <NavDropdown.Item onClick={() => navigate('/Vivo')} className="dropdown-item">
+                    <div className="pill">
+                      <img src={logoVivo} alt="Vivo" className="pill-icon" width="90px" height="90px" style={{borderRadius: '20px'}} />
+                    </div>
+                  </NavDropdown.Item>
+                  <NavDropdown.Item onClick={() => navigate('/ZTE')} className="dropdown-item">
+                    <div className="pill">
+                      <img src={logoZTE} alt="ZTE" className="pill-icon" width="60px" height="60px" />
+                    </div>
+                  </NavDropdown.Item>
+                </NavDropdown>
               </Nav>
 
               {/* caja de búsqueda */}
