@@ -30,6 +30,13 @@
   transform: translateY(-2px);
 }
 
+/* Mantener estilo cuando una pill está activa */
+.pill.active {
+  background: #15CABB;
+  color: #001b19;
+  transform: translateY(-2px);
+}
+
 .pill-icon {
   object-fit: contain;
 }

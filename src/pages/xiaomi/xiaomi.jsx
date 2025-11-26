@@ -1,18 +1,16 @@
 
 
 import { useEffect, useState } from 'react';
-import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { useNavigate,Link } from 'react-router-dom';
-import { Container,Nav, Table, Button, Form, InputGroup } from 'react-bootstrap';
+import { collection, getDocs } from 'firebase/firestore';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Container, Table, Button } from 'react-bootstrap';
 import Swal from 'sweetalert2';
-import { auth, db } from '../../firebase';
+import { db } from '../../firebase';
 import './xiaomi.css';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
-import logoxiami from '../../assets/logos/logoxiami.png'; 
 
 // Importación de Iconos e Imágenes
-import IconoBuscar from '../../assets/Iconos/iconoLupa.png';
 import IconoPantallaV from '../../assets/Iconos/iconoPantallaVerde.png';
 import IconoPantallaR from '../../assets/Iconos/iconoPantallaRojo.png';
 import IconoBateriaR from '../../assets/Iconos/IconoBateriaR3.png';
@@ -21,13 +19,19 @@ import IconoFlexBotonesV from '../../assets/Iconos/flexBotonesV.png';
 import IconoFlexBotonesR from '../../assets/Iconos/flexBotonesR.png';
 import IconoPiezaA from '../../assets/Iconos/IconoPiezaA.png';
 import IconologoXiami from '../../assets/logos/logoxiaomiverde2.png';
+import IconologoSamsung from '../../assets/logos/logosamgsumg.png';
+import IconologoHuawei from '../../assets/logos/logohuawei.png';
+import IconologoMotorola from '../../assets/logos/logomotorola.png';
+import IconologoOppo from '../../assets/logos/OPPOLogo.png';
+import IconologoRealme from '../../assets/logos/Realme_logo.png';
+import IconologoVivo from '../../assets/logos/VivoLogo.png';
+import IconologoZTE from '../../assets/logos/zteLogo.png';
 
 function Xiaomi() {
     const navigate = useNavigate();
+    const location = useLocation();
     const [usuarios, setUsuarios] = useState([]);
     const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
-    const [showModal, setShowModal] = useState(false); // Se mantiene por si reactivas la edición
-    const [selectedAux, setSelectedAux] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
     // 1. Carga inicial de datos (Solo Marcas Xiaomi/Redmi)
@@ -39,12 +43,7 @@ function Xiaomi() {
                     .map(doc => ({
                         id: doc.id,
                         ...doc.data()
-                    }))
-                    .filter(user => {
-                        // Filtro básico por Marca para mostrar solo lo relevante en esta vista
-                        const marca = user.marca?.toLowerCase();
-                        return marca === 'redmi' || marca === 'xiaomi';
-                    });
+                    }));
 
                 setUsuarios(data);
                 setUsuariosFiltrados(data);
@@ -55,30 +54,84 @@ function Xiaomi() {
         fetchUsuarios();
     }, []);
 
-    // 2. Lógica de Búsqueda Profunda (Nombre, Modelo Y Código de Compatibilidad)
+    // 2. Filtrado combinado: por marca (query param) y por término de búsqueda
     useEffect(() => {
-        const term = searchTerm.toLowerCase();
-        
-        const results = usuarios.filter(user => {
-            // Buscamos coincidencia en Nombre o Modelo
-            const porNombre = user.nombre?.toLowerCase().includes(term);
-            const porModelo = user.modelo?.toLowerCase().includes(term);
+        const params = new URLSearchParams(location.search);
+        const brandParam = params.get('brand')?.toLowerCase();
+        const qParam = params.get('q') || '';
 
-            // Buscamos coincidencia dentro del array 'campos' (por codigoCompatibilidad)
-            // user.campos puede ser undefined, usamos ?. y validamos que sea array
-            const porCompatibilidad = Array.isArray(user.campos) && user.campos.some(item => 
-                item.codigoCompatibilidad?.toLowerCase().includes(term)
-            );
+        // Si la URL contiene 'q' la usamos como fuente de verdad; si no, limpiamos el estado de búsqueda
+        const hasQ = new URLSearchParams(location.search).has('q');
+        if (hasQ) {
+            if (qParam !== searchTerm) setSearchTerm(qParam);
+        } else {
+            if (searchTerm !== '') setSearchTerm('');
+        }
 
-            return porNombre || porModelo || porCompatibilidad;
-        });
+        const term = (hasQ ? qParam : '').toLowerCase();
+
+        let results = usuarios.slice();
+
+        // Aliases para marcas (ajusta si tu BD usa nombres diferentes)
+        const brandAliases = {
+            samsung: ['samsung', 'samgsumg'],
+            xiaomi: ['xiaomi', 'redmi'],
+            motorola: ['motorola', 'moto'],
+            huawei: ['huawei'],
+            oppo: ['oppo'],
+            realme: ['realme'],
+            vivo: ['vivo'],
+            zte: ['zte']
+        };
+
+        if (brandParam) {
+            const aliases = brandAliases[brandParam] || [brandParam];
+            results = results.filter(u => {
+                const m = (u.marca || '').toLowerCase();
+                return aliases.some(a => (m && (m === a || m.includes(a) || a.includes(m))));
+            });
+        } else {
+            // Comportamiento por defecto: mostrar solo Xiaomi/Redmi en esta vista
+            results = results.filter(u => {
+                const m = (u.marca || '').toLowerCase();
+                return m === 'redmi' || m === 'xiaomi';
+            });
+        }
+
+        // Aplicar búsqueda (nombre/modelo/código) sobre el conjunto ya filtrado por marca
+        if (term) {
+            results = results.filter(user => {
+                const porNombre = user.nombre?.toLowerCase().includes(term);
+                const porModelo = user.modelo?.toLowerCase().includes(term);
+                const porCompatibilidad = Array.isArray(user.campos) && user.campos.some(item => 
+                    item.codigoCompatibilidad?.toLowerCase().includes(term)
+                );
+                return porNombre || porModelo || porCompatibilidad;
+            });
+        }
 
         setUsuariosFiltrados(results);
-    }, [searchTerm, usuarios]);
+    }, [usuarios, location.search, searchTerm]);
 
-    const handleSearch = (e) => {
-        setSearchTerm(e.target.value);
+    // Logo dinámico según brand
+    const getLogoForBrand = () => {
+        const params = new URLSearchParams(location.search);
+        const brandParam = params.get('brand')?.toLowerCase();
+        switch (brandParam) {
+            case 'samsung': return IconologoSamsung;
+            case 'huawei': return IconologoHuawei;
+            case 'motorola': return IconologoMotorola;
+            case 'oppo': return IconologoOppo;
+            case 'realme': return IconologoRealme;
+            case 'vivo': return IconologoVivo;
+            case 'zte': return IconologoZTE;
+            case 'xiaomi':
+            default:
+                return IconologoXiami;
+        }
     };
+
+    // Nota: la búsqueda desde el navbar actualiza la URL y `searchTerm` se sincroniza desde allí.
 
     // 3. Función Auxiliar para obtener datos del Array 'campos'
     // Busca el objeto dentro del array que corresponda a la pieza (ej: "PANTALLA")
@@ -197,13 +250,13 @@ function Xiaomi() {
                         <div className="header-tabla"></div>
                         <div className='header-tabla2'>
                             <div className="nombre-tabla">
-                                <img src={IconologoXiami} className='mover-logo-xiaomi' width="54px" height="54px" alt="Logo Xiaomi" />
+                                <img src={getLogoForBrand()} className='mover-logo-xiaomi' width="54px" height="54px" alt="Logo Marca" />
                                 <h5 className='texto-separado'>
                                     Si un icono es <span style={{ color: 'red' }}>rojo</span> quiere decir que no hay información de Compatibilidad.
                                 </h5>
                             </div>
 
-                            <InputGroup className="search-input-group" style={{ maxWidth: '300px' }}>
+                            {/* <InputGroup className="search-input-group" style={{ maxWidth: '300px' }}>
                                 <Form.Control
                                     type="text"
                                     placeholder="Buscar por nombre, modelo o código..."
@@ -218,7 +271,7 @@ function Xiaomi() {
                                     className='btn-icon-buscar'
                                     alt="Icono buscar"
                                 />
-                            </InputGroup>
+                            </InputGroup> */}
                         </div>
 
                         <Table striped bordered hover responsive className="tabla-auxiliares">

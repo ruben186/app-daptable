@@ -7,6 +7,15 @@
    
  }
 
+/* Imagen del header: altura fija, ancho automático según proporción */
+.parts-header-logo,
+.mover-logo-xiaomi {
+    height: 54px; /* altura fija */
+    width: auto;  /* ancho depende de la imagen */
+    object-fit: contain;
+    display: inline-block;
+}
+
  /* Efecto Hover para los Iconos de la Tabla */
 .icon-hover-effect {
     transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out;
@@ -92,6 +101,23 @@
 .part-icon {
     max-width: 92%;
     max-height: 92%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Iconos de la tabla: mantener altura fija y ancho automático */
+.tabla-auxiliares img,
+.icono-tabla {
+    height: 34px; /* altura consistente para iconos de estado */
+    width: auto;
+    object-fit: contain;
+}
+
+/* Pills / logos en el navbar: altura fija, ancho auto para respetar proporción */
+.pill .pill-icon,
+.pill-icon {
+    height: 42px;
+    width: auto;
     object-fit: contain;
     display: block;
 }

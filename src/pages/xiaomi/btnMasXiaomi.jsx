@@ -26,6 +26,8 @@ import IconovidrioTV from '../../assets/Iconos/vidrioTV.png';
 import IconovidrioTR from '../../assets/Iconos/vidrioTR.png'; 
 import IconovisorV from '../../assets/Iconos/visorV.png'; 
 import IconoauricularV from '../../assets/Iconos/auricularV.png'; 
+import IconoauricularR from '../../assets/Iconos/auricularR.png'; 
+
 // --- LISTA DE RESPALDO (GARANTIZA LA VISIBILIDAD DE LAS 10 CARDS) ---
 // Si Firebase no devuelve datos, esta lista se usa para que las tarjetas siempre estén visibles.
 const DEFAULT_PARTES = [
@@ -155,7 +157,7 @@ function BtnMasXiaomi() {
         if (nombre.includes('puerto de carga') || nombre.includes('pin') || nombre.includes('puerto')) return has ? IconopuertocargaV : (IconopuertocargaR || IconoPiezaA);
         if (nombre.includes('vidrio')) return has ? IconovidrioTV : IconovidrioTR;
         if (nombre.includes('visor')) return has ? IconovisorV : IconoPiezaA;
-        if (nombre.includes('auricular')) return has ? IconoauricularV : IconoPiezaA;
+        if (nombre.includes('auricular')) return has ? IconoauricularV : IconoauricularR;
 
         return has ? IconoPiezaA : IconoPiezaA;
     };

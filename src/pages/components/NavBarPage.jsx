@@ -1,9 +1,9 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
-import { auth, db } from '../../firebase';
+import { auth } from '../../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { useEffect, useState, useRef } from 'react';
+// ...existing code...
+import { useEffect, useState } from 'react';
 import logo from '../../assets/logos/logoapp-daptable.jpeg';
 import logoxiami from '../../assets/logos/logoxiami.png'; 
 import logosamgsumg from '../../assets/logos/logosamgsumg.png'; 
@@ -21,24 +21,59 @@ import logoZTE from '../../assets/logos/zteLogo.png';
 function NavBar() {
   const navigate = useNavigate();
   const [user] = useAuthState(auth);
-  const [userRole, setUserRole] = useState(null);
+  const location = useLocation();
+  const [activeBrand, setActiveBrand] = useState(null);
+  const [searchValue, setSearchValue] = useState('');
 
 
   // Obtener rol desde Firestore
   useEffect(() => {
-    const fetchUserRole = async () => {
-      if (user) {
-        const userRef = doc(db, 'usuarios', user.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          const rol = userSnap.data().rol?.toLowerCase();
-          setUserRole(rol);
-        }
-      }
+  // placeholder: en el futuro podríamos usar el rol para mostrar opciones
+  }, [user]);
+
+  // Sincronizar marca activa con la query string
+  useEffect(() => {
+    const ps = new URLSearchParams(location.search);
+    const b = ps.get('brand')?.toLowerCase() || null;
+    setActiveBrand(b);
+  }, [location.search]);
+
+  // Manejar búsqueda desde el navbar
+  const handleSearchSubmit = () => {
+    const term = (searchValue || '').trim();
+    if (!term) return; // no hacemos nada si está vacío
+
+    const lower = term.toLowerCase();
+    // Marcas conocidas y aliases
+    const brandAliases = {
+      xiaomi: ['xiaomi', 'redmi'],
+      samsung: ['samsung', 'samgsumg'],
+      huawei: ['huawei'],
+      motorola: ['motorola', 'moto'],
+      oppo: ['oppo'],
+      realme: ['realme'],
+      vivo: ['vivo'],
+      zte: ['zte']
     };
 
-    fetchUserRole();
-  }, [user]);
+    // Detectar marca por aparición del nombre en el término de búsqueda
+    let detected = null;
+    for (const [brand, aliases] of Object.entries(brandAliases)) {
+      if (aliases.some(a => lower.includes(a))) {
+        detected = brand;
+        break;
+      }
+    }
+
+    if (detected) {
+      setActiveBrand(detected);
+      navigate(`/xiaomi?brand=${encodeURIComponent(detected)}&q=${encodeURIComponent(term)}`);
+    } else {
+      // búsqueda genérica sin marca
+      setActiveBrand(null);
+      navigate(`/xiaomi?q=${encodeURIComponent(term)}`);
+    }
+  };
 
   // Nota: la acción de logout está disponible en otro lugar; si se quiere activar aquí,
   // se puede reañadir la función handleLogout.
@@ -58,26 +93,26 @@ function NavBar() {
                   </div>
             
                 {/* Menú accesible por todos - pills con icono y label */}
-                <Nav.Link onClick={() => navigate('/xiaomi')} className="pill-link">
-                  <div className="pill">
+                <Nav.Link onClick={() => { navigate('/xiaomi?brand=xiaomi'); setActiveBrand('xiaomi'); }} className="pill-link">
+                  <div className={"pill" + (activeBrand === 'xiaomi' ? ' active' : '')}>
                     <img src={logoxiami} alt="Xiaomi" className="pill-icon" width="45px" height="42px"/>
                   </div>
                 </Nav.Link>
 
-                <Nav.Link onClick={() => navigate('/samgsumg')} className="pill-link">
-                  <div className="pill">
+                <Nav.Link onClick={() => { navigate('/xiaomi?brand=samsung'); setActiveBrand('samsung'); }} className="pill-link">
+                  <div className={"pill" + (activeBrand === 'samsung' ? ' active' : '')}>
                     <img src={logosamgsumg} alt="Samsung" className="pill-icon" />
                   </div>
                 </Nav.Link>
 
-                <Nav.Link onClick={() => navigate('/huawei')} className="pill-link">
-                  <div className="pill">
+                <Nav.Link onClick={() => { navigate('/xiaomi?brand=huawei'); setActiveBrand('huawei'); }} className="pill-link">
+                  <div className={"pill" + (activeBrand === 'huawei' ? ' active' : '')}>
                     <img src={logohuawei} alt="Huawei" className="pill-icon" />
                   </div>
                 </Nav.Link>
 
-                <Nav.Link onClick={() => navigate('/motorola')} className="pill-link">
-                  <div className="pill">
+                <Nav.Link onClick={() => { navigate('/xiaomi?brand=motorola'); setActiveBrand('motorola'); }} className="pill-link">
+                  <div className={"pill" + (activeBrand === 'motorola' ? ' active' : '')}>
                     <img src={logomotorola} alt="Motorola" className="pill-icon" width="50px" height="50px"  />
                   </div>
                 </Nav.Link>
@@ -88,23 +123,23 @@ function NavBar() {
                   className="pill-link nav-dropdown-pill"
                   renderMenuOnMount={true}
                 >
-                  <NavDropdown.Item onClick={() => navigate('/Oppo')} className="dropdown-item">
-                    <div className="pill">
+                  <NavDropdown.Item onClick={() => { navigate('/xiaomi?brand=oppo'); setActiveBrand('oppo'); }} className="dropdown-item" >
+                    <div className={"pill" + (activeBrand === 'oppo' ? ' active' : '')}>
                       <img src={logoOppo} alt="Oppo" className="pill-icon" width="80px" height="80px" style={{borderRadius: '20px'}} />
                     </div>
                   </NavDropdown.Item>
-                  <NavDropdown.Item onClick={() => navigate('/Realme')} className="dropdown-item">
-                    <div className="pill">
+                  <NavDropdown.Item onClick={() => { navigate('/xiaomi?brand=realme'); setActiveBrand('realme'); }} className="dropdown-item">
+                    <div className={"pill" + (activeBrand === 'realme' ? ' active' : '')}>
                       <img src={logoRealme} alt="Realme" className="pill-icon" width="100px" height="100px" style={{borderRadius: '20px'}} />
                     </div>
                   </NavDropdown.Item>
-                  <NavDropdown.Item onClick={() => navigate('/Vivo')} className="dropdown-item">
-                    <div className="pill">
+                  <NavDropdown.Item onClick={() => { navigate('/xiaomi?brand=vivo'); setActiveBrand('vivo'); }} className="dropdown-item">
+                    <div className={"pill" + (activeBrand === 'vivo' ? ' active' : '')}>
                       <img src={logoVivo} alt="Vivo" className="pill-icon" width="90px" height="90px" style={{borderRadius: '20px'}} />
                     </div>
                   </NavDropdown.Item>
-                  <NavDropdown.Item onClick={() => navigate('/ZTE')} className="dropdown-item">
-                    <div className="pill">
+                  <NavDropdown.Item onClick={() => { navigate('/xiaomi?brand=zte'); setActiveBrand('zte'); }} className="dropdown-item">
+                    <div className={"pill" + (activeBrand === 'zte' ? ' active' : '')}>
                       <img src={logoZTE} alt="ZTE" className="pill-icon" width="60px" height="60px" />
                     </div>
                   </NavDropdown.Item>
@@ -113,7 +148,18 @@ function NavBar() {
 
               {/* caja de búsqueda */}
               <div className="search-wrapper ms-3">
-                <input className="search-input" placeholder="Buscar..." /><img src={IconoBuscar} className="ImgLupa" alt="iconoBusqueda" />
+                <input
+                  className="search-input"
+                  placeholder="Buscar..."
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSearchSubmit();
+                    }
+                  }}
+                />
+                <img src={IconoBuscar} className="ImgLupa" alt="iconoBusqueda" style={{cursor:'pointer'}} onClick={() => handleSearchSubmit()} />
               </div>
             </div>
 
