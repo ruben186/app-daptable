@@ -24,12 +24,22 @@ function NavBar() {
   const location = useLocation();
   const [activeBrand, setActiveBrand] = useState(null);
   const [searchValue, setSearchValue] = useState('');
+  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 992);
+  
 
 
   // Obtener rol desde Firestore
-  useEffect(() => {
-  // placeholder: en el futuro podríamos usar el rol para mostrar opciones
-  }, [user]);
+    useEffect(() => {
+        const handleResize = () => {
+            // Actualiza el estado basado en el breakpoint lg (992px)
+            setIsLargeScreen(window.innerWidth >= 992);
+        };
+
+        window.addEventListener('resize', handleResize);
+        
+        // Limpieza: importante para evitar fugas de memoria
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
   // Sincronizar marca activa con la query string
   useEffect(() => {
@@ -81,16 +91,16 @@ function NavBar() {
   return (
     <div>
       {/* NAVBAR */}
-      <Navbar expand="lg" variant="dark" className="dashboard-navbar fixed-top">
+      <Navbar className="dashboard-navbar fixed-top">
         <Container className="navbarContainer">
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
+          <div className="personas-wrapper" ref={null}>
+            <PersonasMenu navigate={navigate} setActiveBrand={setActiveBrand} showBrandsInDrawer={!isLargeScreen}/>
+          </div>
+          
             {/* contenedor de pills y búsqueda */}
             <div className="navbar-center d-flex align-items-center">
-              <Nav className="pills-container d-flex align-items-center">
-                  <div className="personas-wrapper" ref={null}>
-                    <PersonasMenu navigate={navigate} />
-                  </div>
+              <Nav className="pills-container d-none d-lg-flex align-items-center">
+                  
             
                 {/* Menú accesible por todos - pills con icono y label */}
                 <Nav.Link onClick={() => { navigate('/xiaomi?brand=xiaomi'); setActiveBrand('xiaomi'); }} className="pill-link">
@@ -164,14 +174,14 @@ function NavBar() {
             </div>
 
             {/* brand a la derecha y logout */}
-            <div className="wrapper-logo">
-              <div className="brand-right">
-                <Navbar.Brand onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>
-                  <img src={logo} alt="Logo" className="brand-logo" />
-                </Navbar.Brand>
-              </div>
+            
+            <div className="brand-right">
+              <Navbar.Brand onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>
+                <img src={logo} alt="Logo" className="brand-logo" />
+              </Navbar.Brand>
             </div>
-          </Navbar.Collapse>
+            
+         
         </Container>
       </Navbar>
     </div>

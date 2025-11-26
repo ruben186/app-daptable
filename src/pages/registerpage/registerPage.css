@@ -21,7 +21,7 @@
 
 .btn-outline-secondary:hover { color: #9af3df; }
 
-.form-left { width: 45%; }
+.form-left { width: 35%; }
 .form-right { width: 44%; display:flex; justify-content:center; align-items:center; }
 
 .form-left h3 {
@@ -158,7 +158,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     color: #42F1DD;
     padding: 12px 32px;
     margin-top: 18px;
-    width: 212px;
     margin-left: auto;
     margin-right: auto;
     font-size: 1.1rem;
@@ -167,13 +166,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .btn-primary:hover {   background: #2b867f;
     color: #fff;}
 
-@media (max-width: 900px) {
-    .form-card { flex-direction: column-reverse; padding:36px 28px; border-radius:40px; }
-    .form-left, .form-right { width:100%; }
-    .logo-box { width:220px; height:220px; margin:0 auto 12px; border-width:6px; }
-    .btn-outline-secondary { left:12px; top:12px; font-size:18px; }
-}
-
 /* small tweaks */
 a.btn-outline-secondary:focus, .btn-primary:focus { box-shadow:0 0 0 4px rgba(11,189,165,0.12); outline:none; }
 
@@ -181,4 +173,45 @@ select.form-control { appearance:none; -webkit-appearance:none; -moz-appearance:
 
 /* fallback if logo is used directly as img inside form-card */
 .form-card > img.logo { width:120px; margin:0 auto 12px; }
+
+/* Responsive layout: stack columns and hide right logo on narrow screens */
+@media (max-width: 1280px) {
+    
+    .form-left, .form-right { max-width: 720px; }
+    .form-right { display:flex; justify-content:center; margin-bottom: 16px; }
+    .logo-box { width:440px; height:440px; margin:0 auto 12px; border-width:6px; }
+    .btn-outline-secondary { left:12px; top:12px; font-size:18px; }
+}
+@media (max-width: 1024px) {
+    
+    .form-left, .form-right {  max-width: 720px; }
+    .form-left { width: 45%; }
+    .form-right { display:flex; justify-content:center; margin-bottom: 16px; margin-left: 10px;}
+    .logo-box { width:330px; height:330px; margin:0 auto 12px; border-width:6px; }
+    .btn-outline-secondary { left:12px; top:12px; font-size:18px; }
+}
+@media (max-width: 778px) {
+    
+    .form-left, .form-right { width: 100%; max-width: 720px; }
+    .form-right { display:flex; justify-content:center; margin-bottom: 16px; }
+    .logo-box { width:330px; height:330px; margin:0 auto 12px; border-width:6px; }
+    .btn-outline-secondary { left:12px; top:12px; font-size:18px; }
+}
+
+@media (max-width: 540px) {
+    .bg-gradient2 { padding: 20px 12px; }
+    .form-right { display: none; }
+    .form-left { width: 100%; max-width: 360px; margin: 0 auto; }
+    .logo-box { display: none; }
+    .btn-outline-secondary { left: 8px; top: 8px; font-size: 16px; }
+}
+
+@media (max-width: 360px) {
+    .bg-gradient2 { padding: 12px 8px; }
+    .form-left { max-width: 340px; }
+    .form-label { font-size: 0.92rem; }
+    .form-control2 { padding: 8px 10px; }
+    .btn-primary { padding: 10px 14px; font-size: 1rem; }
+    .btn-outline-secondary { left: 6px; top: 6px; font-size: 14px; padding: 6px 8px; }
+}
 

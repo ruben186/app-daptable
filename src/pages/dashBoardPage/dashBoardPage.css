@@ -169,6 +169,7 @@
 .brand-right {
   display:flex;
   align-items:center;
+  justify-content: center;
   gap:8px;
   position: relative;
   left: 80px;
@@ -267,7 +268,7 @@
   height: 10px;
   position: relative;
   bottom: 3px;
-  left: 80px;
+  left: 70px;
   border-right: 2px solid #42F1DD;
   border-bottom: 2px solid #42F1DD;
   transform: rotate(45deg);
@@ -303,10 +304,12 @@
 }
 .personas-drawer.open { left: 0; }
 
-.personas-drawer-header { display:flex; justify-content:flex-start; padding:10px 16px; background: #21A499; }
+.personas-drawer-header { display:flex; justify-content:flex-start; padding:10px 16px; background: #21A499; flex-shrink: 0; }
 .drawer-close { background: transparent; border:none; color: #cffff8; font-size: 18px; cursor: pointer; }
 
-.personas-drawer-list { display:flex; flex-direction:column; gap:0; padding: 6px 0 40px 0; }
+.personas-drawer-list { display:flex; flex-direction:column; gap:0; padding: 6px 0 40px 0; flex-grow: 1; 
+  overflow-y: auto; overflow-x: hidden; scrollbar-width: thin;
+    scrollbar-color: #0d8d80 #0E4D48; }
 .personas-drawer-item {
   padding: 14px 18px;
   text-align: center;
@@ -318,6 +321,7 @@
   width: 320px;
   transition: all 0.18s ease;
   font-size: 20px;
+  margin-top: 30px;
 }
 .personas-drawer-item:hover {
   background: #13d5c2; color: #0E4D48; transform: translateX(6px);
@@ -328,6 +332,7 @@
   background: #13d5c2;
   color: #0E4D48;
   transform: translateX(6px);
+
 }
 
 /* Items hijos de los grupos (más oscuros que el botón padre) */
@@ -335,13 +340,10 @@
   padding-left: 36px; /* sangría para distinguir hijo */
   background: #115C56;
   color: #3BD5C4;
+  margin: 0;
 }
 .personas-drawer-list div[role="region"] > .personas-drawer-item:hover {
   background: #12a793; color: #0E4D48; transform: translateX(6px);
-}
-
-.espacios-menu {
-  height: 40px;
 }
 @media (max-width: 480px) {
   .personas-drawer { width: 85%; left: -85%; }
@@ -451,6 +453,25 @@
   padding-top: 20px;
 }
 
+.personas-drawer-item.brand-item {
+    display: flex;       /* Habilita flexbox para alinear el icono y el texto */
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    padding-left: 36px; /* Mantener la sangría de los elementos anidados */
+    /* Define un espacio reservado para el icono dentro del padding */
+}
+
+/* 2. Estilo para el logo dentro del drawer */
+.drawer-brand-icon {
+    max-width: 30px; 
+    max-height: 30px;
+    width: auto; 
+    height: 100%;        
+    object-fit: contain; /* Asegura que la imagen sea visible sin cortarse y manteniendo proporciones */
+    flex-shrink: 0;      /* Evita que el logo se encoja si hay mucho texto */
+}
+
 @media (max-width: 576px) {
   .page-offset {
     padding-top: 88px; /* navbar puede ocupar más en móvil */
@@ -461,6 +482,43 @@
 
 /* ajustar responsive */
 @media (max-width: 992px) {
-  .search-wrapper { display: none; }
   .pill { min-width: 64px; padding: 6px 10px; }
 }
+
+@media (max-width: 992px) {
+  /* Hacemos las pills más compactas para ganar espacio */
+  .pill {
+    min-width: 50px; /* Reducido */
+    width: 100px; /* Reducido */
+    height: 40px; /* Reducido */
+    gap: 4px;
+  }
+  
+  .pill small {
+    font-size: 0.9rem; /* Fuente más pequeña */
+  }
+
+  /* Ajustamos el padding de la navbar */
+  .dashboard-navbar {
+    padding: 0.2rem 0.5rem;
+    height: 60px; /* Altura más baja */
+  }
+
+  /* Reducimos el espacio entre las pills */
+  .pills-container {
+    gap: 6px;
+    padding-left: 0;
+  }
+
+  /* Ajustamos la caja de búsqueda para que sea más flexible */
+  .search-wrapper {
+    flex: 1 1 auto; /* Permite que tome el espacio disponible si las pills se ocultan */
+  }
+
+  .search-input {
+    padding: 8px 18px;
+    width: 300px; /* Reducir el ancho fijo */
+  }
+}
+
+

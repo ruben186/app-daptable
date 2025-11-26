@@ -1,7 +1,29 @@
 import { useEffect, useState, useRef } from 'react';
 import menuIcon from '../../assets/Iconos/IconoMenu.png';
 import { useUserRole } from '../hooks/useUserRole';
+import logoxiami from '../../assets/logos/logoxiami.png'; 
+import logosamgsumg from '../../assets/logos/logosamgsumg.png'; 
+import logohuawei from '../../assets/logos/logohuawei.png'; 
+import logomotorola from '../../assets/logos/logomotorola.png';
+import logoOppo from '../../assets/logos/OPPOLogo.png';
+import logoRealme from '../../assets/logos/Realme_logo.png';
+import logoVivo from '../../assets/logos/VivoLogo.png';
+import logoZTE from '../../assets/logos/zteLogo.png';
 
+const MarcaItem = ({ logoSrc, brand, navigate, setActiveBrand, setOpen }) => (
+    <button 
+        className="personas-drawer-item brand-item"
+        onClick={() => {
+            navigate(`/xiaomi?brand=${brand}`);
+            setActiveBrand(brand); // Actualiza el estado en el NavBar principal
+            setOpen(false); // Cierra el menú lateral
+        }}
+    >
+        {/* Usamos una clase específica para el logo en el drawer */}
+        <img src={logoSrc} alt={brand} className="drawer-brand-icon" /> 
+        {brand.charAt(0).toUpperCase() + brand.slice(1)} {/* Muestra el nombre */}
+    </button>
+);
 
 // Componente local: grupo expandible accesible
 function ExpandableGroup({ title, id, children, drawerOpen }) {
@@ -39,7 +61,7 @@ function ExpandableGroup({ title, id, children, drawerOpen }) {
   );
 }
 
-function MenuNavbar({ navigate }) {
+function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef(null);
   const { userRole, isRoleLoading } = useUserRole();
@@ -97,7 +119,22 @@ function MenuNavbar({ navigate }) {
 
         <div className="personas-drawer-list">
           {/* Top-level items */}
-          <div className="espacios-menu" />
+          {showBrandsInDrawer && (
+                <>
+                  <ExpandableGroup title="Marcas" id="marcas" drawerOpen={open}>
+                      {/* ... todos tus MarcaItem ... */}
+                      <MarcaItem logoSrc={logoxiami} brand="xiaomi" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                      <MarcaItem logoSrc={logosamgsumg} brand="samsung" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                      <MarcaItem logoSrc={logohuawei} brand="huawei" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                      <MarcaItem logoSrc={logomotorola} brand="motorola" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                      <MarcaItem logoSrc={logoOppo} brand="oppo" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                      <MarcaItem logoSrc={logoRealme} brand="realme" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                      <MarcaItem logoSrc={logoVivo} brand="vivo" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                      <MarcaItem logoSrc={logoZTE} brand="zte" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                  </ExpandableGroup>
+                </>
+            )}
+
          <button 
              className="personas-drawer-item" 
             onClick={() => { 
@@ -107,7 +144,7 @@ function MenuNavbar({ navigate }) {
           >
              {isAuthenticatedUser? 'Mi Perfil' : 'Iniciar Sesión'}
           </button>
-          <div className="espacios-menu" />
+         
           
           
           {(userRole === 'admin' || userRole === 'usuario') && (
@@ -117,11 +154,11 @@ function MenuNavbar({ navigate }) {
             </button>
             </>
           )}
-          <div className="espacios-menu" />
+
           <button className="personas-drawer-item" onClick={() => { navigate('/noticias'); setOpen(false); }}>
             Noticias
           </button>
-          <div className="espacios-menu" />
+       
           {/* Group: Aprende (expandable) */}
           <ExpandableGroup title="Aprende" id="aprende" drawerOpen={open}>
             <button className="personas-drawer-item"  onClick={() => { navigate('/aprende/paso'); setOpen(false); }}>
@@ -131,7 +168,7 @@ function MenuNavbar({ navigate }) {
               Shorts(Videos)
             </button>
           </ExpandableGroup>
-            <div className="espacios-menu" />
+  
           {/* Group: Ayúdanos (expandable) */}
           {(userRole === 'admin' || userRole === 'usuario') &&(
             <>
@@ -148,7 +185,6 @@ function MenuNavbar({ navigate }) {
           
 
           {/* Admin quick links (original Personas options) */}
-          <div className="espacios-menu" />
           {userRole === 'admin' && (
             <>
             <button className="personas-drawer-item" onClick={() => { navigate('/gestionAdmin'); setOpen(false); }}>

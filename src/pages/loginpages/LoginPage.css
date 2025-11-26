@@ -5,6 +5,12 @@
     --form-max-width: 531px;
     --card-max-width: 400px;
 }
+html {
+    /* Pulgar (primero) y Pista/Fondo (segundo) */
+    scrollbar-color: #0d8d80 #0E4D48; 
+    
+    scrollbar-width: thin; 
+}
 
 body {
     background: linear-gradient(135deg, #111111, #111111);

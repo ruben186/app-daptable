@@ -1,60 +1,60 @@
-.form-email::placeholder {
-    color: #115f59;
+:root{
+    --container-max-width: 552px;
+    --form-max-width: 520px;
+    --card-max-width: 520px;
 }
 
-/* Fondo principal */
+/* Base colors and page bg */
 body, .bg-page {
-    background: #070D11; /* tono muy oscuro */
+    background: linear-gradient(135deg, #070D11, #040606);
     min-height: 100vh;
     color: #42F1DD;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
 }
 
-/* Botón volver en esquina */
+.form-email::placeholder { color: #115f59; }
+
+/* Back button top-left */
 .btn-outline-secondary {
     position: absolute;
     left: 24px;
     top: 20px;
     border: none;
     color: #42F1DD;
-    background-color: #073532; 
-    transition: all 0.3s ease ; 
-    padding: 4px 7px;
-    border-radius: 6px;
-    font-size: 20px;
+    background-color: #073532;
+    transition: all 0.2s ease;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 18px;
 }
-.btn-outline-secondary:hover{
-    background-color: #09665E;
-}
+.btn-outline-secondary:hover{ background-color: #09665E; }
 
-/* Tarjeta del formulario */
+/* Card */
 .form-card {
-    width: 720px;
-    max-width: calc(100% - 80px);
+    width: 100%;
+    max-width: var(--card-max-width);
     background: #05211F; /* verde oscuro translúcido */
-    padding: 56px 64px;
-    border-radius: 80px; /* esquinas grandes redondeadas */
+    padding: 48px 40px;
+    border-radius: 28px;
     text-align: center;
+    margin: 24px auto;
+    box-sizing: border-box;
 }
 
 .form-card h3 {
-    font-size: 28px;
+    font-size: 26px;
     color: #42F1DD;
     margin-bottom: 8px;
 }
-
-.form-card p.subtitle {
-    color: #2CA699;
-    margin-top: 0;
-    margin-bottom: 28px;
-}
+.form-card p.subtitle { color: #2CA699; margin-top: 0; margin-bottom: 18px; }
 
 .form-label {
     color: #42F1DD;
     display: block;
     text-align: left;
-    margin-bottom: 12px;
-    font-size: 1.1rem;
-    font-weight: 500;
+    margin-bottom: 8px;
+    font-size: 1rem;
+    font-weight: 600;
 }
 
 .form-email {
@@ -62,14 +62,11 @@ body, .bg-page {
     border: none;
     color: #42F1DD;
     padding: 12px 14px;
-    border-radius: 4px;
+    border-radius: 6px;
     width: 100%;
+    box-sizing: border-box;
 }
-
-.form-email:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(11, 189, 165, 0.473);
-}
+.form-email:focus { outline: none; box-shadow: 0 0 0 4px rgba(11,189,165,0.16); }
 
 .d-grid .btn-primary {
     background: #09665E;
@@ -77,27 +74,49 @@ body, .bg-page {
     color: #42F1DD;
     padding: 12px 32px;
     margin-top: 18px;
-    width: 260px;
-    margin-left: auto;
-    margin-right: auto;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
+    font-size: 1.05rem;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+}
+.btn-primary:hover { background: #2b867f; color: #fff; }
+
+/* Layout helpers similar to login page */
+.form-wrapper {
+    width: 100%;
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    padding: 0 16px;
+    box-sizing: border-box;
 }
 
-.btn-primary:hover {
-     background: #2b867f;
-    color: #fff;
+/* Media queries to match login responsiveness */
+@media (max-width: 768px) {
+    :root{ --container-max-width: 720px; --form-max-width: 95%; }
+    .form-card{ padding: 36px 28px; border-radius: 22px; }
+    .btn-outline-secondary{ left: 16px; top: 14px; font-size: 17px; }
 }
 
-/* Ajustes responsivos */
-@media (max-width: 700px) {
+@media (max-width: 420px) {
+    :root{ --container-max-width: 100%; --form-max-width: 100%; --card-max-width: 360px; }
+    .form-card{ padding: 24px 18px; border-radius: 16px; }
+    .form-card h3{ font-size: 20px; }
+    .btn-outline-secondary{ left: 12px; top: 10px; font-size: 16px; padding: 6px 8px; }
+    .d-grid .btn-primary{ width: 100%; font-size: 1rem; padding: 10px 18px; }
+}
+
+/* Extra small devices (iPhone SE and similar) */
+@media (max-width: 360px) {
+    :root{ --card-max-width: 340px; }
+    .form-wrapper { padding: 0 8px; }
     .form-card {
-        padding: 36px 28px;
-        border-radius: 40px;
+        padding: 14px 10px;
+        border-radius: 12px;
+        margin: 8px;
     }
-    .d-flex .btn-outline-secondary {
-        left: 12px;
-        top: 12px;
-        font-size: 18px;
-    }
+    .form-card h3 { font-size: 18px; }
+    .form-card p.subtitle { font-size: 0.95rem; }
+    .form-label { font-size: 0.95rem; margin-bottom: 6px; }
+    .form-email { padding: 10px 10px; font-size: 0.95rem; }
+    .d-grid .btn-primary { padding: 10px 12px; font-size: 0.98rem; }
+    .btn-outline-secondary { left: 8px; top: 8px; font-size: 15px; padding: 5px 6px; }
 }

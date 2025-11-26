@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { doc, setDoc, getDoc, collection, getDocs, updateDoc } from 'firebase/firestore'; 
+import { doc, setDoc, getDoc, collection, getDocs, updateDoc, deleteDoc } from 'firebase/firestore'; 
 import { Modal, Button, Form } from 'react-bootstrap';
 import { db } from '../../firebase'; // Asegúrate de que esta ruta sea correcta
 import './GeneradorTablaPage.css';
 import NavBar from '../components/NavBarPage';
 import Swal from 'sweetalert2';
 import { FaPlus } from 'react-icons/fa';
+import IconoEliminar from '../../assets/Iconos/iconoEliminar.png';
 
 const GeneradorTabla = () => {
   const [nombre, setNombre] = useState('');
@@ -514,12 +515,17 @@ const GeneradorTabla = () => {
         
         // 2. Iterar sobre los documentos modificados y guardarlos
         for (const docId of docIdsModificados) {
-            const data = cambiosPorDoc[docId];
-            const docRef = doc(db, 'tablas', docId);
+          const data = cambiosPorDoc[docId];
+          const docRef = doc(db, 'tablas', docId);
+          if (!data.campos || data.campos.length === 0) {
+            // Si no quedaron campos, eliminar el documento por completo
+            await deleteDoc(docRef);
+          } else {
             await updateDoc(docRef, {
-                campos: data.campos,
-                fecha: new Date().toISOString(),
+              campos: data.campos,
+              fecha: new Date().toISOString(),
             });
+          }
         }
 
         Swal.fire({
@@ -617,6 +623,28 @@ const editarCampoAgregado = (rowIndex, newValue) => {
         newRows[rowIndex].campo = newValue; // Guardamos el valor tal cual lo ingresó (con mayúsculas/minúsculas)
         return newRows;
     });
+};
+
+const eliminarFilaAgregada = async (rowIndex) => {
+  const fila = aggregatedRows[rowIndex];
+  if (!fila) return;
+
+  const result = await Swal.fire({
+    title: '¿Eliminar pieza?',
+    text: `¿Deseas eliminar la pieza "${fila.campo || fila.codigo || ''}" de la lista?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#07433E',
+    cancelButtonColor: 'rgba(197, 81, 35, 1)',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar',
+    background: '#052b27ff',
+    color: '#ffdfdfff',
+  });
+
+  if (result.isConfirmed) {
+    setAggregatedRows(prev => prev.filter((_, i) => i !== rowIndex));
+  }
 };
   return (
     <div className="page-offset bg-gradient2">
@@ -827,6 +855,7 @@ const editarCampoAgregado = (rowIndex, newValue) => {
                           <th>Pieza</th>
                           <th>Código</th>
                           <th>Código compatibilidad</th>
+                          {modoEdicionAgregada && <th>Acciones</th>}
                         </tr>
                       </thead>
                       <tbody>
@@ -865,6 +894,18 @@ const editarCampoAgregado = (rowIndex, newValue) => {
                               : (fila.codigoCompatibilidad || '')
                             
                               }</td>
+                            {modoEdicionAgregada && (
+                              <td>
+                                <button className="btn btn-sm btn-danger" onClick={() => eliminarFilaAgregada(index)} title="Eliminar fila">
+                                    <img 
+                                    src={IconoEliminar} 
+                                    alt="btn-eliminar"
+                                    width="30px"
+                                    height="30px"
+                                    />
+                                </button>
+                              </td>
+                            )}
                           </tr>
 
                         ))}
