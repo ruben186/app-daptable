@@ -268,13 +268,13 @@
   height: 10px;
   position: relative;
   bottom: 3px;
-  left: 70px;
   border-right: 2px solid #42F1DD;
   border-bottom: 2px solid #42F1DD;
   transform: rotate(45deg);
   transition: transform 0.18s ease;
   display: inline-block;
   margin-left: 20px;
+  margin-right: 5px;
 }
 .chevM.open { transform: rotate(-135deg); bottom: 0px;  }
 

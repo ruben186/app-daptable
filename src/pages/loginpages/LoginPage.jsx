@@ -78,13 +78,13 @@ function LoginPage() {
         const data = userSnap.data();
         if (data.estado === "Inactivo") {
           Swal.fire({
-                        title:"Acceso denegado", 
-                        text: "Tu cuenta está inactiva. Contacta al administrador.", 
-                        icon: "error",
-                        background: '#052b27ff', // Color de fondo personalizado
-                        color: '#ffdfdfff', // Color del texto personalizado
-                        confirmButtonColor: '#0b6860ff',
-                      });
+            title:"Acceso denegado", 
+            text: "Tu cuenta está inactiva. Contacta al administrador.", 
+            icon: "error",
+            background: '#052b27ff', // Color de fondo personalizado
+            color: '#ffdfdfff', // Color del texto personalizado
+            confirmButtonColor: '#0b6860ff',
+          });
           return;
         }
       }

@@ -57,7 +57,7 @@ const EstudioDetallePage = () => {
       <button type="button" className="btn-outline-volver" onClick={() => navigate(-1)}>
             &lt; Volver
       </button>
-      <main className="container containerVideo2 py-4">
+      <main className="container containerVideo2 ">
           
         {loading && <p>Cargando...</p>}
         {!loading && !item && <p>Material no encontrado.</p>}
@@ -65,8 +65,8 @@ const EstudioDetallePage = () => {
           <div>
             <h2>{item.nombre}</h2>
             <div className="mb-3" style={{ margin: '0 auto', border: '8px solid #09665E' }}>{renderVideo(item.url)}</div>
-            <p><strong>Descripción:</strong> {item.descripcion}</p>
-            <p><strong>Fecha:</strong> {item.creadoEn?.toDate ? new Date(item.creadoEn.toDate()).toLocaleString() : ''}</p>
+            <strong>Descripción:</strong><br /><textarea width className='descripcion-video' disabled>{item.descripcion}</textarea>
+            <p> {item.fecha?.toDate ? new Date(item.fecha.toDate()).toLocaleString() : ''}</p>
           </div>
         )}
       </main>
