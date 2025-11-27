@@ -17,6 +17,7 @@ import IconoBateriaR from '../../assets/Iconos/IconoBateriaR3.png';
 import IconoBateriaV from '../../assets/Iconos/IconoBateriaV.png';
 import IconoFlexBotonesV from '../../assets/Iconos/flexBotonesV.png';
 import IconoFlexBotonesR from '../../assets/Iconos/flexBotonesR.png';
+
 import IconoPiezaA from '../../assets/Iconos/IconoPiezaA.png';
 import IconologoXiami from '../../assets/logos/logoxiaomiverde2.png';
 import IconologoSamsung from '../../assets/logos/logosamgsumg.png';
@@ -30,6 +31,8 @@ import IconologoZTE from '../../assets/logos/zteLogo.png';
 function Xiaomi() {
     const navigate = useNavigate();
     const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const brandParam = params.get('brand')?.toLowerCase();
     const [usuarios, setUsuarios] = useState([]);
     const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -335,18 +338,20 @@ function Xiaomi() {
 
                                         {/* Columna Más */}
                                       <td style={{ textAlign: 'center' }}>
-                                          <Button variant="link"  onClick={() => { navigate('/BtnMasXiaomi'); }}
-                                         className="p-0 border-0 icon-hover-effect"
-                                        >
-                                            <img 
-                                                src={IconoPiezaA} 
-                                                width="34px" 
-                                                height="34px" 
-                                                alt="Más detalles" 
-                                                className="icon-hover-lift" 
-                                            />
-                                        </Button>
-                                    </td>
+                                          <Button
+                                              variant="link"
+                                              onClick={() => { navigate('/BtnMasXiaomi', { state: { nombre: aux.nombre, modelo: aux.modelo, brand: brandParam } }); }}
+                                              className="p-0 border-0 icon-hover-effect"
+                                          >
+                                              <img
+                                                  src={IconoPiezaA}
+                                                  width="34px"
+                                                  height="34px"
+                                                  alt="Más detalles"
+                                                  className="icon-hover-lift"
+                                              />
+                                          </Button>
+                                      </td>
                                     </tr>
                                 ))}
                             </tbody>

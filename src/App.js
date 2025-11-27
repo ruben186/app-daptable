@@ -25,6 +25,10 @@ import RegNuevoUsuario from './pages/registroNuevoUsuario/registroNuevoUsuario';
 import SugerirPieza from './pages/sugerirPieza/sugerirPiezaPage.jsx';
 import BtnMasXiaomi from './pages/xiaomi/btnMasXiaomi.jsx';
 import GestionSugerenciasPage from './pages/gestionSugerenciasPage/gestionSugerenciasPage.jsx';
+import ContenidoAprendePage from './pages/contenidoAprendePage/contenidoAprendePage.jsx';
+import EstudiosVideosPage from './pages/contenidoAprendePage/estudiosVideosPage.jsx';
+import EstudiosPdfPage from './pages/contenidoAprendePage/estudiosPdfPage.jsx';
+import EstudioDetallePage from './pages/contenidoAprendePage/estudioDetallePage.jsx';
 
 function App() {
   return (
@@ -105,6 +109,30 @@ function App() {
          <Route path="/gestionSugerencias" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <GestionSugerenciasPage/>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/nuevoEstudio" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <ContenidoAprendePage />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/aprende/videos" element={
+          <ProtectedRoute allowedRoles={['admin', 'usuario', 'invitado']}>
+            <EstudiosVideosPage />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/aprende/pdfs" element={
+          <ProtectedRoute allowedRoles={['admin', 'usuario', 'invitado']}>
+            <EstudiosPdfPage />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/aprende/video/:id" element={
+          <ProtectedRoute allowedRoles={['admin', 'usuario', 'invitado']}>
+            <EstudioDetallePage />
           </ProtectedRoute>
         } />
 

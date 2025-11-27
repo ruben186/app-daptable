@@ -161,11 +161,11 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
        
           {/* Group: Aprende (expandable) */}
           <ExpandableGroup title="Aprende" id="aprende" drawerOpen={open}>
-            <button className="personas-drawer-item"  onClick={() => { navigate('/aprende/paso'); setOpen(false); }}>
-              Paso a paso(PDF)
+            <button className="personas-drawer-item"  onClick={() => { navigate('/aprende/pdfs'); setOpen(false); }}>
+              Paso a paso (PDF)
             </button>
-            <button className="personas-drawer-item"   onClick={() => { navigate('/aprende/shorts'); setOpen(false); }}>
-              Shorts(Videos)
+            <button className="personas-drawer-item"   onClick={() => { navigate('/aprende/videos'); setOpen(false); }}>
+              Shorts (Videos)
             </button>
           </ExpandableGroup>
   

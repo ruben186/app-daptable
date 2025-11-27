@@ -33,7 +33,7 @@ function GestionUsuariosPage() {
             }))
             .filter(user => {
             const rol = user.rol?.toLowerCase();
-            return rol === 'admin' || rol === 'usuario' || rol === 'invitado' || rol === '-';
+            return rol === 'admin' || rol === 'usuario' || rol === '' || rol === '-';
             });
 
          setUsuarios(data);

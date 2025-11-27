@@ -1,0 +1,85 @@
+
+/* Contenedor principal de las tarjetas de estudio */
+.custom-datacard {
+	border-radius: 12px;
+	overflow: hidden;
+	box-shadow: 0 6px 18px rgba(2,7,9,0.6);
+	transition: transform 200ms ease, box-shadow 200ms ease;
+	background: transparent;
+}
+.custom-datacard:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 10px 28px rgba(2,7,9,0.7);
+}
+
+/* Área superior donde se muestra miniatura o fondo oscuro */
+.custom-datacard .datacard-thumb {
+	width: 100%;
+	display: block;
+}
+
+/* Pie de tarjeta con fondo turquesa y título centrado */
+.custom-datacard .datacard-bottom {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.custom-datacard .datacard-bottom h5 {
+	color: #3BD5C4;
+	font-weight: 600;
+	font-size: 1.05rem;
+}
+.containerVideo{
+    margin-top: 60px;
+	color: #3BD5C4;
+}
+.containerVideo2 h2{
+	margin: 0px auto;
+	color: #3BD5C4;
+}
+.btn-outline-volver{
+	margin:80px 0 0 80px;
+    border: none;
+    color: #42F1DD;
+    background-color: #073532;
+    transition: all 0.2s ease;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 18px;
+}
+.btn-outline-volver:hover{ background-color: #09665E; }
+
+
+/* Ajustes responsivos para el grid */
+@media (max-width: 576px) {
+	.datacard-thumb { height: 180px !important; }
+}
+@media (min-width: 577px) and (max-width: 992px) {
+	.datacard-thumb { height: 200px !important; }
+}
+
+/* Vista detalle */
+.estudio-detalle-container {
+	max-width: 1100px;
+	margin: 0 auto;
+}
+.estudio-detalle-title {
+	font-size: 1.8rem;
+	margin-bottom: 1rem;
+}
+.estudio-detalle-meta {
+	color: #666;
+	margin-bottom: 1rem;
+}
+
+/* Ratio para el iframe/video en detalle */
+.estudio-video-wrapper {
+	width: 100%;
+	aspect-ratio: 16/9;
+	margin-bottom: 1rem;
+}
+
+/* Accesibilidad: foco visible en tarjetas */
+.custom-datacard:focus {
+	outline: 3px solid rgba(63,232,221,0.35);
+}

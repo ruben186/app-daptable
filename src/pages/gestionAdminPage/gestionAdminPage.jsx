@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs, updateDoc, deleteDoc, doc, getDoc} from 'firebase/firestore';
+import { getStorage, ref as storageRef, deleteObject } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
 import { Modal, Form, Button } from 'react-bootstrap'; 
 import { FaEdit, FaTrash, FaUser, FaPlus, FaSearch, FaBook, FaBox } from 'react-icons/fa';
@@ -655,7 +656,23 @@ function GestionAdminPage() {
 
         if (result.isConfirmed) {
             try {
-                await deleteDoc(doc(db, 'estudios', id));
+                // Primero recuperar el documento para saber si tiene storagePath
+                const estudioDocRef = doc(db, 'estudios', id);
+                const estudioSnap = await getDoc(estudioDocRef);
+                if (estudioSnap.exists()) {
+                    const estudioData = estudioSnap.data();
+                    if (estudioData.storagePath) {
+                        try {
+                            const storage = getStorage();
+                            const fileRef = storageRef(storage, estudioData.storagePath);
+                            await deleteObject(fileRef);
+                        } catch (err) {
+                            console.warn('No se pudo eliminar el archivo en Storage (puede que no exista):', err);
+                        }
+                    }
+                }
+
+                await deleteDoc(estudioDocRef);
                 setEstudios(estudios.filter(e => e.id !== id));
                 Swal.fire('Eliminado', 'Material de estudio eliminado correctamente.', 'success');
             } catch (error) {
@@ -961,6 +978,21 @@ function GestionAdminPage() {
                             value={selectedItem.descripcion || ''}
                             onChange={handleModalChangeEstudio}
                         />
+                    </Form.Group>
+                    <Form.Group className="mb-2">
+                        <Form.Label>Tipo</Form.Label>
+                        <Form.Select name="tipo" value={selectedItem.tipo || 'video'} onChange={handleModalChangeEstudio}>
+                            <option value="video">Video</option>
+                            <option value="pdf">PDF</option>
+                        </Form.Select>
+                    </Form.Group>
+                    <Form.Group className="mb-2">
+                        <Form.Label>URL / Enlace</Form.Label>
+                        <Form.Control type="text" name="url" value={selectedItem.url || ''} onChange={handleModalChangeEstudio} />
+                        {/* Mostrar enlace directo si existe */}
+                        {selectedItem.url && (
+                            <a href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
+                        )}
                     </Form.Group>
                     {/* Agrega más campos si es necesario */}
                 </Form>

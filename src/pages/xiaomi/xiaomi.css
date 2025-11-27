@@ -103,6 +103,21 @@
     max-height: 92%;
     object-fit: contain;
     display: block;
+
+    /* Asegura que la imagen esté centrada dentro del contenedor/button */
+    margin: 0 auto;
+}
+
+/* Si la imagen está envuelta en un botón, centra el contenido del botón */
+.card-image-placeholder > button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    background: transparent;
+    border: none;
 }
 
 /* Iconos de la tabla: mantener altura fija y ancho automático */
