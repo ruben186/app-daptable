@@ -692,11 +692,13 @@ function GestionAdminPage() {
 
         try {
             const estudioRef = doc(db, 'estudios', selectedItem.id);
-            await updateDoc(estudioRef, {
-                nombre: selectedItem.nombre,
-                descripcion: selectedItem.descripcion,
-                // Agrega otros campos relevantes
-            });
+                await updateDoc(estudioRef, {
+                    nombre: selectedItem.nombre,
+                    descripcion: selectedItem.descripcion,
+                    tipo: selectedItem.tipo || '',
+                    url: selectedItem.url || '',
+                    fecha: selectedItem.fecha || ''
+                });
 
             // Actualiza el estado local
             setEstudios(estudios.map(e =>
@@ -1326,7 +1328,7 @@ function GestionAdminPage() {
                             collectionName="estudios"
                             handleEdit={handleEditEstudio} 
                             handleDelete={handleEliminarEstudio} 
-                            link={'/gestionEstudios'}
+                            link={'/gestionMaEstudio'}
                             linkNuevo={'/nuevoEstudio'} 
                             showNewButton={true}
                         />

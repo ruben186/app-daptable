@@ -1,5 +1,11 @@
 
 /* Contenedor principal de las tarjetas de estudio */
+.body-new-MEstudio {
+	margin-top: 30px;
+}
+.container-new-MEstudio {
+	max-width: 1000px !important;
+}
 .custom-datacard {
 	border-radius: 12px;
 	overflow: hidden;
@@ -33,8 +39,12 @@
     margin-top: 60px;
 	color: #3BD5C4;
 }
-.containerVideo2 h2{
+.containerVideo2{
 	margin: 0px auto;
+	color: #3BD5C4;
+}
+.containerVideo2 strong{
+	font-size: 1.2rem;
 	color: #3BD5C4;
 }
 .btn-outline-volver{
@@ -49,7 +59,22 @@
 }
 .btn-outline-volver:hover{ background-color: #09665E; }
 
-
+.descripcion-video{
+	color: #2ca395;
+	font-size: 1.1rem;
+	text-align: start;
+	background-color: #073532;
+	border: none;
+	padding: 10px;
+	border-radius: 10px;
+	height: 200px; 
+	width: 100%;
+    resize: none; 
+}
+.bar-carga{
+	background-color: #0b5550 !important;
+	color: #2ca395 !important;
+}
 /* Ajustes responsivos para el grid */
 @media (max-width: 576px) {
 	.datacard-thumb { height: 180px !important; }

@@ -31,8 +31,7 @@ const EstudiosPdfPage = () => {
   return (
     <>
       <NavBar />
-      <main className="container py-4">
-        <h2>Material de Estudio - PDFs</h2>
+      <main className="container  containerVideo py-4">
         {loading && <p>Cargando...</p>}
         <div className="row">
           {pdfs.map(p => (

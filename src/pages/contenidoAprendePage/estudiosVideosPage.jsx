@@ -109,7 +109,6 @@ const EstudiosVideosPage = () => {
     </>
   );
 
-  // no modal aquí; la navegación lleva a la página de detalle
 };
 
 export default EstudiosVideosPage;

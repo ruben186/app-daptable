@@ -339,11 +339,6 @@ function GestionPiezasPage() {
                                 <img src={IconoPieza} width="44px" height="44px" />
                                 <h2>Celulares y Partes</h2>
                             </div>
-                            <div className="d-flex align-items-center">
-                                <div className="count-info2">
-                                    <span className="count-number2">{piezasFiltradas.length}</span> Piezas Registradas
-                                </div>
-                            </div>
                         </div>
                         <div className='header-tabla2'>
                             <Button variant="success" className="btn-nuevo" title='Ingresar nuevo Celular' onClick={handleNuevo}>

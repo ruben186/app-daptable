@@ -20,6 +20,7 @@ import PerfilPage from './pages/perfilPage/PerfilPage.jsx';
 import GestionAdminPage from './pages/gestionAdminPage/gestionAdminPage.jsx';
 import GestionUsuariosPage from './pages/gestionUsuarioPage/gestionUsuarioPage.jsx';
 import GestionPiezasPage from './pages/gestionPiezasPage/gestionPiezasPage.jsx';
+import GestionMaEstudioPage from './pages/gestionMaEstudio/gestionMaEstudio.jsx';
 import Xiaomi from './pages/xiaomi/xiaomi.jsx';
 import RegNuevoUsuario from './pages/registroNuevoUsuario/registroNuevoUsuario';
 import SugerirPieza from './pages/sugerirPieza/sugerirPiezaPage.jsx';
@@ -36,6 +37,12 @@ function App() {
       <Routes>
         {/* Rutas públicas */}
         <Route path="/" element={<LoginPage />} />
+        
+        <Route path="/gestionMaEstudio" element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <GestionMaEstudioPage/>
+          </ProtectedRoute>
+        } />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />

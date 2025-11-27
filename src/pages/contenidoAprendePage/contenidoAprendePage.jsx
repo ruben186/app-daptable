@@ -3,12 +3,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, ProgressBar } from 'react-bootstrap';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import Swal from 'sweetalert2';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 import { db } from '../../firebase';
-
+import './contenidoAprendePage.css';
+const NODE_SERVER_URL = 'http://localhost:3001/api/upload-pdf';
 const ContenidoAprendePage = () => {
 	const [titulo, setTitulo] = useState('');
 	const [descripcion, setDescripcion] = useState('');
@@ -46,22 +46,50 @@ const ContenidoAprendePage = () => {
 		e.preventDefault();
 
 		if (!titulo.trim()) {
-			Swal.fire('Falta título', 'Por favor añade un título.', 'error');
+			Swal.fire({
+				title:"Falta título", 
+				text: "Por favor añade un título.", 
+				icon: "error",
+				background: '#052b27ff', // Color de fondo personalizado
+				color: '#ffdfdfff', // Color del texto personalizado
+				confirmButtonColor: '#0b6860ff',
+			});
 			return;
 		}
 
 		if (tipo === 'video') {
 			if (!videoLink.trim()) {
-				Swal.fire('Falta link', 'Por favor añade el enlace del video.', 'error');
+				Swal.fire({
+				title:"Falta link", 
+				text: "Por favor añade el enlace del video.", 
+				icon: "error",
+				background: '#052b27ff', // Color de fondo personalizado
+				color: '#ffdfdfff', // Color del texto personalizado
+				confirmButtonColor: '#0b6860ff',
+			});
 				return;
 			}
 		} else {
 			if (!file) {
-				Swal.fire('Falta archivo', 'Por favor selecciona un PDF.', 'error');
+				Swal.fire({
+				title:"Falta archivo", 
+				text: "Por favor selecciona un PDF.", 
+				icon: "error",
+				background: '#052b27ff', // Color de fondo personalizado
+				color: '#ffdfdfff', // Color del texto personalizado
+				confirmButtonColor: '#0b6860ff',
+			});
 				return;
 			}
 			if (file.type !== 'application/pdf') {
-				Swal.fire('Formato inválido', 'Solo se permiten archivos PDF.', 'error');
+				Swal.fire({
+					title:"Formato inválido", 
+					text: "Solo se permiten archivos PDF.", 
+					icon: "error",
+					background: '#052b27ff', // Color de fondo personalizado
+					color: '#ffdfdfff', // Color del texto personalizado
+					confirmButtonColor: '#0b6860ff',
+				});
 				return;
 			}
 		}
@@ -70,35 +98,50 @@ const ContenidoAprendePage = () => {
 			if (tipo === 'pdf') {
 				// Subir a Firebase Storage
 				setUploading(true);
-				const storage = getStorage();
-				const timestamp = Date.now();
-				const storagePath = `estudios/${timestamp}_${file.name}`;
-				const storageRef = ref(storage, storagePath);
-				const uploadTask = uploadBytesResumable(storageRef, file);
+				let downloadURL = ''; 
+                
+                // *** 🛑 INICIO: NUEVA LÓGICA DE SUBIDA A NODE.JS/EXPRESS 🛑 ***
 
-				uploadTask.on('state_changed', (snapshot) => {
-					const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-					setUploadProgress(progress);
-				}, (error) => {
-					console.error('Upload error', error);
-					setUploading(false);
-					Swal.fire('Error', 'Error al subir el archivo.', 'error');
-				}, async () => {
-					const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-					// Guardar en Firestore
-					await addDoc(collection(db, 'estudios'), {
-						nombre: titulo,
-						descripcion: descripcion,
-						tipo: 'pdf',
-						url: downloadURL,
-						storagePath: storagePath,
-						creadoEn: serverTimestamp()
-					});
-					setUploading(false);
-					Swal.fire('Guardado', 'Material de estudio guardado correctamente.', 'success');
-					resetForm();
-					navigate('/gestionAdmin');
+                const formData = new FormData();
+                // 'archivo' DEBE coincidir con el campo de Multer en server.js: upload.single('archivo')
+                formData.append('archivo', file); 
+
+                const response = await fetch(NODE_SERVER_URL, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                // Asumimos que la subida fue instantánea para fines de la barra de progreso 
+                // (No hay evento 'state_changed' con fetch, solo inicio y fin)
+                setUploadProgress(50); 
+                
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    // Si el servidor Node.js devuelve un error
+                    throw new Error(data.message || "Error desconocido al subir el archivo.");
+                }
+
+                downloadURL = data.url
+				// Guardar en Firestore
+				await addDoc(collection(db, 'estudios'), {
+					nombre: titulo,
+					descripcion: descripcion,
+					tipo: 'pdf',
+					url: downloadURL,
+					fecha: serverTimestamp()
 				});
+				setUploading(false);
+				Swal.fire({
+					title: "Guardado",
+					text: `Material de estudio guardado correctamente.`,
+					icon: "success",
+					background: '#052b27ff', // Color de fondo personalizado
+					color: '#ffff', // Color del texto personalizado
+				});
+				resetForm();
+				navigate('/gestionAdmin');
+				
 			} else {
 				// Guardar video link directamente
 				await addDoc(collection(db, 'estudios'), {
@@ -106,15 +149,28 @@ const ContenidoAprendePage = () => {
 					descripcion: descripcion,
 					tipo: 'video',
 					url: videoLink.trim(),
-					creadoEn: serverTimestamp()
+					fecha: serverTimestamp()
 				});
-				Swal.fire('Guardado', 'Video guardado correctamente.', 'success');
+				Swal.fire({
+					title: "Guardado",
+					text: `Video guardado correctamente.`,
+					icon: "success",
+					background: '#052b27ff', // Color de fondo personalizado
+					color: '#ffff', // Color del texto personalizado
+				});
 				resetForm();
 				navigate('/gestionAdmin');
 			}
 		} catch (error) {
 			console.error(error);
-			Swal.fire('Error', 'Ocurrió un error guardando el material.', 'error');
+			Swal.fire({
+				title:"Error", 
+				text: "Ocurrió un error guardando el material.", 
+				icon: "error",
+				background: '#052b27ff', // Color de fondo personalizado
+				color: '#ffdfdfff', // Color del texto personalizado
+				confirmButtonColor: '#0b6860ff',
+			});
 			setUploading(false);
 		}
 	};
@@ -147,53 +203,61 @@ const ContenidoAprendePage = () => {
 	return (
 		<>
 			<NavBar />
-			<main className="container py-4">
-				<h2>M. Estudio - Nuevo</h2>
-				<Form onSubmit={handleSubmit} className="mt-3">
-					<Form.Group className="mb-3">
-						<Form.Label>Título</Form.Label>
-						<Form.Control value={titulo} onChange={e => setTitulo(e.target.value)} />
-					</Form.Group>
+			<div className='body-new-MEstudio bg-gradient2'>
+				<main className="container container-new-MEstudio py-4">
+					<h2>M. Estudio - Nuevo</h2>
+					<Form onSubmit={handleSubmit} className="mt-3">
+						<Form.Group className="mb-3">
+							<Form.Label>Título</Form.Label>
+							<input type="text" className="form-control2" value={titulo} onChange={e => setTitulo(e.target.value)}/>
+						</Form.Group>
 
-					<Form.Group className="mb-3">
-						<Form.Label>Descripción</Form.Label>
-						<Form.Control as="textarea" rows={3} value={descripcion} onChange={e => setDescripcion(e.target.value)} />
-					</Form.Group>
+						<Form.Group className="mb-3">
+							<Form.Label>Descripción</Form.Label>
+								<textarea
+									className="form-control2 textarea-comentarios"
+									rows={3}
+									value={descripcion}
+									onChange={e => setDescripcion(e.target.value)} 
+								></textarea>
+						</Form.Group>
 
-					<Form.Group className="mb-3">
-						<Form.Label>Tipo</Form.Label>
-						<div>
-							<Form.Check inline label="Video (link)" name="tipo" type="radio" id="tipo-video" checked={tipo === 'video'} onChange={() => setTipo('video')} />
-							<Form.Check inline label="PDF (subida)" name="tipo" type="radio" id="tipo-pdf" checked={tipo === 'pdf'} onChange={() => setTipo('pdf')} />
+						<Form.Group className="mb-3">
+							<Form.Label>Tipo</Form.Label>
+							<div>
+								<Form.Check inline label="Video (link)" name="tipo" type="radio" id="tipo-video" checked={tipo === 'video'} onChange={() => setTipo('video')} />
+								<Form.Check inline label="PDF (subida)" name="tipo" type="radio" id="tipo-pdf" checked={tipo === 'pdf'} onChange={() => setTipo('pdf')} />
+							</div>
+						</Form.Group>
+
+						{tipo === 'video' && (
+							<>
+								<Form.Group className="mb-3">
+									<Form.Label>Enlace del video</Form.Label>
+									<input type="text" className="form-control2" value={videoLink} onChange={e => setVideoLink(e.target.value)} placeholder="https://..."/>
+								</Form.Group>
+								{renderVideoPreview()}
+							</>
+						)}
+
+						{tipo === 'pdf' && (
+							<>
+								<Form.Group className="mb-3">
+									<Form.Label>Seleccionar PDF</Form.Label>
+									<input type="file" className="form-control2" accept="application/pdf"onChange={handleFileChange}/>
+								</Form.Group>
+								{uploading && < ProgressBar className='bar-carga' now={uploadProgress} label={`${uploadProgress}%`} />}
+							</>
+						)}
+
+						<div className="d-flex gap-2">
+							<Button type="submit" className='btn-success' disabled={uploading}>{uploading ? 'Subiendo...' : 'Guardar'}</Button>
+							<Button className='cancelar-btn' onClick={() => navigate('/gestionAdmin')}>Cancelar</Button>
 						</div>
-					</Form.Group>
-
-					{tipo === 'video' && (
-						<>
-							<Form.Group className="mb-3">
-								<Form.Label>Enlace del video</Form.Label>
-								<Form.Control placeholder="https://..." value={videoLink} onChange={e => setVideoLink(e.target.value)} />
-							</Form.Group>
-							{renderVideoPreview()}
-						</>
-					)}
-
-					{tipo === 'pdf' && (
-						<>
-							<Form.Group className="mb-3">
-								<Form.Label>Seleccionar PDF</Form.Label>
-								<Form.Control type="file" accept="application/pdf" onChange={handleFileChange} />
-							</Form.Group>
-							{uploading && <ProgressBar now={uploadProgress} label={`${uploadProgress}%`} />}
-						</>
-					)}
-
-					<div className="d-flex gap-2">
-						<Button type="submit" disabled={uploading}>{uploading ? 'Subiendo...' : 'Guardar'}</Button>
-						<Button variant="secondary" onClick={() => navigate('/gestionAdmin')}>Cancelar</Button>
-					</div>
-				</Form>
-			</main>
+					</Form>
+				</main>
+			</div>
+			
 			<Footer />
 		</>
 	);
