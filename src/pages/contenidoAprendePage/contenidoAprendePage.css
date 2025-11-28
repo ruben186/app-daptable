@@ -61,7 +61,7 @@
 
 .descripcion-video{
 	color: #2ca395;
-	font-size: 1.1rem;
+	font-size: 1.25rem;
 	text-align: start;
 	background-color: #073532;
 	border: none;
@@ -73,8 +73,41 @@
 }
 .bar-carga{
 	background-color: #0b5550 !important;
-	color: #2ca395 !important;
+	--bs-progress-bar-bg: #2ca395 !important;
 }
+
+/* 2. Estilo de la Tarjeta del PDF */
+.pdf-card {
+    /* Fondo más oscuro que el fondo principal para darle profundidad */
+    background-color:  #0b5550 !important; 
+    border: none;
+    border-radius: 0 0 15px 15px !important;
+    transition: transform 0.2s, box-shadow 0.2s;
+	color: #3BD5C4 !important;
+}
+
+/* Efecto hover sutil */
+.pdf-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 0 5px ; /* Sombra con toque de acento */
+}
+
+/* 3. Estilos de Texto dentro de la Tarjeta */
+.pdf-card-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.pdf-card-text {
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+.pdf-card-date {
+    font-size: 0.75rem;
+}
+
+
 /* Ajustes responsivos para el grid */
 @media (max-width: 576px) {
 	.datacard-thumb { height: 180px !important; }
