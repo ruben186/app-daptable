@@ -8,7 +8,6 @@ import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 import { db } from '../../firebase';
 import './contenidoAprendePage.css';
-const NODE_SERVER_URL = 'http://localhost:3001/api/upload-pdf';
 const ContenidoAprendePage = () => {
 	const [titulo, setTitulo] = useState('');
 	const [descripcion, setDescripcion] = useState('');
@@ -18,6 +17,7 @@ const ContenidoAprendePage = () => {
 	const [uploadProgress, setUploadProgress] = useState(0);
 	const [uploading, setUploading] = useState(false);
 	const navigate = useNavigate();
+	const NODE_SERVER_URL = 'http://localhost:3001/api/upload-pdf';
 
 	const resetForm = () => {
 		setTitulo('');
@@ -99,8 +99,6 @@ const ContenidoAprendePage = () => {
 				// Subir a Firebase Storage
 				setUploading(true);
 				let downloadURL = ''; 
-                
-                // *** 🛑 INICIO: NUEVA LÓGICA DE SUBIDA A NODE.JS/EXPRESS 🛑 ***
 
                 const formData = new FormData();
                 // 'archivo' DEBE coincidir con el campo de Multer en server.js: upload.single('archivo')
@@ -225,8 +223,8 @@ const ContenidoAprendePage = () => {
 						<Form.Group className="mb-3">
 							<Form.Label>Tipo</Form.Label>
 							<div>
-								<Form.Check inline label="Video (link)" name="tipo" type="radio" id="tipo-video" checked={tipo === 'video'} onChange={() => setTipo('video')} />
-								<Form.Check inline label="PDF (subida)" name="tipo" type="radio" id="tipo-pdf" checked={tipo === 'pdf'} onChange={() => setTipo('pdf')} />
+								<Form.Check inline label="Video " name="tipo" type="radio" id="tipo-video" checked={tipo === 'video'} onChange={() => setTipo('video')} />
+								<Form.Check inline label="PDF " name="tipo" type="radio" id="tipo-pdf" checked={tipo === 'pdf'} onChange={() => setTipo('pdf')} />
 							</div>
 						</Form.Group>
 

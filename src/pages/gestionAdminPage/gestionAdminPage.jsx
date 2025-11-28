@@ -674,10 +674,10 @@ function GestionAdminPage() {
 
                 await deleteDoc(estudioDocRef);
                 setEstudios(estudios.filter(e => e.id !== id));
-                Swal.fire('Eliminado', 'Material de estudio eliminado correctamente.', 'success');
+                Swal.fire({ title:"Eliminado", text: "Material de estudio eliminado correctamente", icon: "success", background: '#052b27ff', color: '#ffffffff', confirmButtonColor: '#0b6860ff' });
             } catch (error) {
                 console.error("Error al eliminar estudio:", error);
-                Swal.fire('Error', 'No se pudo eliminar el material de estudio.', 'error');
+                Swal.fire({ title:"Error", text: "No se pudo eliminar el material de estudio.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff'});
             }
         }
     };
@@ -685,8 +685,8 @@ function GestionAdminPage() {
     const handleSaveChangesEstudio = async () => {
         if (!selectedItem || itemType !== 'estudio') return;
 
-        if (!selectedItem.nombre || !selectedItem.descripcion) {
-            Swal.fire({ title:"Campos incompletos", text: "Todos los campos deben ser llenados.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff', });
+        if (!selectedItem.nombre || !selectedItem.descripcion || !selectedItem.url) {
+            Swal.fire({ title:"Campos incompletos", text: "Todos los campos deben ser llenados.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
             return;
         }
 
@@ -706,10 +706,10 @@ function GestionAdminPage() {
             ));
 
             handleCloseModal();
-            Swal.fire('Actualizado', 'Los datos del estudio fueron actualizados.', 'success');
+            Swal.fire({ title:"Actualizado", text: "Los datos del estudio fueron actualizados.", icon: "success", background: '#052b27ff', color: '#ffffffff', confirmButtonColor: '#0b6860ff' });
         } catch (error) {
             console.error(error);
-            Swal.fire('Error', 'No se pudo actualizar el estudio.', 'error');
+            Swal.fire({ title:"Error", text: "No se pudo actualizar el estudio.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
         }
     };
 
@@ -963,7 +963,7 @@ function GestionAdminPage() {
              return (
                 <Form>
                     <Form.Group className="mb-2">
-                        <Form.Label>Nombre del Estudio</Form.Label>
+                        <Form.Label>Nombre</Form.Label>
                         <Form.Control
                             type="text"
                             name="nombre"
@@ -993,7 +993,7 @@ function GestionAdminPage() {
                         <Form.Control type="text" name="url" value={selectedItem.url || ''} onChange={handleModalChangeEstudio} />
                         {/* Mostrar enlace directo si existe */}
                         {selectedItem.url && (
-                            <a href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
+                            <a className='login-invited-btn' href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
                         )}
                     </Form.Group>
                     {/* Agrega más campos si es necesario */}

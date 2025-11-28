@@ -3,7 +3,7 @@ import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
 import { db } from '../../firebase';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
-import { Card, Button } from 'react-bootstrap';
+import { Card, Button} from 'react-bootstrap';
 import './contenidoAprendePage.css';
 
 const EstudiosPdfPage = () => {
@@ -14,7 +14,7 @@ const EstudiosPdfPage = () => {
     const fetchPdfs = async () => {
       setLoading(true);
       try {
-        const q = query(collection(db, 'estudios'), where('tipo', '==', 'pdf'), orderBy('creadoEn', 'desc'));
+        const q = query(collection(db, 'estudios'), where('tipo', '==', 'pdf'));
         const snap = await getDocs(q);
         const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         setPdfs(items);
@@ -36,19 +36,28 @@ const EstudiosPdfPage = () => {
         <div className="row">
           {pdfs.map(p => (
             <div className="col-md-6" key={p.id}>
-              <Card className="mb-3">
-                <Card.Body>
-                  <Card.Title>{p.nombre}</Card.Title>
-                  <Card.Text>{p.descripcion}</Card.Text>
-                  {p.url && (
-                    <div className="mb-2">
-                      <a href={p.url} target="_blank" rel="noreferrer">Abrir PDF</a>
-                    </div>
-                  )}
-                  <div className="d-flex justify-content-between">
-                    {p.url && <Button variant="primary" onClick={() => window.open(p.url, '_blank')}>Ver / Descargar</Button>}
-                    <small className="text-muted">{p.creadoEn?.toDate ? new Date(p.creadoEn.toDate()).toLocaleString() : ''}</small>
+              <Card className="pdf-card shadow-lg mb-3">
+                <Card.Body className="d-flex flex-column" >
+                  <Card.Title className="pdf-card-title">{p.nombre}</Card.Title>
+                  <textarea className="pdf-card-text flex-grow-1 descripcion-video" disabled>{p.descripcion}</textarea>
+                  <hr/>
+                  {p.url && ( 
+                  <div className=" pt-2 ">
+                    {p.url && 
+                    <button 
+                      onClick={() => window.open(p.url, '_blank')}
+                      className=" btn btn-generar w-100"
+                    >
+                      Ver / Descargar
+                    </button>}
+                    <div className="text-end mt-2">
+                       <small className=" pdf-card-date">
+                        {p.fecha?.toDate ? new Date(p.fecha.toDate()).toLocaleDateString('es-ES') : ''}
+                       </small>
+                     </div>
                   </div>
+                  )}
+                 
                 </Card.Body>
               </Card>
             </div>

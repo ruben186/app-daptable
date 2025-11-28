@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { collection, getDocs, deleteDoc, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { Container, Table, Button, Modal, Form, InputGroup } from 'react-bootstrap';
+import { Container, Table, Button, Modal, Form, InputGroup, ProgressBar } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import { FaEdit, FaTrash, FaUserCircle, FaPlus, FaSearch } from 'react-icons/fa';
 import { db } from '../../firebase';
@@ -18,10 +18,15 @@ function GestionMaEstudioPage() {
   const [filtered, setFiltered] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
+  const NODE_SERVER_URL = 'http://localhost:3001/api/upload-pdf';
 
   // Modal para edición/visualización
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
+
+  const [tempFile, setTempFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     const fetch = async () => {
@@ -39,6 +44,7 @@ function GestionMaEstudioPage() {
     };
     fetch();
   }, []);
+  
 
   useEffect(() => {
     const q = (searchTerm || '').toLowerCase().trim();
@@ -48,7 +54,7 @@ function GestionMaEstudioPage() {
     }
     const parts = q.split(/\s+/).filter(Boolean);
     const results = estudios.filter(item => {
-      const text = `${item.nombre || ''} ${item.descripcion || ''}`.toLowerCase();
+      const text = `${item.nombre || ''} ${item.descripcion || '' } ${item.tipo || '' }`.toLowerCase();
       return parts.every(p => text.includes(p));
     });
     setFiltered(results);
@@ -60,23 +66,34 @@ function GestionMaEstudioPage() {
       text: 'Eliminarás este Material de Estudio',
       icon: 'warning',
       showCancelButton: true,
+      background: '#052b27ff',
+      color: '#ffdfdfff',
       confirmButtonColor: '#07433E',
-      cancelButtonColor: '#d33',
+      cancelButtonColor: 'rgba(197, 81, 35, 1)',
       confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
     });
     if (!result.isConfirmed) return;
     try {
       await deleteDoc(doc(db, 'estudios', id));
       setEstudios(prev => prev.filter(p => p.id !== id));
       setFiltered(prev => prev.filter(p => p.id !== id));
-      Swal.fire('Eliminado', 'Registro eliminado correctamente', 'success');
+      Swal.fire({ title:"Eliminado", text: "Material de estudio eliminado correctamente", icon: "success", background: '#052b27ff', color: '#ffffffff', confirmButtonColor: '#0b6860ff'});
     } catch (err) {
       console.error(err);
-      Swal.fire('Error', 'No se pudo eliminar el registro', 'error');
+      Swal.fire({ title:"Error", text: "No se pudo eliminar el registro", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff'});
     }
   };
-
+  const handleCloseModal = () => {
+     setShowModal(false);
+     setTempFile(null);
+     setUploadProgress(0);
+     setUploading(false);
+   };
   const handleOpenModal = async (item) => {
+    setTempFile(null); // Asegura que no haya un archivo pendiente de una sesión anterior
+    setUploadProgress(0); 
+    setUploading(false);
     // Cargar documento actualizado por si hubo cambios
     try {
       const docRef = doc(db, 'estudios', item.id);
@@ -91,32 +108,82 @@ function GestionMaEstudioPage() {
     }
   };
 
+  const handleTempFileChange = (e) => {
+     const f = e.target.files && e.target.files[0];
+     if (f && f.type === 'application/pdf') {
+       setTempFile(f);
+       setUploadProgress(0);
+     } else {
+       setTempFile(null);
+       if (f) {
+         Swal.fire({ title: "Formato inválido", text: "Solo se permiten archivos PDF.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
+       }
+     }
+  };
+
   const handleSave = async () => {
     if (!selected || !selected.id) return;
+     if (!selected.nombre || !selected.descripcion || !selected.url) {
+      Swal.fire({ title:"Campos incompletos", text: "Todos los campos deben ser llenados.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
+      return;
+    }   
+     let downloadURL = selected.url;    
+     // 1. Subida del PDF (Solo si es PDF y se seleccionó un nuevo archivo)
+     if (selected.tipo === 'pdf' && tempFile) {
+       setUploading(true);
+       setUploadProgress(10);
+       try {
+         const formData = new FormData();
+         formData.append('archivo', tempFile);    
+         const response = await fetch(NODE_SERVER_URL, {
+           method: 'POST',
+           body: formData,
+         });
+
+         setUploadProgress(50); 
+         const data = await response.json();    
+         if (!response.ok || !data.success || !data.url) {
+           throw new Error(data.message || "Error al subir el nuevo PDF.");
+         }
+         downloadURL = data.url; // Nueva URL del archivo subido
+         setUploadProgress(90);
+       } catch (error) {
+         console.error("Error al subir PDF:", error);
+         setUploading(false);
+         setUploadProgress(0);
+         Swal.fire({ title: "Error de Subida", text: "No se pudo subir el nuevo PDF.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
+         return; // Detiene el proceso si falla la subida
+       }
+     }
     try {
       const ref = doc(db, 'estudios', selected.id);
       const payload = {
         nombre: selected.nombre || '',
         descripcion: selected.descripcion || '',
-        fecha: selected.fecha || '',
         tipo: selected.tipo || '',
-        url: selected.url || ''
+        url: downloadURL || ''
         
       };
       await updateDoc(ref, payload);
       setEstudios(prev => prev.map(e => e.id === selected.id ? { ...e, ...payload } : e));
       setFiltered(prev => prev.map(e => e.id === selected.id ? { ...e, ...payload } : e));
-      setShowModal(false);
-      Swal.fire('Guardado', 'Cambios guardados correctamente', 'success');
+      setUploadProgress(100);
+      setUploading(false);
+      handleCloseModal();
+
+     
+      Swal.fire({ title:"Guardado", text: "Cambios guardados correctamente", icon: "success", background: '#052b27ff', color: '#ffffffff', confirmButtonColor: '#0b6860ff'});
     } catch (err) {
       console.error(err);
-      Swal.fire('Error', 'No se pudieron guardar los cambios', 'error');
+      setUploading(false);
+      setUploadProgress(0);
+      Swal.fire({ title:"Error", text: "No se pudieron guardar los cambios", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff'});
     }
   };
 
   const exportToCSV = (rows) => {
     if (!rows || rows.length === 0) {
-      Swal.fire('Info', 'No hay filas para exportar', 'info');
+      Swal.fire({ title:"Info", text: "No hay filas para exportar", icon: "info", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff'});
       return;
     }
     const headers = ['Nombre', 'Descripción', 'Tipo', 'Fecha', 'URL'];
@@ -200,7 +267,7 @@ function GestionMaEstudioPage() {
                           day: 'numeric' 
                       }) || '-'}
                     </td>
-                    <td>{item.url ? <a href={item.url} target="_blank" rel="noreferrer">Enlace</a> : '-'}</td>
+                    <td>{item.url ? <a className='login-invited-btn' href={item.url} target="_blank" rel="noreferrer">Enlace</a> : '-'}</td>
                     <td>
                       <Button variant="warning" size="sm" className="me-2" onClick={() => handleOpenModal(item)}>
                         <img src={IconoEditar} alt="editar" width="30" height="30" />
@@ -234,21 +301,58 @@ function GestionMaEstudioPage() {
               </Form.Group>
               <Form.Group className="mb-2">
                 <Form.Label>Tipo</Form.Label>
-                <Form.Select value={selected.tipo || 'video'} onChange={(e) => setSelected(s => ({ ...s, tipo: e.target.value }))}>
-                  <option value="video">Video</option>
-                  <option value="pdf">PDF</option>
-                </Form.Select>
+                <Form.Select 
+                   value={selected.tipo || 'video'} 
+                   onChange={(e) => setSelected(s => ({ ...s, tipo: e.target.value, url: '' }))} // Limpiar URL si el tipo cambia
+                   disabled={uploading} // No permitir cambiar si se está subiendo
+                 >
+                   <option value="video">Video</option>
+                   <option value="pdf">PDF</option>
+                 </Form.Select>
               </Form.Group>
-              <Form.Group className="mb-2">
-                <Form.Label>URL</Form.Label>
-                <Form.Control value={selected.url || ''} onChange={(e) => setSelected(s => ({ ...s, url: e.target.value }))} />
-              </Form.Group>
+                {selected.tipo === 'video' ? (
+                  <Form.Group className="mb-2">
+                    <Form.Label>Enlace del Video (URL)</Form.Label>
+                    <Form.Control 
+                      value={selected.url || ''} 
+                      onChange={(e) => setSelected(s => ({ ...s, url: e.target.value }))} 
+                      disabled={uploading}
+                    />
+                  </Form.Group>
+                 ) : (
+                  <>
+                    <Form.Group className="mb-2">
+                      <Form.Label>Enlace del PDF (URL) </Form.Label>
+                      <Form.Control type="text" name="url" value={selected.url || ''} onChange={(e) => setSelected(s => ({ ...s, url: e.target.value }))} />
+                      {/* Mostrar enlace directo si existe */}
+                      {selected.url && (
+                          <a className='login-invited-btn' href={selected.url} target="_blank" rel="noreferrer">Ver recurso</a>
+                      )}
+                    </Form.Group>
+                  
+                    <Form.Group className="mb-2">
+                    <Form.Label>Reemplazar PDF</Form.Label>
+                    <Form.Control 
+                      type="file" 
+                      accept="application/pdf"
+                      onChange={handleTempFileChange}
+                      disabled={uploading}
+                    />
+                    {tempFile && <p className="text-info small mt-1">Archivo seleccionado: **{tempFile.name}**</p>}
+                    {uploading && (
+                     <div className="mt-2">
+                       <ProgressBar className='bar-carga' now={uploadProgress} label={`${uploadProgress}%`} />
+                     </div>
+                    )}
+                    </Form.Group>
+                  </>
+                )}
             </Form>
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>Cancelar</Button>
-          <Button variant="primary" onClick={handleSave}>Guardar</Button>
+          <Button variant="secondary" onClick={handleCloseModal} disabled={uploading}>Cancelar</Button>
+          <Button variant="primary" onClick={handleSave} disabled={uploading}>Guardar</Button>
         </Modal.Footer>
       </Modal>
 
