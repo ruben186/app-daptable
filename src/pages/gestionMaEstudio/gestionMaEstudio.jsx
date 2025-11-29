@@ -134,7 +134,12 @@ function GestionMaEstudioPage() {
        setUploadProgress(10);
        try {
          const formData = new FormData();
-         formData.append('archivo', tempFile);    
+         formData.append('archivo', tempFile); 
+         
+         if (selected.url) {
+           formData.append('oldFileUrl', selected.url);
+          }
+
          const response = await fetch(NODE_SERVER_URL, {
            method: 'POST',
            body: formData,
@@ -161,7 +166,8 @@ function GestionMaEstudioPage() {
         nombre: selected.nombre || '',
         descripcion: selected.descripcion || '',
         tipo: selected.tipo || '',
-        url: downloadURL || ''
+        url: downloadURL || '',
+        fecha: selected.fecha || ''
         
       };
       await updateDoc(ref, payload);
@@ -318,6 +324,9 @@ function GestionMaEstudioPage() {
                       onChange={(e) => setSelected(s => ({ ...s, url: e.target.value }))} 
                       disabled={uploading}
                     />
+                    {selected.url && (
+                      <a className='login-invited-btn' href={selected.url} target="_blank" rel="noreferrer">Ver recurso</a>
+                    )}
                   </Form.Group>
                  ) : (
                   <>

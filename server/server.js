@@ -1,7 +1,9 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
+const cors = require('cors');
 const fs = require('fs');
+
 
 const app = express();
 // Usamos el puerto 3001 para el backend (React usa 3000)
@@ -22,12 +24,12 @@ const storage = multer.diskStorage({
     cb(null, uploadDir); 
   },
   filename: (req, file, cb) => {
-    // Crear nombre de archivo único: archivo-timestamp_nombreoriginal.pdf
     const ext = path.extname(file.originalname);
     const uniqueName = `archivo-${Date.now()}_${Math.random().toString(36).substring(2)}${ext}`;
     cb(null, uniqueName);
   }
 });
+
 
 const upload = multer({ 
   storage: storage,
@@ -65,8 +67,44 @@ app.post('/api/upload-pdf', upload.single('archivo'), (req, res) => {
   }
 
   // Éxito: El archivo está guardado en el servidor.
-  const fileUrl = `http://localhost:${port}/uploads/${req.file.filename}`;
-  
+  const newFilename = req.file.filename;
+  const fileUrl = `http://localhost:${port}/uploads/${newFilename}`;
+  const oldFileUrl = req.body.oldFileUrl;
+
+  if (oldFileUrl && typeof oldFileUrl === 'string' && oldFileUrl.includes('/uploads/')) {
+        try {
+            // 1. Extraer el nombre del archivo de la URL (más seguro que new URL)
+            const urlParts = oldFileUrl.split('/');
+            let oldFilename = urlParts[urlParts.length - 1]; 
+
+            // Limpiar cualquier parámetro de consulta (ej: si termina en ?v=123)
+            oldFilename = oldFilename.split('?')[0]; 
+            
+            const oldPath = path.join(uploadDir, oldFilename);
+
+            console.log('Nombre de archivo antiguo extraído:', oldFilename);
+            console.log('Ruta completa a intentar eliminar:', oldPath);
+            
+            // 2. Intentar eliminar
+            if (fs.existsSync(oldPath)) {
+                fs.unlink(oldPath, (err) => {
+                    if (err) {
+                        // Error de sistema de archivos (ej: permisos)
+                        console.error(' ERROR FS: No se pudo eliminar el archivo. Verifique permisos:', err);
+                    } else {
+                        console.log(` Archivo antiguo eliminado exitosamente: ${oldFilename}`);
+                    }
+                });
+            } else {
+                 console.log(` ADVERTENCIA: Archivo antiguo no encontrado en disco: ${oldPath}`);
+            }
+        } catch (e) {
+            console.error(" ERROR GENERAL en la lógica de eliminación:", e);
+        }
+    } else {
+        console.log('INFO: No se proporcionó una URL antigua válida para eliminación.');
+    }
+
   res.status(200).json({
     success: true,
     message: 'Archivo subido exitosamente.',

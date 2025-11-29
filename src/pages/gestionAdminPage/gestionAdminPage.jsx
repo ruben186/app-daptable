@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { collection, getDocs, updateDoc, deleteDoc, doc, getDoc} from 'firebase/firestore';
 import { getStorage, ref as storageRef, deleteObject } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
-import { Modal, Form, Button } from 'react-bootstrap'; 
+import { Modal, Form, Button, ProgressBar } from 'react-bootstrap'; 
 import { FaEdit, FaTrash, FaUser, FaPlus, FaSearch, FaBook, FaBox } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import { auth, db } from '../../firebase';
@@ -246,12 +246,19 @@ function GestionAdminPage() {
     const [selectedItem, setSelectedItem] = useState(null); // Almacena el item (usuario o pieza) a editar
     const [itemType, setItemType] = useState(null); // 'usuario', 'pieza', 'estudio', o 'compatibilidad'
 
+    const [tempFile, setTempFile] = useState(null);
+    const [uploading, setUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const NODE_SERVER_URL = 'http://localhost:3001/api/upload-pdf';
     
     // Manejador genérico para cerrar el modal
     const handleCloseModal = () => {
         setShowModal(false);
         setSelectedItem(null);
         setItemType(null);
+        setTempFile(null);
+        setUploadProgress(0);
+        setUploading(false);
     };
 
     // FUNCIÓN ASÍNCRONA PARA BUSCAR NOMBRE DE USUARIO (USADA EN COMPATIBILIDAD)
@@ -681,6 +688,19 @@ function GestionAdminPage() {
             }
         }
     };
+
+    const handleTempFileChange = (e) => {
+     const f = e.target.files && e.target.files[0];
+     if (f && f.type === 'application/pdf') {
+        setTempFile(f);
+        setUploadProgress(0);
+        } else {
+        setTempFile(null);
+        if (f) {
+            Swal.fire({ title: "Formato inválido", text: "Solo se permiten archivos PDF.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
+        }
+        }
+    };
     
     const handleSaveChangesEstudio = async () => {
         if (!selectedItem || itemType !== 'estudio') return;
@@ -690,25 +710,64 @@ function GestionAdminPage() {
             return;
         }
 
+        let downloadURL = selectedItem.url;    
+        // 1. Subida del PDF (Solo si es PDF y se seleccionó un nuevo archivo)
+        if (selectedItem.tipo === 'pdf' && tempFile) {
+        setUploading(true);
+        setUploadProgress(10);
+        try {
+            const formData = new FormData();
+            formData.append('archivo', tempFile); 
+            
+            if (selectedItem.url) {
+            formData.append('oldFileUrl', selectedItem.url);
+            }
+
+            const response = await fetch(NODE_SERVER_URL, {
+            method: 'POST',
+            body: formData,
+            });
+
+            setUploadProgress(50); 
+            const data = await response.json();    
+            if (!response.ok || !data.success || !data.url) {
+            throw new Error(data.message || "Error al subir el nuevo PDF.");
+            }
+            downloadURL = data.url; // Nueva URL del archivo subido
+            setUploadProgress(90);
+        } catch (error) {
+            console.error("Error al subir PDF:", error);
+            setUploading(false);
+            setUploadProgress(0);
+            Swal.fire({ title: "Error de Subida", text: "No se pudo subir el nuevo PDF.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
+            return; // Detiene el proceso si falla la subida
+        }
+        }
+
         try {
             const estudioRef = doc(db, 'estudios', selectedItem.id);
                 await updateDoc(estudioRef, {
                     nombre: selectedItem.nombre,
                     descripcion: selectedItem.descripcion,
                     tipo: selectedItem.tipo || '',
-                    url: selectedItem.url || '',
+                    url: downloadURL || '',
                     fecha: selectedItem.fecha || ''
                 });
-
+                
             // Actualiza el estado local
             setEstudios(estudios.map(e =>
                 e.id === selectedItem.id ? selectedItem : e
             ));
 
+            setUploadProgress(100);
+            setUploading(false);
             handleCloseModal();
+
             Swal.fire({ title:"Actualizado", text: "Los datos del estudio fueron actualizados.", icon: "success", background: '#052b27ff', color: '#ffffffff', confirmButtonColor: '#0b6860ff' });
         } catch (error) {
             console.error(error);
+            setUploading(false);
+            setUploadProgress(0);
             Swal.fire({ title:"Error", text: "No se pudo actualizar el estudio.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
         }
     };
@@ -983,20 +1042,51 @@ function GestionAdminPage() {
                     </Form.Group>
                     <Form.Group className="mb-2">
                         <Form.Label>Tipo</Form.Label>
-                        <Form.Select name="tipo" value={selectedItem.tipo || 'video'} onChange={handleModalChangeEstudio}>
+                        <Form.Select name="tipo" value={selectedItem.tipo || 'video'} onChange={handleModalChangeEstudio} disabled={uploading} >
                             <option value="video">Video</option>
                             <option value="pdf">PDF</option>
                         </Form.Select>
                     </Form.Group>
+                    {selectedItem.tipo === 'video' ? (
                     <Form.Group className="mb-2">
-                        <Form.Label>URL / Enlace</Form.Label>
-                        <Form.Control type="text" name="url" value={selectedItem.url || ''} onChange={handleModalChangeEstudio} />
-                        {/* Mostrar enlace directo si existe */}
+                        <Form.Label>Enlace del Video (URL)</Form.Label>
+                        <Form.Control 
+                        value={selectedItem.url || ''} 
+                        onChange={(e) => setSelectedItem(s => ({ ...s, url: e.target.value }))} 
+                        disabled={uploading}
+                        />
                         {selectedItem.url && (
                             <a className='login-invited-btn' href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
                         )}
                     </Form.Group>
-                    {/* Agrega más campos si es necesario */}
+                    ) : (
+                    <>
+                        <Form.Group className="mb-2">
+                        <Form.Label>Enlace del PDF (URL) </Form.Label>
+                        <Form.Control type="text" name="url" value={selectedItem.url || ''} onChange={(e) => setSelectedItem(s => ({ ...s, url: e.target.value }))} />
+                        {/* Mostrar enlace directo si existe */}
+                        {selectedItem.url && (
+                            <a className='login-invited-btn' href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
+                        )}
+                        </Form.Group>
+                    
+                        <Form.Group className="mb-2">
+                        <Form.Label>Reemplazar PDF</Form.Label>
+                        <Form.Control 
+                        type="file" 
+                        accept="application/pdf"
+                        onChange={handleTempFileChange}
+                        disabled={uploading}
+                        />
+                        {tempFile && <p className="text-info small mt-1">Archivo seleccionado: **{tempFile.name}**</p>}
+                        {uploading && (
+                        <div className="mt-2">
+                        <ProgressBar className='bar-carga' now={uploadProgress} label={`${uploadProgress}%`} />
+                        </div>
+                        )}
+                        </Form.Group>
+                    </>
+                    )}
                 </Form>
             );
         }else if (itemType === 'compatibilidad') {
@@ -1361,10 +1451,10 @@ function GestionAdminPage() {
                     {renderModalBody()}
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleCloseModal}>
+                    <Button variant="secondary" onClick={handleCloseModal} disabled={uploading}>
                         Cerrar
                     </Button>
-                    <Button variant="primary" onClick={handleSave}>
+                    <Button variant="primary" onClick={handleSave} disabled={uploading}>
                         Guardar Cambios
                     </Button>
                 </Modal.Footer>

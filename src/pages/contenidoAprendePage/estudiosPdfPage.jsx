@@ -48,7 +48,7 @@ const EstudiosPdfPage = () => {
                       onClick={() => window.open(p.url, '_blank')}
                       className=" btn btn-generar w-100"
                     >
-                      Ver / Descargar
+                      Ver
                     </button>}
                     <div className="text-end mt-2">
                        <small className=" pdf-card-date">

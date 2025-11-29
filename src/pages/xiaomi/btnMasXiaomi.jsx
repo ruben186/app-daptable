@@ -9,8 +9,23 @@ import './xiaomi.css';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 
-// Importación de Iconos e Imágenes
-import IconologoXiami from '../../assets/logos/logoxiaomiverde2.png';
+// Importación de Iconos logos de marcas en verde
+import IconologoXiamiV from '../../assets/logos/logoxiaomiverde2.png';
+import IconologoSamsungV from '../../assets/logos/logosamsumgV.png';
+import IconologoHuaweiV from '../../assets/logos/logohuaweiV.png';
+import IconologoMotorolaV from '../../assets/logos/logomotorolaV.png';
+
+//  Importación de Iconos logos de marcas 
+import IconologoXiami from '../../assets/logos/logoxiami.png';
+import IconologoSamsung from '../../assets/logos/logosamgsumg.png';
+import IconologoHuawei from '../../assets/logos/logohuawei.png';
+import IconologoMotorola from '../../assets/logos/logomotorola.png';
+import IconologoOppo from '../../assets/logos/OPPOLogo.png';
+import IconologoRealme from '../../assets/logos/Realme_logo.png';
+import IconologoVivo from '../../assets/logos/VivoLogo.png';
+import IconologoZte from '../../assets/logos/zteLogo.png';
+
+//importaciones de iconos imagenes 
 import IconoPantallaV from '../../assets/Iconos/iconoPantallaVerde.png';
 import IconoPantallaR from '../../assets/Iconos/iconoPantallaRojo.png';
 import IconoBateriaV from '../../assets/Iconos/IconoBateriaV.png';
@@ -229,7 +244,7 @@ function BtnMasXiaomi() {
 
             const headerHtml = `
                 <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                    <img src="${IconologoXiami}" width="48" height="48" style="border-radius:6px;filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));" alt="Logo Xiaomi" />
+                    <img src="${IconologoXiamiV}" width="48" height="48" style="border-radius:6px;filter: drop-shadow(0 4px 8px rgba(199, 57, 57, 0.25));" alt="Logo Xiaomi" />
                     <div style="line-height:1;">
                         <div style="font-weight:600">${selectedModelEntry.nombre || ''}</div>
                         <div style="font-size:0.95em;color:#cfe9e4">Modelo: <strong>${selectedModelEntry.modelo || ''}</strong></div>
@@ -282,6 +297,29 @@ function BtnMasXiaomi() {
         return normalized.toUpperCase();
     };
 
+    // --- NUEVA FUNCIÓN PARA SELECCIONAR EL LOGO DE LA MARCA ---
+const getBrandLogo = (marca) => {
+    if (!marca) return IconologoXiami; // Fallback por defecto
+
+    const normalizedMarca = marca.toString().toLowerCase().trim();
+
+    // Utilizamos las importaciones de logos que ya tienes
+    if (normalizedMarca.includes('samsung')) return IconologoSamsung;
+    if (normalizedMarca.includes('huawei')) return IconologoHuawei;
+    if (normalizedMarca.includes('motorola') || normalizedMarca.includes('moto')) return IconologoMotorola;
+    if (normalizedMarca.includes('oppo')) return IconologoOppo;
+    if (normalizedMarca.includes('realme')) return IconologoRealme;
+    if (normalizedMarca.includes('vivo')) return IconologoVivo;
+    if (normalizedMarca.includes('zte')) return IconologoZte;
+    
+    // Default o Xiaomi/Redmi
+    return;
+};
+
+// ... (Resto del código)
+
+
+
     // Función para manejar clic en iconos dinámicos (igual que en xiaomi.jsx)
     const handleIconClick = (tipoPieza, userActual) => {
         console.log("handleIconClick ejecutado. Pieza:", tipoPieza, "Usuario:", userActual);
@@ -316,7 +354,10 @@ function BtnMasXiaomi() {
                 title: 'Sin Información',
                 text: `Este modelo (${userActual.modelo}) no tiene registrado un código de compatibilidad para ${nombreCampoBD}.`
             });
+            
             return;
+
+
         }
 
         // 3. BUSCAR HERMANOS: Filtrar todos los usuarios para ver quiénes comparten ese código
@@ -341,7 +382,7 @@ function BtnMasXiaomi() {
                 <img src="${IconologoXiami}" width="48" height="48" style="border-radius:6px;" alt="Logo Xiaomi" />
                 <div style="line-height:1;">
                     <div style="font-weight:600">${userActual.nombre || ''}</div>
-                    <div style="font-size:0.95em;color:#cfe9e4">Modelo: <strong>${userActual.modelo || ''}</strong></div>
+                    <div style="font-size:0.95em;color:111111">Modelo: <strong>${userActual.modelo || ''}</strong></div>
                 </div>
             </div>
         `;

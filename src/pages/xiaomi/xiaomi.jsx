@@ -1,5 +1,3 @@
-
-
 import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -17,16 +15,24 @@ import IconoBateriaR from '../../assets/Iconos/IconoBateriaR3.png';
 import IconoBateriaV from '../../assets/Iconos/IconoBateriaV.png';
 import IconoFlexBotonesV from '../../assets/Iconos/flexBotonesV.png';
 import IconoFlexBotonesR from '../../assets/Iconos/flexBotonesR.png';
-
 import IconoPiezaA from '../../assets/Iconos/IconoPiezaA.png';
-import IconologoXiami from '../../assets/logos/logoxiaomiverde2.png';
+
+// Importación de Iconos logos de marcas en verde
+import IconologoXiamiV from '../../assets/logos/logoxiaomiverde2.png';
+import IconologoSamsungV from '../../assets/logos/logosamsumgV.png';
+import IconologoHuaweiV from '../../assets/logos/logohuaweiV.png';
+import IconologoMotorolaV from '../../assets/logos/logomotorolaV.png';
+
+//  Importación de Iconos logos de marcas 
+import IconologoXiami from '../../assets/logos/logoxiami.png';
 import IconologoSamsung from '../../assets/logos/logosamgsumg.png';
 import IconologoHuawei from '../../assets/logos/logohuawei.png';
 import IconologoMotorola from '../../assets/logos/logomotorola.png';
 import IconologoOppo from '../../assets/logos/OPPOLogo.png';
 import IconologoRealme from '../../assets/logos/Realme_logo.png';
 import IconologoVivo from '../../assets/logos/VivoLogo.png';
-import IconologoZTE from '../../assets/logos/zteLogo.png';
+import IconologoZte from '../../assets/logos/zteLogo.png';
+
 
 function Xiaomi() {
     const navigate = useNavigate();
@@ -121,19 +127,21 @@ function Xiaomi() {
         const params = new URLSearchParams(location.search);
         const brandParam = params.get('brand')?.toLowerCase();
         switch (brandParam) {
-            case 'samsung': return IconologoSamsung;
-            case 'huawei': return IconologoHuawei;
-            case 'motorola': return IconologoMotorola;
+            case 'samsung': return IconologoSamsungV;
+            case 'huawei': return IconologoHuaweiV;
+            case 'motorola': return IconologoMotorolaV;
             case 'oppo': return IconologoOppo;
             case 'realme': return IconologoRealme;
             case 'vivo': return IconologoVivo;
-            case 'zte': return IconologoZTE;
-            case 'xiaomi':
+            case 'zte': return IconologoZte ;
+            case 'xiaomi':return IconologoXiamiV;
             default:
-                return IconologoXiami;
+                return;
         }
     };
 
+
+    
     // Nota: la búsqueda desde el navbar actualiza la URL y `searchTerm` se sincroniza desde allí.
 
     // 3. Función Auxiliar para obtener datos del Array 'campos'
@@ -169,6 +177,7 @@ function Xiaomi() {
                 iconoRojo = IconoFlexBotonesR;
                 break;
             default:
+                return null;
                 
         }
 
@@ -183,7 +192,7 @@ function Xiaomi() {
         let nombreCampoBD = '';
         if (tipoPieza === 'pantalla') nombreCampoBD = 'PANTALLA';
         else if (tipoPieza === 'bateria') nombreCampoBD = 'BATERIA';
-        else if (tipoPieza === 'flexBotones') nombreCampoBD = 'FLEX BOTONES'; // Ojo con el nombre exacto en tu BD
+        else if (tipoPieza === 'flexBotones') nombreCampoBD = 'FLEX DE BOTONES'; // Ojo con el nombre exacto en tu BD
 
         // 2. Obtener el código del celular actual al que le diste clic
         const piezaInfoActual = getPiezaInfo(userActual, nombreCampoBD);
