@@ -4,11 +4,15 @@ import { db } from '../../firebase';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 import { Card, Button} from 'react-bootstrap';
+import { useLocation } from 'react-router-dom';
 import './contenidoAprendePage.css';
 
 const EstudiosPdfPage = () => {
   const [pdfs, setPdfs] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [filteredPdfs, setFilteredPdfs] = useState([]); 
+  const location = useLocation();
+  
 
   useEffect(() => {
     const fetchPdfs = async () => {
@@ -18,6 +22,7 @@ const EstudiosPdfPage = () => {
         const snap = await getDocs(q);
         const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         setPdfs(items);
+        setFilteredPdfs(items);
       } catch (err) {
         console.error('Error cargando pdfs:', err);
         setPdfs([]);
@@ -27,6 +32,25 @@ const EstudiosPdfPage = () => {
     };
     fetchPdfs();
   }, []);
+  useEffect(() => {
+    const ps = new URLSearchParams(location.search);
+    const searchTerm = ps.get('q')?.toLowerCase() || '';    
+    if (searchTerm && pdfs.length > 0) {
+      // Filtrar por nombre o descripción (búsqueda local en el cliente)
+      const results = pdfs.filter(pdf => 
+        pdf.nombre?.toLowerCase().includes(searchTerm) || 
+        pdf.descripcion?.toLowerCase().includes(searchTerm)
+      );
+      setFilteredPdfs(results);
+    } else {
+      // Si no hay término de búsqueda o si pdfs acaba de cargarse, mostrar todos
+      setFilteredPdfs(pdfs);
+    }
+
+  }, [location.search, pdfs]);
+
+  const ps = new URLSearchParams(location.search);
+  const searchTerm = ps.get('q') || '';
 
   return (
     <>
@@ -34,7 +58,8 @@ const EstudiosPdfPage = () => {
       <main className="container  containerVideo py-4">
         {loading && <p>Cargando...</p>}
         <div className="row">
-          {pdfs.map(p => (
+         {filteredPdfs.length > 0 ? (
+            filteredPdfs.map(p => (
             <div className="col-md-6" key={p.id}>
               <Card className="pdf-card shadow-lg mb-3">
                 <Card.Body className="d-flex flex-column" >
@@ -61,8 +86,9 @@ const EstudiosPdfPage = () => {
                 </Card.Body>
               </Card>
             </div>
-          ))}
-          {pdfs.length === 0 && !loading && <p>No hay PDFs disponibles.</p>}
+          ))) : (
+            !loading && (searchTerm ? <p>No se encontraron PDFs para "{searchTerm}".</p> : <p>No hay PDFs disponibles.</p>)
+          )}
         </div>
       </main>
       <Footer />

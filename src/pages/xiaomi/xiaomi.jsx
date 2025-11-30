@@ -3,10 +3,12 @@ import { collection, getDocs } from 'firebase/firestore';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Container, Table, Button } from 'react-bootstrap';
 import Swal from 'sweetalert2';
-import { db } from '../../firebase';
+import { db, auth } from '../../firebase';
 import './xiaomi.css';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
+import { logActivity } from '../../firebase/historialService';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 // Importación de Iconos e Imágenes
 import IconoPantallaV from '../../assets/Iconos/iconoPantallaVerde.png';
@@ -34,6 +36,8 @@ import IconologoVivo from '../../assets/logos/VivoLogo.png';
 import IconologoZte from '../../assets/logos/zteLogo.png';
 
 
+
+
 function Xiaomi() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -42,6 +46,7 @@ function Xiaomi() {
     const [usuarios, setUsuarios] = useState([]);
     const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [user] = useAuthState(auth);
 
     // 1. Carga inicial de datos (Solo Marcas Xiaomi/Redmi)
     useEffect(() => {
@@ -187,7 +192,7 @@ function Xiaomi() {
         return tieneDatos ? iconoVerde : iconoRojo;
     };
 
-   const handleIconClick = (tipoPieza, userActual) => {
+   const handleIconClick = async (tipoPieza, userActual) => {
         // 1. Definir qué pieza estamos buscando (Pantalla, Batería, etc.)
         let nombreCampoBD = '';
         if (tipoPieza === 'pantalla') nombreCampoBD = 'PANTALLA';
@@ -209,6 +214,23 @@ function Xiaomi() {
                 text: `Este modelo (${userActual.modelo}) no tiene registrado un código de compatibilidad para ${nombreCampoBD}.`
             });
             return;
+        }
+
+        if (user) {
+            try {
+                // Registrar la consulta exitosa
+                await logActivity(user.uid, {
+                    Modelo: userActual.nombre || userActual.modelo || 'Desconocido',
+                    Marca: userActual.marca || 'Desconocido',
+                    Pieza: nombreCampoBD,
+                    Accion: "Consulta de Compatibilidad (Específica)",
+                    CodigoBuscado: codigoCompatibilidad,          
+                });
+                console.log(`Actividad de compatibilidad registrada: ${userActual.modelo} - ${nombreCampoBD}`);
+            } catch (error) {
+                console.error("Fallo al registrar la actividad:", error);
+                // No detenemos el proceso si falla el registro del historial, solo lo notificamos.
+            }
         }
 
         // 3. BUSCAR HERMANOS: Filtrar todos los usuarios para ver quiénes comparten ese código

@@ -17,7 +17,6 @@
 .perfil-container {
     color: #42F1DD;
     width: 100%;
-    padding: 30px;
 }
 
 /* --- Estilos de la Maquetación Principal --- */
@@ -131,18 +130,29 @@
 }
 
 .actividades-recientes-grid { 
-    display: flex;
-    gap: 61px;
+    display: grid;
+    gap: 30px;
     margin-top: 30px; 
     margin-bottom: 20px;
-    width: 830px;
     justify-content: center;
+    overflow-y: hidden;
+    padding: 30px;
+    width: 100%;
+    max-width: 1400px; 
+    max-height: 1500px;
+
+    transition: max-height 0.3s ease-in-out;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.actividades-recientes-grid.scroll-enabled {
+    max-height: 1200px; /* Altura para 8 elementos, activa el scroll */
+    overflow-y: auto; /* Muestra el scroll */
 }
 
 .actividad-item {
     flex: 1;
     width: 236px;
-    height: 335px; /* Aumentado la altura para acomodar las dos secciones */
+    height: 315px; /* Aumentado la altura para acomodar las dos secciones */
     background-color: transparent; /* El color se define en las secciones internas */
     border-radius: 8px; /* Bordes más redondeados */
     overflow: hidden; /* Importante para contener los bordes redondeados */
@@ -153,16 +163,64 @@
     /* Usamos Flexbox para la estructura interna de la tarjeta */
     display: flex;
     flex-direction: column;
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    cursor: pointer;
+    
+}
+.actividad-item:hover{
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.55);
+}
+.actividad-item.active {
+    border-color: #1ca893;
+    box-shadow: 0 0 20px  rgba(8,120,110,0.35);
 }
 .actividad-item-superior {
     height:70%; /* Aproximadamente el 70% de altura */
     background-color: #020911; /* Color de fondo oscuro */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .actividad-item-inferior {
     height: 40%; /* El 30% restante de altura */
     background-color: #07433E; /* Turquesa oscuro sólido de la paleta */
+    color: #dffcf7;
+    padding: 5px;
+
 }
 
+.detalle-pieza-marca {
+    /* Necesario para alinear el logo y el texto de la pieza */
+    display: flex;
+    align-items: center; 
+}
+
+.icono-pieza-historial {
+    /* Define el tamaño del icono de la pieza */
+    height: 170px;
+}
+
+.logo-marca-historial {
+    /* Define el tamaño del logo de la marca */
+    height: 20px;
+    border-radius: 4px; 
+}
+
+.btn-toggle-historial {
+    background-color: #0b6860ff;
+    color: #ffdfdfff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+}
+
+.btn-toggle-historial:hover {
+    background-color: #07433E;
+}
 /* Media Query para responsividad */
 @media (max-width: 768px) {
     .perfil-main {

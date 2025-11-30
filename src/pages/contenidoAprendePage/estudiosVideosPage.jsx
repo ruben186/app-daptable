@@ -4,11 +4,15 @@ import { db } from '../../firebase';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 import { Card, Button } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 
 const EstudiosVideosPage = () => {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(false);
+  const location = useLocation();
+  const [filteredVideos, setFilteredVideos] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -18,6 +22,7 @@ const EstudiosVideosPage = () => {
         const snap = await getDocs(q);
         const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         setVideos(items);
+        setFilteredVideos(items);
       } catch (err) {
         console.error('Error cargando videos:', err);
         setVideos([]);
@@ -27,6 +32,27 @@ const EstudiosVideosPage = () => {
     };
     fetchVideos();
   }, []);
+
+  useEffect(() => {
+    const ps = new URLSearchParams(location.search);
+    const currentSearchTerm = ps.get('q')?.toLowerCase() || ''; // Definición local para el useEffect
+
+     if (currentSearchTerm && videos.length > 0) {
+       // Filtrar por nombre o descripción
+       const results = videos.filter(video => 
+         video.nombre?.toLowerCase().includes(currentSearchTerm) || 
+         video.descripcion?.toLowerCase().includes(currentSearchTerm)
+       );
+       setFilteredVideos(results);
+     } else {
+       // Si no hay término de búsqueda, mostrar todos los videos cargados
+       setFilteredVideos(videos);
+     }
+
+   }, [location.search, videos]); 
+   // Definición del término de búsqueda para el renderizado (mensajes)
+   const ps = new URLSearchParams(location.search);
+   const searchTerm = ps.get('q') || '';
 
   const renderPreview = (url) => {
     if (!url) return null;
@@ -48,8 +74,6 @@ const EstudiosVideosPage = () => {
       );
     } catch (e) { return null; }
   };
-
-  const navigate = useNavigate();
 
   const goToDetalle = (item) => {
     if (!item || !item.id) return;
@@ -94,14 +118,14 @@ const EstudiosVideosPage = () => {
       <main className="containerVideo container py-4">
         {loading && <p>Cargando...</p>}
         <div className="row">
-          {videos.length > 0 ? (
-            videos.map(v => (
+          {filteredVideos.length > 0 ? (
+            filteredVideos.map(v => (
               <div className="col-12 col-sm-6 col-md-4 mb-3" key={v.id}>
                 <DataCard item={v} />
               </div>
             ))
           ) : (
-            !loading && <p>No hay videos disponibles.</p>
+           !loading && (searchTerm ? <p>No se encontraron videos para "{searchTerm}".</p> : <p>No hay videos disponibles.</p>)
           )}
         </div>
       </main>

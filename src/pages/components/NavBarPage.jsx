@@ -51,7 +51,20 @@ function NavBar() {
   // Manejar búsqueda desde el navbar
   const handleSearchSubmit = () => {
     const term = (searchValue || '').trim();
-    if (!term) return; // no hacemos nada si está vacío
+    const currentPath = location.pathname;
+    const hasSearchQuery = location.search.includes('q=');
+    if (!term) {
+        // Solo navegamos si hay un query string que necesitamos eliminar
+        if (hasSearchQuery) {
+            // Navega a la ruta base sin ningún query, forzando la limpieza.
+            navigate(currentPath, { replace: true });
+        }
+        
+        // Limpiar el estado visual, sin importar si navegamos o no.
+        setSearchValue('');
+      setActiveBrand(null);
+      return; // Detiene la ejecución
+    }
 
     const lower = term.toLowerCase();
     // Marcas conocidas y aliases
@@ -81,12 +94,18 @@ function NavBar() {
     } else {
       // búsqueda genérica sin marca
       setActiveBrand(null);
+      const currentPath = location.pathname;
       navigate(`/xiaomi?q=${encodeURIComponent(term)}`);
+      const isLearningPath = currentPath.startsWith('/aprende');
+      if (isLearningPath) {
+         // Mantiene la ruta actual y solo añade el término de búsqueda (ej: /aprende/videos?q=nuevo)
+         navigate(`${currentPath}?q=${encodeURIComponent(term)}`);
+      } else {
+       // Si no estamos en una página de aprendizaje, va a la página de resultados principal
+       navigate(`/xiaomi?q=${encodeURIComponent(term)}`);
     }
+  }
   };
-
-  // Nota: la acción de logout está disponible en otro lugar; si se quiere activar aquí,
-  // se puede reañadir la función handleLogout.
 
   return (
     <div>
@@ -189,7 +208,3 @@ function NavBar() {
 }
 
 export default NavBar;
- 
-
-
-                 

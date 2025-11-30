@@ -1,9 +1,13 @@
+import React from 'react';
 import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { Container, Button } from 'react-bootstrap';
 // import Swal from 'sweetalert2'; 
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../../firebase'; // Asegúrate de tener la ruta correcta a 'auth'
+import { logActivity } from '../../firebase/historialService';
 import { db } from '../../firebase'; // Asegúrate de que la ruta sea correcta
 import './xiaomi.css'; 
 import NavBar from '../components/NavBarPage';
@@ -60,6 +64,7 @@ const DEFAULT_PARTES = [
 
 function BtnMasXiaomi() {
     const navigate = useNavigate();
+    const [user] = useAuthState(auth);
 
     // Estados
     const [partes, setPartes] = useState([]);
@@ -287,7 +292,7 @@ function BtnMasXiaomi() {
         // Mapeo de nombres posibles a nombres de BD
         if (normalized.includes('pantalla')) return 'PANTALLA';
         if (normalized.includes('bateria') || normalized.includes('batería')) return 'BATERIA';
-        if (normalized.includes('flex') && normalized.includes('boton')) return 'FLEX BOTONES';
+        if (normalized.includes('flex') && normalized.includes('boton')) return 'FLEX DE BOTONES';
         if (normalized.includes('flex') && normalized.includes('carga')) return 'FLEX DE CARGA';
         if (normalized.includes('puerto') || normalized.includes('pin')) return 'PUERTO DE CARGA';
         if (normalized.includes('vidrio')) return 'VIDRIO TEMPLADO';
@@ -402,6 +407,16 @@ const getBrandLogo = (marca) => {
             confirmButtonText: 'Cerrar',
             width: 680
         });
+
+        if (user && userActual) {
+            logActivity(user.uid, {
+                Modelo: userActual.nombre || userActual.modelo || 'Desconocido',
+                Marca: userActual.marca || 'Desconocido',
+                Pieza: nombreCampoBD,
+                Accion: "Consulta de Compatibilidad (Específica)",
+                CodigoBuscado: codigoCompatibilidad,
+            });
+        }
     };
 
     return (
@@ -414,7 +429,7 @@ const getBrandLogo = (marca) => {
                     <h2 className="section-title text-center mb-4">
                         {selectedModelEntry 
                             ? `Partes disponibles ${selectedModelEntry.nombre || ''} (${selectedModelEntry.modelo || ''}):`
-                            : 'Partes disponibles Redmi Note 8 (M1908c3jg):'
+                            : 'Partes disponibles:'
                         }
                     </h2>
 
@@ -461,17 +476,19 @@ const getBrandLogo = (marca) => {
                                     <div 
                                         key={parte.id}
                                         className={`xiaomi-card ${selectedPartId === parte.id ? 'active' : ''}`}
-                                        onClick={() => setSelectedPartId(parte.id)}
+                                        onClick={(e) => { 
+                                            e.stopPropagation();
+                                            setSelectedPartId(parte.id);
+                                            console.log("Imagen presionada. Pieza:", nombreParte, "Modelo:", selectedModelEntry);
+                                            handleIconClick(nombreParte, selectedModelEntry);
+                                        }}
+
                                     >
                                         <div className="card-image-placeholder" style={{ position: 'relative' }}>
                                             <Button
                                                 variant="link"
                                                 className="p-0 border-0 icon-hover-effect image-btn"
-                                                onClick={(e) => { 
-                                                    e.stopPropagation();
-                                                    console.log("Imagen presionada. Pieza:", nombreParte, "Modelo:", selectedModelEntry);
-                                                    handleIconClick(nombreParte, selectedModelEntry);
-                                                }}
+
                                             >
                                                 <img 
                                                     // LÓGICA DE IMAGEN: usar `computedSrc` que respeta la falta de código de compatibilidad

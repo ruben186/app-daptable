@@ -44,7 +44,7 @@
   font-size: 14px;
 }
 
-.btn-generar { background-color: #008b8b !important; color: white !important; margin: 0; width: 200px; transition: all 0.3s ease !important;}
+.btn-generar { background-color: #008b8b !important; color: white !important; margin: 0; width: 200px; border:none !important;transition: all 0.3s ease !important;}
 .btn-generar:hover { background-color: #003838 !important;}
 .btn-success { background-color: #28a745; }
 .btn-success-light { background-color: #5cb85c; }

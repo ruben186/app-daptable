@@ -206,6 +206,7 @@ CSS
     color: #42F1DD;
     box-shadow: 0 0 0 3px rgba(11, 189, 165, 0.473);
 }
+
 .mb-2 .form-control:disabled{
     background: #0b302d;
     border: none;
