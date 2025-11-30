@@ -745,20 +745,25 @@ function GestionAdminPage() {
         }
 
         try {
-            const estudioRef = doc(db, 'estudios', selectedItem.id);
-                await updateDoc(estudioRef, {
-                    nombre: selectedItem.nombre,
-                    descripcion: selectedItem.descripcion,
-                    tipo: selectedItem.tipo || '',
-                    url: downloadURL || '',
-                    fecha: selectedItem.fecha || ''
-                });
+          const estudioRef = doc(db, 'estudios', selectedItem.id);
                 
-            // Actualiza el estado local
-            setEstudios(estudios.map(e =>
-                e.id === selectedItem.id ? selectedItem : e
-            ));
+         const updatePayload = {
+             nombre: selectedItem.nombre,
+             descripcion: selectedItem.descripcion,
+             tipo: selectedItem.tipo || '',
+             url: downloadURL || '', 
+             fecha: selectedItem.fecha || ''
+         };        
+         await updateDoc(estudioRef, updatePayload);
 
+         setEstudios(estudios.map(e =>
+            e.id === selectedItem.id 
+                 ? { ...e, ...updatePayload } // <-- ¡FIX CLAVE!
+            : e
+         ));
+         if (itemType === 'estudio') {
+                setSelectedItem(prev => ({ ...prev, ...updatePayload }));
+            }
             setUploadProgress(100);
             setUploading(false);
             handleCloseModal();

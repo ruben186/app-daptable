@@ -220,3 +220,12 @@ svg{
     display: block;
     margin: 0px 20px;
 }
+.btn:disabled{
+    background-color: #09665E !important;
+    border: none !important;
+}
+.form-select:disabled{
+    background-color: #0b302d !important;
+    border: none !important;
+    color: #257e73 !important;
+}

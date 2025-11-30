@@ -86,7 +86,7 @@
 }
 
 .xiaomi-card.active {
-    border-color: #25e3c8;
+    border-color: #1ca893;
     box-shadow: 0 18px 40px rgba(8,120,110,0.35);
 }
 
@@ -138,7 +138,7 @@
 }
 
 .card-label{
-    background: linear-gradient(180deg, rgba(36,195,175,0.08) 0%, rgba(18,90,84,0.95) 100%);
+    background: #07433E;
     color: #dffcf7;
     padding: 14px 10px;
     text-align: center;
