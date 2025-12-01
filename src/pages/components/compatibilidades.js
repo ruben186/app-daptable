@@ -1,6 +1,28 @@
 import Swal from 'sweetalert2';
-import IconologoXiami from '../../assets/logos/logoxiami.png'; // Asegúrate de ajustar la ruta si es necesario
-
+import IconologoXiami from '../../assets/logos/logoxiami.png';
+import IconologoSamsung from '../../assets/logos/logosamgsumg.png';
+import IconologoHuawei from '../../assets/logos/logohuawei.png';
+import IconologoMotorola from '../../assets/logos/logomotorola.png';
+import IconologoOppo from '../../assets/logos/OPPOLogo.png';
+import IconologoRealme from '../../assets/logos/Realme_logo.png';
+import IconologoVivo from '../../assets/logos/VivoLogo.png';
+import IconologoZte from '../../assets/logos/zteLogo.png';
+const MARCA_LOGOS = {
+    'xiaomi': IconologoXiami,
+    'redmi': IconologoXiami, 
+    'samsung': IconologoSamsung,
+    'huawei': IconologoHuawei,
+    'motorola': IconologoMotorola,
+    'oppo': IconologoOppo,
+    'realme': IconologoRealme,
+    'vivo': IconologoVivo,
+    'zte': IconologoZte,
+};
+export const getLogoUrlByMarca = (marca) => {
+    // Normaliza la marca a minúsculas para la búsqueda
+    const normalizedMarca = marca ? marca.toLowerCase() : '';
+    return MARCA_LOGOS[normalizedMarca] || null; 
+};
 // Función auxiliar para normalizar nombres de piezas (extraída de BtnMasXiaomi)
 export const normalizePieceName = (nombrePieza) => {
     if (!nombrePieza) return '';
@@ -59,11 +81,14 @@ export const handleCompatibilityCheck = (tipoPieza, userActual, modelos, logActi
         Swal.fire({
             icon: 'info',
             title: 'Sin Información',
-            text: `El modelo (${userActual.modelo}) no tiene registrado un código de compatibilidad para ${nombreCampoBD}.`
+            text: `El modelo (${userActual.modelo}) no tiene registrado un código de compatibilidad para ${nombreCampoBD}.`,
+            background: '#052b27ff', // Color de fondo personalizado
+            color: '#ffdfdfff', // Color del texto personalizado
+            confirmButtonColor: '#0b6860ff'
         });
         return;
     }
-
+    const marcaLogoUrl = getLogoUrlByMarca(userActual.marca);
     // Buscar hermanos (modelos con el mismo código de compatibilidad)
     const normTarget = normalizeCode(codigoCompatibilidad);
     const modelosCompatibles = modelos.filter(u => {
@@ -84,10 +109,10 @@ export const handleCompatibilityCheck = (tipoPieza, userActual, modelos, logActi
     // Generar encabezado de la alerta
     const headerHtml = `
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-            <img src="${IconologoXiami}" width="48" height="48" style="border-radius:6px;" alt="Logo Modelo" />
+            <img src="${marcaLogoUrl}" height="48" style="border-radius:6px;" alt="Logo Modelo" />
             <div style="line-height:1;">
                 <div style="font-weight:600">${userActual.nombre || ''}</div>
-                <div style="font-size:0.95em;color:#111111">Modelo: <strong>${userActual.modelo || ''}</strong></div>
+                <div style="font-size:0.95em;">Modelo: <strong>${userActual.modelo || ''}</strong></div>
             </div>
         </div>
     `;
@@ -105,6 +130,9 @@ export const handleCompatibilityCheck = (tipoPieza, userActual, modelos, logActi
         `,
         icon: 'success',
         confirmButtonText: 'Cerrar',
+        background: '#052b27ff', // Color de fondo personalizado
+        color: '#ffffffff', // Color del texto personalizado
+        confirmButtonColor: 'rgba(197, 81, 35, 1)',
         width: 680
     });
 

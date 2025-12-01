@@ -9,7 +9,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import logo from '../../assets/logos/logoapp-daptable.jpeg';
 import userDefault from '../../assets/logos/user.png'; 
 import './PerfilPage.css';
-import { handleCompatibilityCheck } from '../components/compatibilidades';
+import { handleCompatibilityCheck, getLogoUrlByMarca } from '../components/compatibilidades';
 import { logActivity } from '../../firebase/historialService';
 import Swal from 'sweetalert2';
 import NavBar from '../components/NavBarPage';
@@ -23,14 +23,6 @@ import IconovidrioTV from '../../assets/Iconos/vidrioTV.png';
 import IconovisorV from '../../assets/Iconos/visorV.png'; 
 import IconoauricularV from '../../assets/Iconos/auricularV.png'; 
 import IconoPiezaA from '../../assets/Iconos/IconoPiezaA.png'; 
-import IconologoXiami from '../../assets/logos/logoxiami.png';
-import IconologoSamsung from '../../assets/logos/logosamgsumg.png';
-import IconologoHuawei from '../../assets/logos/logohuawei.png';
-import IconologoMotorola from '../../assets/logos/logomotorola.png';
-import IconologoOppo from '../../assets/logos/OPPOLogo.png';
-import IconologoRealme from '../../assets/logos/Realme_logo.png';
-import IconologoVivo from '../../assets/logos/VivoLogo.png';
-import IconologoZte from '../../assets/logos/zteLogo.png';
 
 
 const EditableField = ({ label, value, name, type = 'text', onChange, isEditing, options }) => {
@@ -104,18 +96,6 @@ const PIEZA_ICONOS = {
     'OTRO': IconoPiezaA,
 };
 
-// Mapeo simple de Marcas para logos (Asegúrate de tener las imágenes importadas)
-const MARCA_LOGOS = {
-    'xiaomi': IconologoXiami,
-     'redmi': IconologoXiami, 
-     'samsung': IconologoSamsung,
-     'huawei': IconologoHuawei,
-     'motorola': IconologoMotorola,
-     'oppo': IconologoOppo,
-     'realme': IconologoRealme,
-     'vivo': IconologoVivo,
-     'zte': IconologoZte,
-};
 
 function PerfilPage() {
     const [datosPerfil, setDatosPerfil] = useState([null]);
@@ -135,12 +115,6 @@ function PerfilPage() {
     
     const navigate = useNavigate();
     const [user] = useAuthState(auth);
-
-    const getLogoUrlByMarca = (marca) => {
-        // Normaliza la marca a minúsculas para la búsqueda
-        const normalizedMarca = marca ? marca.toLowerCase() : '';
-        return MARCA_LOGOS[normalizedMarca] || null; // Devuelve null si no encuentra un logo
-    };
     useEffect(() => {
     // Asegúrate de que el usuario esté autenticado antes de buscar
     if (!user || !user.uid) return; 

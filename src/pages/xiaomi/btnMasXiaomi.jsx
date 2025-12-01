@@ -8,6 +8,11 @@ import { Container, Button } from 'react-bootstrap';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../firebase'; // Asegúrate de tener la ruta correcta a 'auth'
 import { logActivity } from '../../firebase/historialService';
+import { 
+    handleCompatibilityCheck,
+    normalizePieceName, 
+    getPiezaInfoFromModel 
+} from '../components/compatibilidades';
 import { db } from '../../firebase'; // Asegúrate de que la ruta sea correcta
 import './xiaomi.css'; 
 import NavBar from '../components/NavBarPage';
@@ -18,16 +23,6 @@ import IconologoXiamiV from '../../assets/logos/logoxiaomiverde2.png';
 import IconologoSamsungV from '../../assets/logos/logosamsumgV.png';
 import IconologoHuaweiV from '../../assets/logos/logohuaweiV.png';
 import IconologoMotorolaV from '../../assets/logos/logomotorolaV.png';
-
-//  Importación de Iconos logos de marcas 
-import IconologoXiami from '../../assets/logos/logoxiami.png';
-import IconologoSamsung from '../../assets/logos/logosamgsumg.png';
-import IconologoHuawei from '../../assets/logos/logohuawei.png';
-import IconologoMotorola from '../../assets/logos/logomotorola.png';
-import IconologoOppo from '../../assets/logos/OPPOLogo.png';
-import IconologoRealme from '../../assets/logos/Realme_logo.png';
-import IconologoVivo from '../../assets/logos/VivoLogo.png';
-import IconologoZte from '../../assets/logos/zteLogo.png';
 
 //importaciones de iconos imagenes 
 import IconoPantallaV from '../../assets/Iconos/iconoPantallaVerde.png';
@@ -196,12 +191,6 @@ function BtnMasXiaomi() {
         return results;
     };
 
-    // Helper para obtener la info de la pieza dentro de un documento de `tablas`
-    const getPiezaInfoFromModel = (modelEntry, nombrePiezaBD) => {
-        if (!modelEntry || !Array.isArray(modelEntry.campos)) return null;
-        return modelEntry.campos.find(c => (c.campo || '').toString().toUpperCase() === (nombrePiezaBD || '').toString().toUpperCase());
-    };
-
     // Determina el icono (verde/rojo) según si existen compatibilidades para la pieza en la colección 'tablas'
     const getIconForPart = (nombreParte) => {
         const nombre = (nombreParte || '').toString().toLowerCase();
@@ -283,140 +272,17 @@ function BtnMasXiaomi() {
             width: 600
         });
     };
-
-    // Función auxiliar para normalizar nombres de piezas
-    const normalizePieceName = (nombrePieza) => {
-        if (!nombrePieza) return '';
-        const normalized = nombrePieza.toString().toLowerCase().trim();
-        
-        // Mapeo de nombres posibles a nombres de BD
-        if (normalized.includes('pantalla')) return 'PANTALLA';
-        if (normalized.includes('bateria') || normalized.includes('batería')) return 'BATERIA';
-        if (normalized.includes('flex') && normalized.includes('boton')) return 'FLEX DE BOTONES';
-        if (normalized.includes('flex') && normalized.includes('carga')) return 'FLEX DE CARGA';
-        if (normalized.includes('puerto') || normalized.includes('pin')) return 'PUERTO DE CARGA';
-        if (normalized.includes('vidrio')) return 'VIDRIO TEMPLADO';
-        if (normalized.includes('visor')) return 'VISOR';
-        if (normalized.includes('auricular')) return 'AURICULAR';
-        
-        return normalized.toUpperCase();
-    };
-
-    // --- NUEVA FUNCIÓN PARA SELECCIONAR EL LOGO DE LA MARCA ---
-const getBrandLogo = (marca) => {
-    if (!marca) return IconologoXiami; // Fallback por defecto
-
-    const normalizedMarca = marca.toString().toLowerCase().trim();
-
-    // Utilizamos las importaciones de logos que ya tienes
-    if (normalizedMarca.includes('samsung')) return IconologoSamsung;
-    if (normalizedMarca.includes('huawei')) return IconologoHuawei;
-    if (normalizedMarca.includes('motorola') || normalizedMarca.includes('moto')) return IconologoMotorola;
-    if (normalizedMarca.includes('oppo')) return IconologoOppo;
-    if (normalizedMarca.includes('realme')) return IconologoRealme;
-    if (normalizedMarca.includes('vivo')) return IconologoVivo;
-    if (normalizedMarca.includes('zte')) return IconologoZte;
-    
-    // Default o Xiaomi/Redmi
-    return;
-};
-
-// ... (Resto del código)
-
-
-
     // Función para manejar clic en iconos dinámicos (igual que en xiaomi.jsx)
     const handleIconClick = (tipoPieza, userActual) => {
         console.log("handleIconClick ejecutado. Pieza:", tipoPieza, "Usuario:", userActual);
         
-        // Si no hay modelo seleccionado, mostrar error
-        if (!userActual) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'No hay un modelo seleccionado. Por favor, navega desde la tabla de Xiaomi.'
-            });
-            return;
-        }
-
-        // 1. Definir qué pieza estamos buscando (Pantalla, Batería, etc.)
-        const nombreCampoBD = normalizePieceName(tipoPieza);
-        console.log("Nombre campo BD normalizado:", nombreCampoBD);
-
-        // 2. Obtener el código del modelo actual
-        const piezaInfoActual = getPiezaInfoFromModel(userActual, nombreCampoBD);
-        const codigoCompatibilidad = piezaInfoActual?.codigoCompatibilidad;
-
-        console.log("Pieza info actual:", piezaInfoActual, "Código:", codigoCompatibilidad);
-
-        // Normalizador para comparar códigos de forma exacta (trim + lower)
-        const normalizeCode = (c) => (c === undefined || c === null) ? '' : String(c).trim().toLowerCase();
-
-        // Si no hay código, mostramos error y salimos
-        if (!codigoCompatibilidad || normalizeCode(codigoCompatibilidad) === '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Sin Información',
-                text: `Este modelo (${userActual.modelo}) no tiene registrado un código de compatibilidad para ${nombreCampoBD}.`
-            });
-            
-            return;
-
-
-        }
-
-        // 3. BUSCAR HERMANOS: Filtrar todos los usuarios para ver quiénes comparten ese código
-        const normTarget = normalizeCode(codigoCompatibilidad);
-        const modelosCompatibles = modelos.filter(u => {
-            const infoPiezaUsuario = getPiezaInfoFromModel(u, nombreCampoBD);
-            const codigo = infoPiezaUsuario?.codigoCompatibilidad;
-            // Comparamos codigo normalizado de forma estricta
-            return normalizeCode(codigo) === normTarget;
-        });
-
-        console.log("Modelos compatibles encontrados:", modelosCompatibles.length);
-
-        // 4. Generar la lista HTML para mostrar en la Alerta
-        const listaModelosHTML = modelosCompatibles.length > 0 
-            ? modelosCompatibles.map(m => `<li style="text-align: left; margin-bottom: 5px;">📱 ${m.nombre || ''} - <strong>${m.modelo || ''}</strong></li>`).join('')
-            : '<li>No se encontraron otros modelos.</li>';
-
-        // 5. Mostrar la Alerta con el logo y la lista
-        const headerHtml = `
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                <img src="${IconologoXiami}" width="48" height="48" style="border-radius:6px;" alt="Logo Xiaomi" />
-                <div style="line-height:1;">
-                    <div style="font-weight:600">${userActual.nombre || ''}</div>
-                    <div style="font-size:0.95em;color:111111">Modelo: <strong>${userActual.modelo || ''}</strong></div>
-                </div>
-            </div>
-        `;
-
-        Swal.fire({
-            title: `Compatibilidad: ${nombreCampoBD}`,
-            html: `
-                ${headerHtml}
-                <div style="font-size: 0.95em;">
-                    <p style="margin-bottom: 10px;">El código <strong>${codigoCompatibilidad}</strong> es compatible con:</p>
-                    <ul style="list-style: none; padding: 0; max-height: 260px; overflow-y: auto; border: 1px solid #eee; padding: 10px;">
-                        ${listaModelosHTML}
-                    </ul>
-                </div>
-            `,
-            icon: 'success',
-            confirmButtonText: 'Cerrar',
-            width: 680
-        });
-
-        if (user && userActual) {
-            logActivity(user.uid, {
-                Modelo: userActual.nombre || userActual.modelo || 'Desconocido',
-                Marca: userActual.marca || 'Desconocido',
-                Pieza: nombreCampoBD,
-                Accion: "Consulta de Compatibilidad (Específica)",
-                CodigoBuscado: codigoCompatibilidad,
-            });
-        }
+        handleCompatibilityCheck(
+            tipoPieza, 
+            userActual, 
+            modelos, 
+            logActivity, 
+            user
+        );
     };
 
     return (

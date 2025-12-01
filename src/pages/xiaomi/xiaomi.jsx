@@ -8,6 +8,7 @@ import './xiaomi.css';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 import { logActivity } from '../../firebase/historialService';
+import { handleCompatibilityCheck, getPiezaInfoFromModel } from '../components/compatibilidades';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 // Importación de Iconos e Imágenes
@@ -24,6 +25,7 @@ import IconologoXiamiV from '../../assets/logos/logoxiaomiverde2.png';
 import IconologoSamsungV from '../../assets/logos/logosamsumgV.png';
 import IconologoHuaweiV from '../../assets/logos/logohuaweiV.png';
 import IconologoMotorolaV from '../../assets/logos/logomotorolaV.png';
+import IconologoOppoV from '../../assets/logos/logooppoV.png';
 
 //  Importación de Iconos logos de marcas 
 import IconologoXiami from '../../assets/logos/logoxiami.png';
@@ -135,7 +137,7 @@ function Xiaomi() {
             case 'samsung': return IconologoSamsungV;
             case 'huawei': return IconologoHuaweiV;
             case 'motorola': return IconologoMotorolaV;
-            case 'oppo': return IconologoOppo;
+            case 'oppo': return IconologoOppoV;
             case 'realme': return IconologoRealme;
             case 'vivo': return IconologoVivo;
             case 'zte': return IconologoZte ;
@@ -153,9 +155,7 @@ function Xiaomi() {
     // Busca el objeto dentro del array que corresponda a la pieza (ej: "PANTALLA")
     // Esta función auxiliar la seguimos usando para encontrar la pieza dentro del array
     const getPiezaInfo = (user, nombrePiezaBD) => {
-        if (!user.campos || !Array.isArray(user.campos)) return null;
-        // Busca ignorando mayúsculas/minúsculas
-        return user.campos.find(c => c.campo?.toUpperCase() === nombrePiezaBD.toUpperCase());
+        return getPiezaInfoFromModel(user, nombrePiezaBD);
     };
 
     // 4. Lógica para decidir qué Icono mostrar (Verde o Rojo)
@@ -192,87 +192,15 @@ function Xiaomi() {
         return tieneDatos ? iconoVerde : iconoRojo;
     };
 
-   const handleIconClick = async (tipoPieza, userActual) => {
+    const handleIconClick = async (tipoPieza, userActual) => {
         // 1. Definir qué pieza estamos buscando (Pantalla, Batería, etc.)
-        let nombreCampoBD = '';
-        if (tipoPieza === 'pantalla') nombreCampoBD = 'PANTALLA';
-        else if (tipoPieza === 'bateria') nombreCampoBD = 'BATERIA';
-        else if (tipoPieza === 'flexBotones') nombreCampoBD = 'FLEX DE BOTONES'; // Ojo con el nombre exacto en tu BD
-
-        // 2. Obtener el código del celular actual al que le diste clic
-        const piezaInfoActual = getPiezaInfo(userActual, nombreCampoBD);
-        const codigoCompatibilidad = piezaInfoActual?.codigoCompatibilidad;
-
-        // Normalizador para comparar códigos de forma exacta (trim + lower)
-        const normalizeCode = (c) => (c === undefined || c === null) ? '' : String(c).trim().toLowerCase();
-
-        // Si no hay código, mostramos error y salimos
-        if (!codigoCompatibilidad || normalizeCode(codigoCompatibilidad) === '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Sin Información',
-                text: `Este modelo (${userActual.modelo}) no tiene registrado un código de compatibilidad para ${nombreCampoBD}.`
-            });
-            return;
-        }
-
-        if (user) {
-            try {
-                // Registrar la consulta exitosa
-                await logActivity(user.uid, {
-                    Modelo: userActual.nombre || userActual.modelo || 'Desconocido',
-                    Marca: userActual.marca || 'Desconocido',
-                    Pieza: nombreCampoBD,
-                    Accion: "Consulta de Compatibilidad (Específica)",
-                    CodigoBuscado: codigoCompatibilidad,          
-                });
-                console.log(`Actividad de compatibilidad registrada: ${userActual.modelo} - ${nombreCampoBD}`);
-            } catch (error) {
-                console.error("Fallo al registrar la actividad:", error);
-                // No detenemos el proceso si falla el registro del historial, solo lo notificamos.
-            }
-        }
-
-        // 3. BUSCAR HERMANOS: Filtrar todos los usuarios para ver quiénes comparten ese código
-        const normTarget = normalizeCode(codigoCompatibilidad);
-        const modelosCompatibles = usuarios.filter(u => {
-            const infoPiezaUsuario = getPiezaInfo(u, nombreCampoBD);
-            const codigo = infoPiezaUsuario?.codigoCompatibilidad;
-            // Comparamos codigo normalizado de forma estricta
-            return normalizeCode(codigo) === normTarget;
-        });
-
-        // 4. Generar la lista HTML para mostrar en la Alerta
-        const listaModelosHTML = modelosCompatibles.length > 0 
-            ? modelosCompatibles.map(m => `<li style="text-align: left; margin-bottom: 5px;">📱 ${m.nombre || ''} - <strong>${m.modelo || ''}</strong></li>`).join('')
-            : '<li>No se encontraron otros modelos.</li>';
-
-        // 5. Mostrar la Alerta con el logo y la lista
-        const headerHtml = `
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                <img src="${IconologoXiami}" width="48" height="48" style="border-radius:6px;" alt="Logo Xiaomi" />
-                <div style="line-height:1;">
-                    <div style="font-weight:600">${userActual.nombre || ''}</div>
-                    <div style="font-size:0.95em;color:#cfe9e4">Modelo: <strong>${userActual.modelo || ''}</strong></div>
-                </div>
-            </div>
-        `;
-
-        Swal.fire({
-            title: `Compatibilidad: ${nombreCampoBD}`,
-            html: `
-                ${headerHtml}
-                <div style="font-size: 0.95em;">
-                    <p style="margin-bottom: 10px;">El código <strong>${codigoCompatibilidad}</strong> es compatible con:</p>
-                    <ul style="list-style: none; padding: 0; max-height: 260px; overflow-y: auto; border: 1px solid #eee; padding: 10px;">
-                        ${listaModelosHTML}
-                    </ul>
-                </div>
-            `,
-            icon: 'success',
-            confirmButtonText: 'Cerrar',
-            width: 680
-        });
+        await handleCompatibilityCheck(
+        tipoPieza, 
+        userActual, 
+        usuarios, // La lista completa de modelos cargada en el estado 'usuarios'
+        logActivity, // La función importada para el historial
+        user // El objeto de autenticación del usuario
+        );
     };
 
     return (
