@@ -154,7 +154,7 @@ function NavBar() {
                 >
                   <NavDropdown.Item onClick={() => { navigate('/xiaomi?brand=oppo'); setActiveBrand('oppo'); }} className="dropdown-item" >
                     <div className={"pill" + (activeBrand === 'oppo' ? ' active' : '')}>
-                      <img src={logoOppo} alt="Oppo" className="pill-icon" width="80px" height="80px" style={{borderRadius: '20px'}} />
+                      <img src={logoOppo} alt="Oppo" className="pill-icon" width="80px" height="80px" />
                     </div>
                   </NavDropdown.Item>
                   <NavDropdown.Item onClick={() => { navigate('/xiaomi?brand=realme'); setActiveBrand('realme'); }} className="dropdown-item">
