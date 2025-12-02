@@ -70,7 +70,7 @@ const EstudiosPdfPage = () => {
                   <div className=" pt-2 ">
                     {p.url && 
                     <button 
-                      onClick={() => window.open(p.url, '_blank')}
+                      onClick={() => window.open(p.url, '_self')}
                       className=" btn btn-generar w-100"
                     >
                       Ver

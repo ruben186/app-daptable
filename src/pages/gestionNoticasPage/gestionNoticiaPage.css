@@ -1,0 +1,69 @@
+
+
+/* 1. Estilos del Contenedor Principal */
+.gestion-noticias-page {
+    min-height: 120vh;
+    background-color: #052e2a;
+}
+
+/* 2. Estilos de Encabezados y Separadores */
+.section-title {
+    margin-bottom: 20px;
+}
+
+.title-separator {
+    opacity: 0.5;
+}
+
+/* 3. Estilos de la Tarjeta de Noticias */
+.news-card {
+    background-color: #0b5550  ;
+    border: 1px solid #169788;
+    border-radius: 8px;
+    padding: 10px;
+    transition: all 0.3s ease;
+    /* La transición de hover se mantiene en el JSX por la naturaleza del evento */
+}
+.card-body {
+    padding: 10px !important;
+}
+
+.card-image {
+    height: 180px;
+    object-fit: cover;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.card-title-custom {
+    font-size: 1.1em;
+}
+
+.card-metadata {
+    opacity: 0.7;
+}
+
+.card-description {
+    margin: 0;
+    color: white !important;
+}
+
+/* 4. Estilos del Botón "Ver Fuente" */
+.card-link-btn {
+    background-color: #008b8b !important;
+    color: white !important;
+    border: none;
+    padding: 5px 15px;
+    text-decoration: none;
+    transition: all 0.3s ease !important;
+}
+.card-link-btn:hover{
+    text-decoration: none;
+    background-color: #003838 !important;
+}
+
+/* 5. Mensajes de Estado */
+.loading-text, .no-news-message {
+    color: var(--light-text);
+    text-align: center;
+}

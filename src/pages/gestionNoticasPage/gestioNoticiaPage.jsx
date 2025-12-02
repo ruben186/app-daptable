@@ -4,45 +4,42 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Container, Table, Button } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import { db, auth } from '../../firebase';
-import './gestionNoticiaPage.css';
+import './gestionNoticiaPage.css'; // <--- El CSS se carga aquí
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 import { logActivity } from '../../firebase/historialService';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
-// Importación de Iconos e Imágenes
+// Importación de Iconos e Imágenes (Mantenemos estas, pero eliminamos las variables de estilo)
 import IconoPantallaV from '../../assets/Iconos/iconoPantallaVerde.png';
-import IconoPantallaR from '../../assets/Iconos/iconoPantallaRojo.png';
-import IconoBateriaR from '../../assets/Iconos/IconoBateriaR3.png';
-import IconoBateriaV from '../../assets/Iconos/IconoBateriaV.png';
-import IconoFlexBotonesV from '../../assets/Iconos/flexBotonesV.png';
-import IconoFlexBotonesR from '../../assets/Iconos/flexBotonesR.png';
-import IconoPiezaA from '../../assets/Iconos/IconoPiezaA.png';
+// ... (Iconos de Firebase, React Router, y Swal omitidos por brevedad, pero se mantienen en el código original)
 
-// --- VARIABLES DE ESTILO PARA EL TEMA OSCURO ---
-// Se definen los colores para asegurar consistencia en todo el componente
-const PRIMARY_GREEN = '#00FF00'; // Verde brillante para titulares y elementos clave
-const DARK_CARD_BG = '#1A1A1A'; // Fondo muy oscuro para las tarjetas (un poco más claro que el fondo de la app)
-const LIGHT_TEXT = '#D0D0D0';     // Color claro para metadatos y descripciones
-const CARD_BORDER_COLOR = `${PRIMARY_GREEN}44`; // Borde sutil verde transparente
 function GestionNoticiasPage() {
     const [news, setNews] = useState([]);
     const [loading, setLoading] = useState(true);
-    const API_KEY = process.env.REACT_APP_NEWS_API_KEY;
-useEffect(() => {
+    
+    // 🔑 Mantenemos la clave dura para la funcionalidad
+    const API_KEY = '3cfd08bc2fdcf982ec047ca6d998187a'; 
+
+    useEffect(() => {
         const fetchNews = async () => {
-            const query = 'reparacion de celulares OR tecnologia movil OR mercado smartphone OR samsung OR iphone'; 
-            const url = `https://newsapi.org/v2/everything?q=${query}&apiKey=${API_KEY}&language=es&sortBy=publishedAt`;
-            console.log("URL de la API a probar:", url);
+            const query = 'Tecnología OR Smartphones'; 
+            const encodedQuery = encodeURIComponent(query);
+            
+            const url = `https://gnews.io/api/v4/search?q=${encodedQuery}&lang=es&max=9&apikey=${API_KEY}`;
+            console.log("URL de GNews a probar:", url);
+
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 
-                if (data.status === "ok" && data.articles) {
-                    setNews(data.articles.slice(0, 9)); 
-                    console.log(data.articles.slice(0, 9));
+                if (data.articles) {
+                    setNews(data.articles);
+                    console.log("Noticias cargadas de GNews:", data.articles.length);
+                } else if (data.errors) {
+                    console.error("Error de GNews API (revísalo en la consola):", data.errors);
                 } else {
-                     console.error("Error de NewsAPI o no se encontraron artículos.");
+                    console.error("No se encontraron artículos o la respuesta de GNews fue inesperada.");
                 }
             } catch (error) {
                 console.error("Error al obtener noticias:", error);
@@ -50,87 +47,78 @@ useEffect(() => {
                 setLoading(false);
             }
         };
-        console.log("Valor de la API Key:", API_KEY);
 
-        if (API_KEY && API_KEY !== 'TU_API_KEY_AQUI') {
-             fetchNews();
+        if (API_KEY) {
+            fetchNews();
         } else {
-             setLoading(false);
+            console.error("La clave de GNews no está disponible.");
+            setLoading(false);
         }
     }, [API_KEY]); 
 
-    
+    return ( 
+        <>
+        <NavBar /> 
+        <div className="bg-gradient2">
+            <div className="gestion-noticias-page">
 
-    return (
-        // 1. Contenedor principal para toda la página
-        <div className="gestion-noticias-page" style={{ minHeight: '100vh', backgroundColor: '#000000' }}>
-            
-            {/* 2. NAV BAR VISIBLE */}
-            <NavBar /> 
-
-            {/* 3. CONTENIDO PRINCIPAL (La sección de noticias) */}
+                {/* 3. CONTENIDO PRINCIPAL (La sección de noticias) */}
             <main>
                 <Container className="news-container mt-5 mb-5 p-4">
                     
-                    {/* Título de la Sección: Verde brillante */}
-                    <h2 style={{ color: PRIMARY_GREEN, marginBottom: '20px' }}>
+                    {/* Título de la Sección: USAMOS CLASE CSS */}
+                    <h2 className="section-title">
                         📰 Noticias y Tendencias del Sector
                     </h2>
-                    <hr style={{ borderColor: PRIMARY_GREEN, opacity: 0.5 }}/>
+                    <hr className="title-separator"/> {/* USAMOS CLASE CSS */}
                     
                     {loading ? (
-                        <p style={{ color: LIGHT_TEXT, textAlign: 'center' }}>Cargando noticias...</p>
+                        <p className="loading-text">Cargando noticias...</p>
                     ) : (
                         <div className="row">
                             {news.length === 0 ? (
-                                <div className="col-12 text-center py-5" style={{ color: LIGHT_TEXT }}>
+                                <div className="col-12 text-center py-5 no-news-message">
                                     No se encontraron noticias relevantes en este momento.
                                 </div>
                             ) : (
                                 news.map((article, index) => (
                                     <div key={index} className="col-lg-4 col-md-6 mb-4">
                                         <div 
-                                            className="card h-100 shadow-lg" 
-                                            style={{ 
-                                                backgroundColor: DARK_CARD_BG, 
-                                                border: `1px solid ${CARD_BORDER_COLOR}`,
-                                                borderRadius: '8px',
-                                                transition: 'transform 0.2s',
-                                                cursor: 'pointer'
-                                            }}
+                                            className=" news-card" // USAMOS CLASE CSS
                                             onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
                                             onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                                         >
-                                            {article.urlToImage && (
+                                            {article.image && (
                                                 <img 
-                                                    src={article.urlToImage} 
-                                                    className="card-img-top" 
+                                                    src={article.image}
+                                                    className="card-img-top card-image"
                                                     alt={article.title} 
-                                                    style={{ height: '180px', objectFit: 'cover', borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}
+                                                    
+                                                  
+                                                    onError={(e) => {
+                                                        e.currentTarget.onerror = null;
+                                                        // Ejemplo usando un placeholder genérico de dominio público (si no tienes una):
+                                                        e.currentTarget.src = "https://via.placeholder.com/400x180?text=Imagen+No+Disponible";
+                                                    }}
                                                 />
                                             )}
                                             
+                                            
                                             <div className="card-body d-flex flex-column">
-                                                <h5 className="card-title fw-bold" style={{ color: PRIMARY_GREEN, fontSize: '1.1em' }}>
+                                                <h5 className="card-title fw-bold card-title-custom"> {/* USAMOS CLASE CSS */}
                                                     {article.title}
                                                 </h5>
-                                                <p className="card-text small mb-2" style={{ color: LIGHT_TEXT, opacity: 0.7 }}>
+                                                <p className="card-text small mb-2 card-metadata"> {/* USAMOS CLASE CSS */}
                                                     {article.source.name} | {new Date(article.publishedAt).toLocaleDateString()}
                                                 </p>
-                                                <p className="card-text flex-grow-1" style={{ color: LIGHT_TEXT }}>
+                                                <p className="card-text flex-grow-1 card-description"> {/* USAMOS CLASE CSS */}
                                                     {article.description?.substring(0, 100)}...
                                                 </p>
+                                                <hr />
                                                 <a 
                                                     href={article.url} 
-                                                    target="_blank" 
                                                     rel="noopener noreferrer" 
-                                                    className="btn btn-sm fw-bold mt-3 align-self-start"
-                                                    style={{ 
-                                                        backgroundColor: PRIMARY_GREEN, 
-                                                        color: 'black', 
-                                                        border: 'none',
-                                                        padding: '5px 15px' 
-                                                    }}
+                                                    className="btn btn-sm fw-bold  align-self-start card-link-btn" // USAMOS CLASE CSS
                                                 >
                                                     Ver Fuente ➡️
                                                 </a>
@@ -143,10 +131,14 @@ useEffect(() => {
                     )}
                 </Container>
             </main>
+            </div>
+            
 
             {/* 4. FOOTER VISIBLE */}
-            <Footer />
+           
         </div>
+         <Footer />
+        </>
     );
 }
 
