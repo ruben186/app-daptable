@@ -23,7 +23,7 @@ function GestionNoticiasPage() {
 
     useEffect(() => {
         const fetchNews = async () => {
-            const query = 'Tecnología OR Smartphones'; 
+            const query = 'tecnología OR Smartphones'; 
             const encodedQuery = encodeURIComponent(query);
             
             const url = `https://gnews.io/api/v4/search?q=${encodedQuery}&lang=es&max=9&apikey=${API_KEY}`;

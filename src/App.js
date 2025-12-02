@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-
 // Rutas públicas
 import LoginPage from './pages/loginpages/LoginPage';
 import RegisterPage from './pages/registerpage/registerPage';
