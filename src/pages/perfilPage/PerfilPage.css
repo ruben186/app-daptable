@@ -138,13 +138,13 @@
     overflow-y: hidden;
     padding: 30px;
     max-width: 1400px; 
-    max-height: 1500px;
+    max-height: auto;
 
     transition: max-height 0.3s ease-in-out;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 .actividades-recientes-grid.scroll-enabled {
-    max-height: 1200px; /* Altura para 8 elementos, activa el scroll */
+    max-height: auto; /* Altura para 8 elementos, activa el scroll */
     overflow-y: auto; /* Muestra el scroll */
 }
 

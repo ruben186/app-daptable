@@ -104,6 +104,10 @@
     margin-top: 5px;
     background: #042220;
 }
+.container-sugerencias{
+    width: 100%;
+
+}
 
 @media (max-width: 900px) {
     .pieza-registro-container {

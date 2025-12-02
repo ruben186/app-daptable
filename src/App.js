@@ -30,6 +30,7 @@ import ContenidoAprendePage from './pages/contenidoAprendePage/contenidoAprendeP
 import EstudiosVideosPage from './pages/contenidoAprendePage/estudiosVideosPage.jsx';
 import EstudiosPdfPage from './pages/contenidoAprendePage/estudiosPdfPage.jsx';
 import EstudioDetallePage from './pages/contenidoAprendePage/estudioDetallePage.jsx';
+import NoticiaPage  from './pages/gestionNoticasPage/gestioNoticiaPage.jsx';
 
 function App() {
   return (
@@ -59,6 +60,12 @@ function App() {
         <Route path="/xiaomi" element={
           <ProtectedRoute allowedRoles={['admin', 'invitado', 'usuario']}>
             <Xiaomi/>
+          </ProtectedRoute>
+        } />
+
+         <Route path="/NoticiaPage" element={
+          <ProtectedRoute allowedRoles={['admin', 'invitado', 'usuario']}>
+            <NoticiaPage/>
           </ProtectedRoute>
         } />
 

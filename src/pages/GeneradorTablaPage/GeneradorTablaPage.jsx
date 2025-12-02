@@ -649,359 +649,362 @@ const eliminarFilaAgregada = async (rowIndex) => {
   return (
     <div className="page-offset bg-gradient2">
       <NavBar/>
-      <div className="generador-container">
-        <h2>Ingresa Celular</h2>
-        {/* calcular filas filtradas para usar en botones y tabla */}
-        {/* filteredRows se usa en el render para habilitar/deshabilitar Exportar */}
-        {(() => {})()}
-        <div className="generador-form">
-          {/* Search input at the start of the form (replaces name/model inputs) */}
-          <div className="search-row" style={{ flex: 1 }}>
-            <input
-              type="text"
-              placeholder="Buscar celular (ej: pantalla, moto g7, XT1962-4)"
-              value={searchQuery}
-              onFocus={() => { fetchRemoteTablas(); setShowSuggestions(true); updateSuggestions(searchQuery); }}
-              onChange={(e) => {
-                const v = e.target.value;
-                setSearchQuery(v);
-                if (!v || v.toString().trim() === '') {
-                  // if cleared, hide suggestions and results
-                  setSuggestions([]);
-                  setShowSuggestions(false);
-                  setAggregatedMode(false);
-                  setShowResults(false);
-                  setTableGenerated(false);
-                  return;
-                }
-                // Ensure remote tablas are loaded when user types
-                if (remoteTablas.length === 0 && !remoteLoading) fetchRemoteTablas();
-                updateSuggestions(v);
-                // typing a new query should hide any previously generated table until user confirms
-                setTableGenerated(false);
-                setShowResults(true);
-              }}
-              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              className="search-input"
-            />
-            {/* Para cometarizar lineas seleccionadas se usa Shift + Alt + A
-            {showSuggestions && suggestions && suggestions.length > 0 && (
-              <div className="suggestions">
-                {suggestions.map((s) => (
-                  <div key={s._id} className="suggestion-item" onMouseDown={() => {
-                    // onMouseDown to capture click before input blur
-                    setNombre(s.nombre || '');
-                    setModelo(s.modelo || '');
-                    setMarca(s.marca || '');
-                    setTabla(s.campos || []);
-                    setSearchQuery(`${s.nombre || ''} ${s.modelo || ''}`.trim());
+      <div>
+          <div className="generador-container">
+          <h2>Ingresa Celular</h2>
+          {/* calcular filas filtradas para usar en botones y tabla */}
+          {/* filteredRows se usa en el render para habilitar/deshabilitar Exportar */}
+          {(() => {})()}
+          <div className="generador-form">
+            {/* Search input at the start of the form (replaces name/model inputs) */}
+            <div className="search-row" style={{ flex: 1 }}>
+              <input
+                type="text"
+                placeholder="Buscar celular (ej: pantalla, moto g7, XT1962-4)"
+                value={searchQuery}
+                onFocus={() => { fetchRemoteTablas(); setShowSuggestions(true); updateSuggestions(searchQuery); }}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setSearchQuery(v);
+                  if (!v || v.toString().trim() === '') {
+                    // if cleared, hide suggestions and results
+                    setSuggestions([]);
                     setShowSuggestions(false);
                     setAggregatedMode(false);
-                    // selecting a suggestion should not show action buttons until the user explicitly presses Generar Tabla
+                    setShowResults(false);
                     setTableGenerated(false);
-                  }}>
-                    <strong>{s.nombre}</strong> {s.modelo ? <span style={{ color: '#666' }}>{s.modelo}</span> : null}
-                    <div style={{ fontSize: 12, color: '#999' }}>ID: {s._id}</div>
-                  </div>
-                ))}
-              </div>
-            )} */}
-            <button className="btn btn-danger volver-btn" onClick={volver} style={{ marginLeft: 8 }}>Volver</button>
-      </div>
+                    return;
+                  }
+                  // Ensure remote tablas are loaded when user types
+                  if (remoteTablas.length === 0 && !remoteLoading) fetchRemoteTablas();
+                  updateSuggestions(v);
+                  // typing a new query should hide any previously generated table until user confirms
+                  setTableGenerated(false);
+                  setShowResults(true);
+                }}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                className="search-input"
+              />
+              {/* Para cometarizar lineas seleccionadas se usa Shift + Alt + A
+              {showSuggestions && suggestions && suggestions.length > 0 && (
+                <div className="suggestions">
+                  {suggestions.map((s) => (
+                    <div key={s._id} className="suggestion-item" onMouseDown={() => {
+                      // onMouseDown to capture click before input blur
+                      setNombre(s.nombre || '');
+                      setModelo(s.modelo || '');
+                      setMarca(s.marca || '');
+                      setTabla(s.campos || []);
+                      setSearchQuery(`${s.nombre || ''} ${s.modelo || ''}`.trim());
+                      setShowSuggestions(false);
+                      setAggregatedMode(false);
+                      // selecting a suggestion should not show action buttons until the user explicitly presses Generar Tabla
+                      setTableGenerated(false);
+                    }}>
+                      <strong>{s.nombre}</strong> {s.modelo ? <span style={{ color: '#666' }}>{s.modelo}</span> : null}
+                      <div style={{ fontSize: 12, color: '#999' }}>ID: {s._id}</div>
+                    </div>
+                  ))}
+                </div>
+              )} */}
+              <button className="btn btn-danger volver-btn" onClick={volver} style={{ marginLeft: 8 }}>Volver</button>
         </div>
+          </div>
 
-        {showResults && (
-          <>
-            {tableGenerated && (aggregatedMode ? aggregatedRows.length > 0 : tabla.filter((f) => matchesQuery(f)).length > 0) && (
-            <div className="generador-actions">
-               {modoEdicionLocal && (
-                <div className="num-campos">
-                  <label>Número de campos:</label>
-                  <input
-                    type="number"
-                    min={1}
-                    value={numCampos}
-                    onChange={(e) => cambiarNumCampos(e.target.value)}
-                    className="small-input number-input"
-                  />
+          {showResults && (
+            <>
+              {tableGenerated && (aggregatedMode ? aggregatedRows.length > 0 : tabla.filter((f) => matchesQuery(f)).length > 0) && (
+              <div className="generador-actions">
+                {modoEdicionLocal && (
+                  <div className="num-campos">
+                    <label>Número de campos:</label>
+                    <input
+                      type="number"
+                      min={1}
+                      value={numCampos}
+                      onChange={(e) => cambiarNumCampos(e.target.value)}
+                      className="small-input number-input"
+                    />
+                  </div>
+                )}
+                <button className={`btn ${modoEdicionLocal ? 'cancelar-btn' : 'btn-gold'}`}  onClick={() => { setModoEdicionLocal(!modoEdicionLocal); setAggregatedMode(false); }}>{modoEdicionLocal ? 'Cancelar' : 'Editar'}</button>
+                <div  className='select-marca' style={{ marginLeft: 12}}>
+                  <div>
+                    <label style={{ marginRight: 8 }}>Marca:</label>
+                    <select
+                      value={marca}
+                      onChange={(e) => {
+                          const nuevaMarca = e.target.value;
+                          if (nuevaMarca === 'Otros') {
+                              // Lógica para abrir modal y resetear la selección (opcional)
+                              setMostrarModal(true);
+                              //setMarca(''); 
+                          } else {
+                              // Lógica normal
+                              setMarca(nuevaMarca);
+                          }
+                      }}
+                      className="brand-select"
+                    >
+                      <option value="">-- Selecciona marca --</option>
+                      {marcasDisponibles.map((m) => (
+                        <option key={m} value={m}>{m}</option>
+                        
+                      ))}
+                    </select>
+                  </div>
+                  <Modal show={mostrarModal} onHide={() => {
+                  // Función de cancelación completa
+                  setMostrarModal(false); 
+                  setNuevaMarcaInput('');
+                  // setMarcaSeleccionada(''); 
+                  setMarca(''); 
+                  }}>
+                      <Modal.Header closeButton>
+                          <Modal.Title>Agregar Nueva Marca</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body>
+                          <Form>
+                              <Form.Group className="mb-3">
+                                  <Form.Label>Nombre de la nueva marca:</Form.Label>
+                                  <input
+                                    type="text"
+                                    value={nuevaMarcaInput}
+                                    className='tabla-edicion-input'
+                                    onChange={(e) => setNuevaMarcaInput(e.target.value)}
+                                    placeholder="Ej: Google Pixel"
+                                  />
+                              </Form.Group>
+                          </Form>
+                      </Modal.Body>
+                      <Modal.Footer>
+                          {/* Botón Cancelar */}
+                          <Button variant="secondary" onClick={() => {
+                              setMostrarModal(false); 
+                              setNuevaMarcaInput('');
+                              // setMarcaSeleccionada(''); // Si aplica
+                              setMarca('');
+                          }}>
+                              Cancelar
+                          </Button>
+                          <Button variant="primary" onClick={handleAgregarMarca}>
+                              Guardar y Seleccionar
+                          </Button>
+                      </Modal.Footer>
+                  </Modal>
+
                 </div>
+                <button onClick={() => { guardarTabla(); setAggregatedMode(false); }}>Guardar</button>
+              </div>
               )}
-              <button className={`btn ${modoEdicionLocal ? 'cancelar-btn' : 'btn-gold'}`}  onClick={() => { setModoEdicionLocal(!modoEdicionLocal); setAggregatedMode(false); }}>{modoEdicionLocal ? 'Cancelar' : 'Editar'}</button>
-              <div  className='select-marca' style={{ marginLeft: 12}}>
-                <div>
-                  <label style={{ marginRight: 8 }}>Marca:</label>
-                  <select
-                    value={marca}
-                    onChange={(e) => {
-                        const nuevaMarca = e.target.value;
-                        if (nuevaMarca === 'Otros') {
-                            // Lógica para abrir modal y resetear la selección (opcional)
-                            setMostrarModal(true);
-                            //setMarca(''); 
-                        } else {
-                            // Lógica normal
-                            setMarca(nuevaMarca);
-                        }
-                    }}
-                    className="brand-select"
-                  >
-                    <option value="">-- Selecciona marca --</option>
-                    {marcasDisponibles.map((m) => (
-                      <option key={m} value={m}>{m}</option>
-                      
-                    ))}
-                  </select>
-                </div>
-                <Modal show={mostrarModal} onHide={() => {
-                // Función de cancelación completa
-                setMostrarModal(false); 
-                setNuevaMarcaInput('');
-                // setMarcaSeleccionada(''); 
-                setMarca(''); 
-                }}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Agregar Nueva Marca</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <Form>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Nombre de la nueva marca:</Form.Label>
+
+              {/** Compute displayed rows applying search and marca filter **/}
+                { (() => {
+                  if (aggregatedMode) {
+                    const rowsAgg = aggregatedRows;
+                    if (!rowsAgg.length) {
+                      return (
+                        <div style={{ padding: 20, textAlign: 'center' }}>
+                          No se encontraron resultados para la búsqueda.
+                        </div>
+                      );
+                    }
+                    return (
+
+                      <>
+                        <div className='generador-actions'>
+                          {modoEdicionAgregada && (
+                          <>
+                            {/* botón nueva pieza */}
+                            <button 
+                                className="btn btn-nuevo" 
+                                onClick={agregarFilaAgregada}
+                            >
+                                <FaPlus className="plus-new"/>Añadir Pieza a este Celular
+                            </button>
+                          </>
+                          )}
+
+                          {modoEdicionAgregada && (
+                          <button 
+                              className="btn btn-success" 
+                              onClick={guardarCambiosAgregados}
+                              style={{ marginLeft: '8px' }}
+                          >
+                              Guardar Cambios
+                          </button>
+                          )}
+                          <button 
+                          className={`btn ${modoEdicionAgregada ? 'cancelar-btn' : 'btn-gold'}`} 
+                          onClick={() => { 
+                            if (modoEdicionAgregada) {
+                              updateSuggestions(searchQuery); 
+                            }
+                            setModoEdicionAgregada(!modoEdicionAgregada); 
+                          }}
+                          >
+                            {modoEdicionAgregada ? 'Cancelar Edición' : 'Editar Tabla'}
+                          </button>
+                          </div>
+                          <table className="tabla-auxiliares">
+                        <thead>
+                          
+                          <tr>
+                            <th>Nombre</th>
+                            <th>Modelo</th>
+                            <th>Marca</th>
+                            <th>Pieza</th>
+                            <th>Código</th>
+                            <th>Código compatibilidad</th>
+                            {modoEdicionAgregada && <th>Acciones</th>}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {rowsAgg.map((fila, index) => (
+                            <tr key={`${fila._id || 'r'}-${index}`}>
+                              <td>{fila.nombre}</td>
+
+                              <td>{fila.modelo}</td>
+
+                              <td>{fila.marca}</td>
+                              
+                                  
+                              <td>{modoEdicionAgregada && fila.isNew ? (
+                                  <input
+                                      type="text"
+                                      className='tabla-edicion-input'
+                                      value={fila.campo || ''}
+                                      onChange={(e) => editarCampoAgregado(index, e.target.value)}
+                                  />
+                              ) : (
+                                  // Si no es nueva o no está en modo edición, se muestra solo el texto
+                                  fila.campo
+                              )}</td>
+
+                              <td>{fila.codigo}</td>
+
+                              <td>{
+                              modoEdicionAgregada ? (
                                 <input
                                   type="text"
-                                  value={nuevaMarcaInput}
                                   className='tabla-edicion-input'
-                                  onChange={(e) => setNuevaMarcaInput(e.target.value)}
-                                  placeholder="Ej: Google Pixel"
+                                  value={fila.codigoCompatibilidad|| ''}
+                                  onChange={(e) => editarCompatibilidadAgregada(index, e.target.value)}
                                 />
-                            </Form.Group>
-                        </Form>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        {/* Botón Cancelar */}
-                        <Button variant="secondary" onClick={() => {
-                            setMostrarModal(false); 
-                            setNuevaMarcaInput('');
-                            // setMarcaSeleccionada(''); // Si aplica
-                            setMarca('');
-                        }}>
-                            Cancelar
-                        </Button>
-                        <Button variant="primary" onClick={handleAgregarMarca}>
-                            Guardar y Seleccionar
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
+                              ) 
+                                : (fila.codigoCompatibilidad || '')
+                              
+                                }</td>
+                              {modoEdicionAgregada && (
+                                <td>
+                                  <button className="btn btn-sm btn-danger" onClick={() => eliminarFilaAgregada(index)} title="Eliminar fila">
+                                      <img 
+                                      src={IconoEliminar} 
+                                      alt="btn-eliminar"
+                                      width="30px"
+                                      height="30px"
+                                      />
+                                  </button>
+                                </td>
+                              )}
+                            </tr>
 
-              </div>
-              <button onClick={() => { guardarTabla(); setAggregatedMode(false); }}>Guardar</button>
-            </div>
-            )}
-
-            {/** Compute displayed rows applying search and marca filter **/}
-              { (() => {
-                if (aggregatedMode) {
-                  const rowsAgg = aggregatedRows;
-                  if (!rowsAgg.length) {
-                    return (
-                      <div style={{ padding: 20, textAlign: 'center' }}>
-                        No se encontraron resultados para la búsqueda.
-                      </div>
+                          ))}
+                        </tbody>
+                      </table>
+                      </>
+                      
                     );
-                  }
+                }
+
+                const rows = tabla.filter((f) => matchesQuery(f));
+                if (!rows.length) {
                   return (
-
-                    <>
-                      <div className='generador-actions'>
-                        {modoEdicionAgregada && (
-                        <>
-                          {/* botón nueva pieza */}
-                          <button 
-                              className="btn btn-nuevo" 
-                              onClick={agregarFilaAgregada}
-                          >
-                              <FaPlus className="plus-new"/>Añadir Pieza a este Celular
-                          </button>
-                        </>
-                        )}
-
-                        {modoEdicionAgregada && (
-                        <button 
-                            className="btn btn-success" 
-                            onClick={guardarCambiosAgregados}
-                            style={{ marginLeft: '8px' }}
-                        >
-                            Guardar Cambios
-                        </button>
-                        )}
-                        <button 
-                        className={`btn ${modoEdicionAgregada ? 'cancelar-btn' : 'btn-gold'}`} 
-                        onClick={() => { 
-                          if (modoEdicionAgregada) {
-                            updateSuggestions(searchQuery); 
-                          }
-                          setModoEdicionAgregada(!modoEdicionAgregada); 
-                        }}
-                        >
-                          {modoEdicionAgregada ? 'Cancelar Edición' : 'Editar Tabla'}
-                        </button>
-                        </div>
-                        <table className="tabla-auxiliares">
-                      <thead>
+                    <div style={{ padding: 20, textAlign: 'center'}}>
+                      <div>No se encontraron resultados.</div>
+                      <div style={{ marginTop: 12 }}>
+                        <label style={{ display: 'block', marginBottom: 6 }}>Ingrese el modelo del celular para crear uno nuevo:</label>
+                        <div style={{ display:'flex', justifyContent:'center'}}>
+                          <input
+                          type="text"
+                          name="nuevoModelo"
+                          placeholder="Ej: XT1962-4 (Modelo del celular)"
+                          value={nuevoModeloInput}
+                          onChange={(e) => setNuevoModeloInput(e.target.value)}
+                          className="small-input"
+                        />
+                        <button
+                          className="btn btn-generar"
+                          style={{ marginLeft: 8 }}
+                          onClick={() => generarTablaConModeloManual(nuevoModeloInput)}
                         
-                        <tr>
-                          <th>Nombre</th>
-                          <th>Modelo</th>
-                          <th>Marca</th>
-                          <th>Pieza</th>
-                          <th>Código</th>
-                          <th>Código compatibilidad</th>
-                          {modoEdicionAgregada && <th>Acciones</th>}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {rowsAgg.map((fila, index) => (
-                          <tr key={`${fila._id || 'r'}-${index}`}>
-                            <td>{fila.nombre}</td>
+                        >Crear nuevo celular</button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
 
-                            <td>{fila.modelo}</td>
-
-                            <td>{fila.marca}</td>
-                            
-                                
-                            <td>{modoEdicionAgregada && fila.isNew ? (
-                                <input
-                                    type="text"
-                                    className='tabla-edicion-input'
-                                    value={fila.campo || ''}
-                                    onChange={(e) => editarCampoAgregado(index, e.target.value)}
-                                />
-                            ) : (
-                                // Si no es nueva o no está en modo edición, se muestra solo el texto
-                                fila.campo
-                            )}</td>
-
-                            <td>{fila.codigo}</td>
-
-                            <td>{
-                            modoEdicionAgregada ? (
+                return (
+                  <table className="tabla-auxiliares">
+                    <thead>
+                      <tr>
+                        <th>pieza</th>
+                        <th>Código</th>
+                        <th>Código compatibilidad</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.map((fila, index) => (
+                        <tr key={index}>
+                          <td>
+                            {modoEdicionLocal ? (
                               <input
                                 type="text"
                                 className='tabla-edicion-input'
-                                value={fila.codigoCompatibilidad|| ''}
-                                onChange={(e) => editarCompatibilidadAgregada(index, e.target.value)}
+                                value={fila.campo}
+                                onChange={(e) => editarCampo(index, e.target.value)}
                               />
-                            ) 
-                              : (fila.codigoCompatibilidad || '')
-                            
-                              }</td>
-                            {modoEdicionAgregada && (
-                              <td>
-                                <button className="btn btn-sm btn-danger" onClick={() => eliminarFilaAgregada(index)} title="Eliminar fila">
-                                    <img 
-                                    src={IconoEliminar} 
-                                    alt="btn-eliminar"
-                                    width="30px"
-                                    height="30px"
-                                    />
-                                </button>
-                              </td>
+                            ) : (
+                              fila.campo
                             )}
-                          </tr>
-
-                        ))}
-                      </tbody>
-                    </table>
-                    </>
-                    
-                  );
-              }
-
-              const rows = tabla.filter((f) => matchesQuery(f));
-              if (!rows.length) {
-                return (
-                  <div style={{ padding: 20, textAlign: 'center'}}>
-                    <div>No se encontraron resultados.</div>
-                    <div style={{ marginTop: 12 }}>
-                      <label style={{ display: 'block', marginBottom: 6 }}>Ingrese el modelo del celular para crear uno nuevo:</label>
-                      <div style={{ display:'flex', justifyContent:'center'}}>
-                        <input
-                        type="text"
-                        name="nuevoModelo"
-                        placeholder="Ej: XT1962-4 (Modelo del celular)"
-                        value={nuevoModeloInput}
-                        onChange={(e) => setNuevoModeloInput(e.target.value)}
-                        className="small-input"
-                      />
-                      <button
-                        className="btn btn-generar"
-                        style={{ marginLeft: 8 }}
-                        onClick={() => generarTablaConModeloManual(nuevoModeloInput)}
-                      
-                      >Crear nuevo celular</button>
-                      </div>
-                    </div>
-                  </div>
+                          </td>
+                          <td>
+                            {modoEdicionLocal ? (
+                              <input
+                                type="text"
+                                className='tabla-edicion-input'
+                                value={fila.codigo}
+                                onChange={(e) => editarCodigo(index, e.target.value)}
+                              />
+                            ) : (
+                              fila.codigo
+                            )}
+                          </td>
+                          <td>
+                            {modoEdicionLocal ? (
+                              <input
+                                type="text"
+                                className='tabla-edicion-input'
+                                value={fila.codigoCompatibilidad || ''}
+                                onChange={(e) => editarCompatibilidad(index, e.target.value)}
+                              />
+                            ) : (
+                              fila.codigoCompatibilidad || ''
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 );
-              }
-
-              return (
-                <table className="tabla-auxiliares">
-                  <thead>
-                    <tr>
-                      <th>pieza</th>
-                      <th>Código</th>
-                      <th>Código compatibilidad</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map((fila, index) => (
-                      <tr key={index}>
-                        <td>
-                          {modoEdicionLocal ? (
-                            <input
-                              type="text"
-                              className='tabla-edicion-input'
-                              value={fila.campo}
-                              onChange={(e) => editarCampo(index, e.target.value)}
-                            />
-                          ) : (
-                            fila.campo
-                          )}
-                        </td>
-                        <td>
-                          {modoEdicionLocal ? (
-                            <input
-                              type="text"
-                              className='tabla-edicion-input'
-                              value={fila.codigo}
-                              onChange={(e) => editarCodigo(index, e.target.value)}
-                            />
-                          ) : (
-                            fila.codigo
-                          )}
-                        </td>
-                        <td>
-                          {modoEdicionLocal ? (
-                            <input
-                              type="text"
-                              className='tabla-edicion-input'
-                              value={fila.codigoCompatibilidad || ''}
-                              onChange={(e) => editarCompatibilidad(index, e.target.value)}
-                            />
-                          ) : (
-                            fila.codigoCompatibilidad || ''
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              );
-            })() }
-          
-        </>
-      )}
+              })() }
+            
+          </>
+        )}
+        </div>
       </div>
+      
     </div>
   );
 };

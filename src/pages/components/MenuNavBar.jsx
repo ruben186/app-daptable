@@ -155,7 +155,7 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
             </>
           )}
 
-          <button className="personas-drawer-item" onClick={() => { navigate('/noticias'); setOpen(false); }}>
+          <button className="personas-drawer-item" onClick={() => { navigate('/NoticiaPage'); setOpen(false); }}>
             Noticias
           </button>
        

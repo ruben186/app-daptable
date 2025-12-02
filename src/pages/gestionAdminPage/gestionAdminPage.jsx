@@ -15,6 +15,7 @@ import IconoEliminar from '../../assets/Iconos/iconoEliminar.png';
 import IconoPieza from '../../assets/Iconos/iconoPieza.png';
 import IconoLibro from '../../assets/Iconos/iconoLibro.png';
 import IconoUsuario from '../../assets/Iconos/usuario2.png';
+import IconoGrabadora from '../../assets/Iconos//iconograbadora.png';
 import './gestionAdminPage.css'; 
 
 
@@ -1363,12 +1364,14 @@ function GestionAdminPage() {
     const handleSave = itemType === 'usuario' ? handleSaveChangesUser : 
                        itemType === 'estudio' ? handleSaveChangesEstudio :
                        itemType === 'compatibilidad' ? handleSaveChangesCompatibilidad :
+                       itemType === 'noticias' ? handleSaveChangesCompatibilidad :
                        () => alert('Función de guardado no definida');
                        
     // Asignación dinámica del título del modal
     const modalTitle = itemType === 'usuario' ? 'Editar Usuario': 
                        itemType === 'estudio' ? 'Editar Material de Estudio' :
                        itemType === 'compatibilidad' ? 'Editar Registro de Compatibilidad' :
+                       itemType === 'noticias' ? 'Editar Noticias' :
                        'Editar Registro';
 
 
@@ -1427,6 +1430,8 @@ function GestionAdminPage() {
                             linkNuevo={'/nuevoEstudio'} 
                             showNewButton={true}
                         />
+
+                        
                         <div className="grid-full-width">
                         {/* 4. SECCIÓN COMPATIBILIDAD  */}
                         <DataCard
@@ -1442,6 +1447,20 @@ function GestionAdminPage() {
                             showNewButton={false}
                         />
                         </div>
+                        {/* 5. NOTICIAS */}
+                         <DataCard
+                            title="Noticias"
+                            icon={IconoGrabadora}
+                            data={estudios} 
+                            searchQuery={searchQueryEstudios}
+                            setSearchQuery={setSearchQueryEstudios}
+                            collectionName="noticiascel"
+                            handleEdit={handleEditEstudio} 
+                            handleDelete={handleEliminarEstudio} 
+                            link={'/gestionNoticiasPage'}
+                            linkNuevo={'/nuevoEstudio'} 
+                            showNewButton={true}
+                        />
                     </div>
                 </div>
             </main>

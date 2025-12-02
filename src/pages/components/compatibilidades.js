@@ -108,7 +108,7 @@ export const handleCompatibilityCheck = (tipoPieza, userActual, modelos, logActi
 
     // Generar encabezado de la alerta
     const headerHtml = `
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px; background: #269689; padding: 10px; border-radius: 40px; ">
             <img src="${marcaLogoUrl}" height="48" style="border-radius:6px;" alt="Logo Modelo" />
             <div style="line-height:1;">
                 <div style="font-weight:600">${userActual.nombre || ''}</div>
@@ -123,14 +123,14 @@ export const handleCompatibilityCheck = (tipoPieza, userActual, modelos, logActi
             ${headerHtml}
             <div style="font-size: 0.95em;">
                 <p style="margin-bottom: 10px;">El código <strong>${codigoCompatibilidad}</strong> es compatible con:</p>
-                <ul style="list-style: none; padding: 0; max-height: 260px; overflow-y: auto; border: 1px solid #eee; padding: 10px;">
+                <ul style="list-style: none; padding: 0; max-height: 260px; overflow-y: auto; border: 1px solid #eee; padding: 10px; background: #269689; border-radius: 20px;">
                     ${listaModelosHTML}
                 </ul>
             </div>
         `,
         icon: 'success',
         confirmButtonText: 'Cerrar',
-        background: '#052b27ff', // Color de fondo personalizado
+        background: '#124945ff', // Color de fondo personalizado
         color: '#ffffffff', // Color del texto personalizado
         confirmButtonColor: 'rgba(197, 81, 35, 1)',
         width: 680

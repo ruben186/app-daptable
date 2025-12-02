@@ -282,8 +282,8 @@ function SugerirPiezaPage() {
             <button type="button" className="btn-outline-secondary" onClick={() => navigate(-1)}>
                 &lt; Volver
             </button>
-            
-            <div className="pieza-registro-container">
+            <div className="container-sugerencias">
+                <div className="pieza-registro-container">
                 
                 <form onSubmit={handleSubmit} className="col-formulario">
                     
@@ -486,11 +486,13 @@ function SugerirPiezaPage() {
                     ></textarea>
                 </div>
                 
+                </div>
+                
+                <div className="d-grid gap-2" style={{marginTop: '30px'}}>
+                    <button type="submit" className="btn-primary" onClick={handleSubmit}>Enviar Sugerencia</button>
+                </div>
             </div>
             
-            <div className="d-grid gap-2" style={{marginTop: '30px'}}>
-                <button type="submit" className="btn-primary" onClick={handleSubmit}>Enviar Sugerencia</button>
-            </div>
         </div>
     );
 }
