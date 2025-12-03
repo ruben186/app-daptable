@@ -233,6 +233,12 @@ function GestionAdminPage() {
     // ** [NUEVOS ESTADOS] **
     const [estudios, setEstudios] = useState([]); // Array de datos de estudios
     const [searchQueryEstudios, setSearchQueryEstudios] = useState('');
+
+
+    
+    // ** [NUEVOS ESTADOS noticias] **
+    const [noticia, setNoticia] = useState([]); // Array de datos de estudios
+    const [searchQueryNoticia, setSearchQueryNoticia] = useState('');
     
     const [compatibilidad, setCompatibilidad] = useState([]); // Array de datos de compatibilidad (sugerenciasPiezas)
     const [searchQueryCompatibilidad, setSearchQueryCompatibilidad] = useState('');
@@ -393,6 +399,29 @@ function GestionAdminPage() {
             }
         };
         fetchEstudios();
+    }, []);
+
+
+
+    useEffect(() => {
+        const fetchNoticia = async () => {
+            setLoading(true);
+            try {
+                // Asumo una colección 'estudios' con documentos que tienen un campo 'nombre' y 'descripcion'
+                const querySnapshot = await getDocs(collection(db, 'materialNoticias'));
+                const data = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                setNoticia(data);
+            } catch (error) {
+                console.error("Error al cargar Noticias:", error);
+                setNoticia([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchNoticia();
     }, []);
 
     // 4. Carga de Compatibilidad (Datos crudos)
@@ -910,6 +939,141 @@ function GestionAdminPage() {
         }
     };
     
+
+
+
+ // ------------------------------------------------------------------
+    // --- MANEJADORES DE NOTICIAS---
+    // ------------------------------------------------------------------
+
+
+    const handleEliminarNoticia= async (id) => {
+        const result = await Swal.fire({
+            title:"¿Estás Seguro?", 
+            text: "¡Eliminarás esta Noticia!", 
+            icon: "warning",
+            showCancelButton: true,
+            background: '#052b27ff',
+            color: '#ffdfdfff',
+            confirmButtonColor: '#07433E',
+            cancelButtonColor: 'rgba(197, 81, 35, 1)',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                // Primero recuperar el documento para saber si tiene storagePath
+                const noticiaDocRef = doc(db, 'materialNoticias', id);
+                const noticiaSnap = await getDoc(noticiaDocRef);
+                if (noticiaSnap.exists()) {
+                    const noticiaData = noticiaSnap.data();
+                    if (noticiaData.storagePath) {
+                        try {
+                            const storage = getStorage();
+                            const fileRef = storageRef(storage, noticiaData.storagePath);
+                            await deleteObject(fileRef);
+                        } catch (err) {
+                            console.warn('No se pudo eliminar el archivo en Storage (puede que no exista):', err);
+                        }
+                    }
+                }
+
+                await deleteDoc(noticiaDocRef);
+                setNoticia(noticia.filter(e => e.id !== id));
+                Swal.fire({ title:"Eliminado", text: "Noticia eliminad correctamente", icon: "success", background: '#052b27ff', color: '#ffffffff', confirmButtonColor: '#0b6860ff' });
+            } catch (error) {
+                console.error("Error al eliminar estudio:", error);
+                Swal.fire({ title:"Error", text: "No se pudo eliminar el material de estudio.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff'});
+            }
+        }
+    };
+
+        const handleSaveChangesNoticias = async () => {
+        if (!selectedItem || itemType !== 'noticia') return;
+
+        if (!selectedItem.nombre || !selectedItem.descripcion || !selectedItem.url) {
+            Swal.fire({ title:"Campos incompletos", text: "Todos los campos deben ser llenados.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
+            return;
+        }
+
+        let downloadURL = selectedItem.url;    
+        // 1. Subida del PDF (Solo si es PDF y se seleccionó un nuevo archivo)
+        if (selectedItem.tipo === 'pdf' && tempFile) {
+        setUploading(true);
+        setUploadProgress(10);
+        try {
+            const formData = new FormData();
+            formData.append('archivo', tempFile); 
+            
+            if (selectedItem.url) {
+            formData.append('oldFileUrl', selectedItem.url);
+            }
+
+            const response = await fetch(NODE_SERVER_URL, {
+            method: 'POST',
+            body: formData,
+            });
+
+            setUploadProgress(50); 
+            const data = await response.json();    
+            if (!response.ok || !data.success || !data.url) {
+            throw new Error(data.message || "Error al subir el nuevo PDF.");
+            }
+            downloadURL = data.url; // Nueva URL del archivo subido
+            setUploadProgress(90);
+        } catch (error) {
+            console.error("Error al subir PDF:", error);
+            setUploading(false);
+            setUploadProgress(0);
+            Swal.fire({ title: "Error de Subida", text: "No se pudo subir el nuevo PDF.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
+            return; // Detiene el proceso si falla la subida
+        }
+        }
+
+        try {
+          const noticiaRef = doc(db, 'materialNoticias', selectedItem.id);
+                
+         const updatePayload = {
+             nombre: selectedItem.nombre,
+             descripcion: selectedItem.descripcion,
+             tipo: selectedItem.tipo || '',
+             url: downloadURL || '', 
+             fecha: selectedItem.fecha || ''
+         };        
+         await updateDoc(noticiaRef, updatePayload);
+
+         setNoticia(noticia.map(e =>
+            e.id === selectedItem.id 
+                 ? { ...e, ...updatePayload } // <-- ¡FIX CLAVE!
+            : e
+         ));
+         if (itemType === 'noticia') {
+                setSelectedItem(prev => ({ ...prev, ...updatePayload }));
+            }
+            setUploadProgress(100);
+            setUploading(false);
+            handleCloseModal();
+
+            Swal.fire({ title:"Actualizado", text: "Los datos del estudio fueron actualizados.", icon: "success", background: '#052b27ff', color: '#ffffffff', confirmButtonColor: '#0b6860ff' });
+        } catch (error) {
+            console.error(error);
+            setUploading(false);
+            setUploadProgress(0);
+            Swal.fire({ title:"Error", text: "No se pudo actualizar el estudio.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
+        }
+    };
+
+    const handleModalChangeNoticia = (e) => {
+        const { name, value } = e.target;
+        setSelectedItem((prev) => ({ ...prev, [name]: value }));
+    };
+     const handleEditNoticia = (item) => {
+        // Clonamos el objeto para evitar mutaciones directas del estado.
+        setSelectedItem({ ...item }); 
+        setItemType('noticia');
+        setShowModal(true);
+    };
     // ------------------------------------------------------------------
     // --- RENDERIZADO DEL MODAL ---
     // ------------------------------------------------------------------
@@ -1084,7 +1248,78 @@ function GestionAdminPage() {
                         onChange={handleTempFileChange}
                         disabled={uploading}
                         />
-                        {tempFile && <p className="text-info small mt-1">Archivo seleccionado: **{tempFile.name}**</p>}
+                        {tempFile && <p className="text-info small mt-1">Archivo seleccionado: *{tempFile.name}*</p>}
+                        {uploading && (
+                        <div className="mt-2">
+                        <ProgressBar className='bar-carga' now={uploadProgress} label={`${uploadProgress}%`} />
+                        </div>
+                        )}
+                        </Form.Group>
+                    </>
+                    )}
+                </Form>
+            );
+        }else if (itemType === 'noticia') {
+             return (
+                <Form>
+                    <Form.Group className="mb-2">
+                        <Form.Label>Nombre</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="nombre"
+                            value={selectedItem.nombre || ''}
+                            onChange={handleModalChangeNoticia}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-2">
+                        <Form.Label>Descripción</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            rows={3}
+                            name="descripcion"
+                            value={selectedItem.descripcion || ''}
+                            onChange={handleModalChangeNoticia}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-2">
+                        <Form.Label>Tipo</Form.Label>
+                        <Form.Select name="tipo" value={selectedItem.tipo || 'video'} onChange={handleModalChangeNoticia} disabled={uploading} >
+                            <option value="video">Video</option>
+                            <option value="pdf">PDF</option>
+                        </Form.Select>
+                    </Form.Group>
+                    {selectedItem.tipo === 'video' ? (
+                    <Form.Group className="mb-2">
+                        <Form.Label>Enlace del Video (URL)</Form.Label>
+                        <Form.Control 
+                        value={selectedItem.url || ''} 
+                        onChange={(e) => setSelectedItem(s => ({ ...s, url: e.target.value }))} 
+                        disabled={uploading}
+                        />
+                        {selectedItem.url && (
+                            <a className='login-invited-btn' href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
+                        )}
+                    </Form.Group>
+                    ) : (
+                    <>
+                        <Form.Group className="mb-2">
+                        <Form.Label>Enlace del PDF (URL) </Form.Label>
+                        <Form.Control type="text" name="url" value={selectedItem.url || ''} onChange={(e) => setSelectedItem(s => ({ ...s, url: e.target.value }))} />
+                        {/* Mostrar enlace directo si existe */}
+                        {selectedItem.url && (
+                            <a className='login-invited-btn' href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
+                        )}
+                        </Form.Group>
+                    
+                        <Form.Group className="mb-2">
+                        <Form.Label>Reemplazar PDF</Form.Label>
+                        <Form.Control 
+                        type="file" 
+                        accept="application/pdf"
+                        onChange={handleTempFileChange}
+                        disabled={uploading}
+                        />
+                        {tempFile && <p className="text-info small mt-1">Archivo seleccionado: *{tempFile.name}*</p>}
                         {uploading && (
                         <div className="mt-2">
                         <ProgressBar className='bar-carga' now={uploadProgress} label={`${uploadProgress}%`} />
@@ -1363,15 +1598,15 @@ function GestionAdminPage() {
     // Asignación dinámica de la función de guardado
     const handleSave = itemType === 'usuario' ? handleSaveChangesUser : 
                        itemType === 'estudio' ? handleSaveChangesEstudio :
+                       itemType === 'noticia' ? handleSaveChangesNoticias :
                        itemType === 'compatibilidad' ? handleSaveChangesCompatibilidad :
-                       itemType === 'noticias' ? handleSaveChangesCompatibilidad :
                        () => alert('Función de guardado no definida');
                        
     // Asignación dinámica del título del modal
     const modalTitle = itemType === 'usuario' ? 'Editar Usuario': 
                        itemType === 'estudio' ? 'Editar Material de Estudio' :
                        itemType === 'compatibilidad' ? 'Editar Registro de Compatibilidad' :
-                       itemType === 'noticias' ? 'Editar Noticias' :
+                       itemType === 'noticia' ? 'Editar Noticias' :
                        'Editar Registro';
 
 
@@ -1451,13 +1686,13 @@ function GestionAdminPage() {
                          <DataCard
                             title="Noticias"
                             icon={IconoGrabadora}
-                            data={estudios} 
-                            searchQuery={searchQueryEstudios}
-                            setSearchQuery={setSearchQueryEstudios}
+                            data={noticia} 
+                            searchQuery={searchQueryNoticia}
+                            setSearchQuery={setSearchQueryNoticia}
                             collectionName="noticiascel"
-                            handleEdit={handleEditEstudio} 
-                            handleDelete={handleEliminarEstudio} 
-                            link={'/gestionNoticiasPage'}
+                            handleEdit={handleEditNoticia} 
+                            handleDelete={handleEliminarNoticia} 
+                            link={'/gestionNoticias'}
                             linkNuevo={'/nuevoEstudio'} 
                             showNewButton={true}
                         />

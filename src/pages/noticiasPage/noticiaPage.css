@@ -2,10 +2,13 @@
 
 /* 1. Estilos del Contenedor Principal */
 .gestion-noticias-page {
-    min-height: 120vh;
+    width: 1500px;
     background-color: #052e2a;
+    border-radius: 0 0 20px 20px;
 }
-
+.bg-noticias{
+  align-items: flex-start;
+}
 /* 2. Estilos de Encabezados y Separadores */
 .section-title {
     margin-bottom: 20px;

@@ -149,7 +149,7 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
           
           {(userRole === 'admin' || userRole === 'usuario') && (
             <>
-            <button className="personas-drawer-item" onClick={() => { navigate('/opinion'); setOpen(false); }}>
+            <button className="personas-drawer-item" onClick={() => { navigate('/OpinionPage'); setOpen(false); }}>
             Nos interesa tu opinión
             </button>
             </>

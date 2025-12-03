@@ -647,7 +647,7 @@ const eliminarFilaAgregada = async (rowIndex) => {
   }
 };
   return (
-    <div className="page-offset bg-gradient2">
+    <div className="page-offset bg-gradient2 bg-generador">
       <NavBar/>
       <div>
           <div className="generador-container">

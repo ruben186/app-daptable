@@ -29,7 +29,10 @@ import ContenidoAprendePage from './pages/contenidoAprendePage/contenidoAprendeP
 import EstudiosVideosPage from './pages/contenidoAprendePage/estudiosVideosPage.jsx';
 import EstudiosPdfPage from './pages/contenidoAprendePage/estudiosPdfPage.jsx';
 import EstudioDetallePage from './pages/contenidoAprendePage/estudioDetallePage.jsx';
-import NoticiaPage  from './pages/gestionNoticasPage/gestioNoticiaPage.jsx';
+import NoticiaPage  from './pages/noticiasPage/noticiaPage.jsx';
+import OpinionPage  from './pages/OpinionPage/opinionPage.jsx';
+import GestionNoticiasPage from './pages/gestionNoticiasPage/gestionNoticiasPage.jsx';
+import NuevaNoticiaPage from './pages/gestionNoticiasPage/nuevaNoticiaPage.jsx';
 
 function App() {
   return (
@@ -68,6 +71,13 @@ function App() {
           </ProtectedRoute>
         } />
 
+        <Route path="/OpinionPage" element={
+          <ProtectedRoute allowedRoles={['admin', 'invitado', 'usuario']}>
+            <OpinionPage/>
+          </ProtectedRoute>
+        } />
+
+
         
         <Route path="/btnMasXiaomi" element={
           <ProtectedRoute allowedRoles={['admin', 'invitado', 'usuario']}>
@@ -92,6 +102,18 @@ function App() {
         <Route path="/TablaCel" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <GeneradorTablaPage/>
+          </ProtectedRoute>
+        } />
+
+         <Route path="/gestionNoticias" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <GestionNoticiasPage/>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/nuevaNoticia" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <NuevaNoticiaPage/>
           </ProtectedRoute>
         } />
         

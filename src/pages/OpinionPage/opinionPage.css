@@ -1,0 +1,124 @@
+.opinion-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #0b2f2e; /* Fondo oscuro similar */
+  color: #c7d2d2; /* Texto claro */
+  min-height: 100vh;
+}
+
+.opinion-header {
+  margin-bottom: 30px;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: #00d49f; /* Color de acento verde/azul */
+  font-size: 1em;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+h2 {
+  font-size: 1.5em;
+  font-weight: 400;
+}
+
+.options-grid {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.option-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 5px;
+  border-radius: 8px;
+  border: 2px solid transparent; /* Borde por defecto */
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: #123e3d; /* Fondo de la tarjeta */
+}
+
+/* Estilo para la tarjeta seleccionada */
+.option-card.selected {
+  border-color: #00d49f; /* Resaltar borde cuando está seleccionada */
+  box-shadow: 0 0 10px rgba(0, 212, 159, 0.5);
+}
+
+.icon-placeholder {
+  font-size: 3em;
+  margin-bottom: 5px;
+}
+
+.option-text {
+  font-weight: bold;
+  padding: 2px 10px;
+  border-radius: 4px;
+}
+
+.mala {
+  color: #ff5252; /* Rojo */
+}
+
+.buena {
+  color: #cddc39; /* Verde claro */
+}
+
+.excelente {
+  color: #ffc107; /* Amarillo/Sol */
+  border: 1px solid #ffc107;
+}
+
+.justification-section label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.justification-section textarea {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #00d49f;
+  border-radius: 4px;
+  background-color: #0d3837;
+  color: #c7d2d2;
+  resize: vertical;
+  min-height: 100px;
+  box-sizing: border-box; /* Incluir padding en el ancho */
+}
+
+.submit-button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 20px;
+  background-color: #00d49f;
+  color: #0b2f2e;
+  border: none;
+  border-radius: 4px;
+  font-size: 1.1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: #00b382;
+}
+
+.submit-button:disabled {
+  background-color: #5d7e7d;
+  cursor: not-allowed;
+}
+
+.status-message {
+  margin-top: 15px;
+  text-align: center;
+  font-style: italic;
+}

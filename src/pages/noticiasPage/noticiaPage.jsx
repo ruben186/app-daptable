@@ -1,20 +1,16 @@
 import { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs,query, where, } from 'firebase/firestore';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Container, Table, Button } from 'react-bootstrap';
+import { Container, Table, Button, Card } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import { db, auth } from '../../firebase';
-import './gestionNoticiaPage.css'; // <--- El CSS se carga aquí
+import './noticiaPage.css'; // <--- El CSS se carga aquí
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 import { logActivity } from '../../firebase/historialService';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
-// Importación de Iconos e Imágenes (Mantenemos estas, pero eliminamos las variables de estilo)
-import IconoPantallaV from '../../assets/Iconos/iconoPantallaVerde.png';
-// ... (Iconos de Firebase, React Router, y Swal omitidos por brevedad, pero se mantienen en el código original)
-
-function GestionNoticiasPage() {
+function NoticiasPage() {
     const [news, setNews] = useState([]);
     const [loading, setLoading] = useState(true);
     
@@ -23,11 +19,10 @@ function GestionNoticiasPage() {
 
     useEffect(() => {
         const fetchNews = async () => {
-            const query = 'tecnología OR Smartphones'; 
+            const query = 'tecnología OR Celulares OR reparacion celulares'; 
             const encodedQuery = encodeURIComponent(query);
             
             const url = `https://gnews.io/api/v4/search?q=${encodedQuery}&lang=es&max=9&apikey=${API_KEY}`;
-            console.log("URL de GNews a probar:", url);
 
             try {
                 const response = await fetch(url);
@@ -59,7 +54,7 @@ function GestionNoticiasPage() {
     return ( 
         <>
         <NavBar /> 
-        <div className="bg-gradient2">
+        <div className="bg-gradient2 bg-noticias">
             <div className="gestion-noticias-page">
 
                 {/* 3. CONTENIDO PRINCIPAL (La sección de noticias) */}
@@ -142,4 +137,4 @@ function GestionNoticiasPage() {
     );
 }
 
-export default GestionNoticiasPage;
+export default NoticiasPage;
