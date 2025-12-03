@@ -9,10 +9,15 @@ import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 import { logActivity } from '../../firebase/historialService';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import iconoNoticiasFal from '../../assets/Iconos/iconoNoticiasFal.png';
 
 function NoticiasPage() {
     const [news, setNews] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [videos, setVideos] = useState([]);
+    const location = useLocation();
+    const [filteredVideos, setFilteredVideos] = useState([]);
+    const navigate = useNavigate();
     
     // 🔑 Mantenemos la clave dura para la funcionalidad
     const API_KEY = '3cfd08bc2fdcf982ec047ca6d998187a'; 
@@ -51,6 +56,75 @@ function NoticiasPage() {
         }
     }, [API_KEY]); 
 
+    useEffect(() => {
+    const fetchVideos = async () => {
+        setLoading(true);
+        try {
+        const q = query(collection(db, 'materialNoticias'));
+        const snap = await getDocs(q);
+        const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        setVideos(items);
+        setFilteredVideos(items);
+        } catch (err) {
+        console.error('Error cargando videos:', err);
+        setVideos([]);
+        } finally {
+        setLoading(false);
+        }
+    };
+    fetchVideos();
+    }, []);
+    const goToDetalle = (item) => {
+        if (!item || !item.id) return;
+        if(item.tipo == 'video'){
+            navigate(`/aprende/video/${item.id}`);
+        }else{
+            window.open(item.url, '_self')
+        }
+    };
+    const DataCard = ({ item }) => {
+    const fecha = item.fecha?.toDate ? new Date(item.fecha.toDate()).toLocaleString() : (item.fecha ? String(item.fecha) : '');
+    // Extraer posible thumbnail de YouTube (si es youtube) para mostrar en el área superior
+    let thumbnail = null;
+    try {
+      const m = item.url && item.url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_\-]+)/);
+      if (m && m[1]) thumbnail = `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg`;
+    } catch (e) { /* ignore */ }
+
+    return (
+                <div  className=" news-card"  
+                onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
+                onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                >
+                    <div className="card-img-top card-image" alt={item.nombre}  style={{
+                        backgroundImage: `url(${thumbnail || iconoNoticiasFal})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                        }} 
+                    />
+                    <div className="card-body d-flex flex-column">
+                        <h5 className="card-title fw-bold card-title-custom"> {/* USAMOS CLASE CSS */}
+                            {item.nombre}
+                        </h5>
+                        <p className="card-text small mb-2 card-metadata"> {/* USAMOS CLASE CSS */}
+                            {item.fecha?.toDate ? new Date(item.fecha.toDate()).toLocaleDateString('es-ES') : ''}
+                        </p>
+                        <p className="card-text flex-grow-1 card-description"> {/* USAMOS CLASE CSS */}
+                            {item.descripcion?.substring(0, 150)}...
+                        </p>
+                        <hr />
+                        <a 
+                            onClick={() => goToDetalle(item)}
+                            rel="noopener noreferrer" 
+                            className="btn btn-sm fw-bold  align-self-start card-link-btn" // USAMOS CLASE CSS
+                        >
+                            Ver Fuente ➡️
+                        </a>
+                    </div>
+                </div>
+    );
+  };
+
     return ( 
         <>
         <NavBar /> 
@@ -59,14 +133,26 @@ function NoticiasPage() {
 
                 {/* 3. CONTENIDO PRINCIPAL (La sección de noticias) */}
             <main>
-                <Container className="news-container mt-5 mb-5 p-4">
-                    
+                <Container className=" mt-5 mb-5 p-4">   
                     {/* Título de la Sección: USAMOS CLASE CSS */}
                     <h2 className="section-title">
                         📰 Noticias y Tendencias del Sector
                     </h2>
                     <hr className="title-separator"/> {/* USAMOS CLASE CSS */}
+                    <div className="news-container">
+                     <div className="row">
+                        {filteredVideos.length > 0 ? (
+                            filteredVideos.map(v => (
+                            <div  className="col-lg-4 col-md-6 mb-4">
+                            <DataCard item={v} />
+                            </div>
+                        ))
+                        ) : (
+                        !loading && (<p></p>)
+                        )}
+                    </div> 
                     
+                    </div>
                     {loading ? (
                         <p className="loading-text">Cargando noticias...</p>
                     ) : (
@@ -77,7 +163,8 @@ function NoticiasPage() {
                                 </div>
                             ) : (
                                 news.map((article, index) => (
-                                    <div key={index} className="col-lg-4 col-md-6 mb-4">
+                                    <div key={index}  className="col-lg-4 col-md-6 mb-4">
+                                        
                                         <div 
                                             className=" news-card" // USAMOS CLASE CSS
                                             onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
@@ -93,7 +180,7 @@ function NoticiasPage() {
                                                     onError={(e) => {
                                                         e.currentTarget.onerror = null;
                                                         // Ejemplo usando un placeholder genérico de dominio público (si no tienes una):
-                                                        e.currentTarget.src = "https://via.placeholder.com/400x180?text=Imagen+No+Disponible";
+                                                        e.currentTarget.src = {iconoNoticiasFal};
                                                     }}
                                                 />
                                             )}
@@ -124,13 +211,11 @@ function NoticiasPage() {
                             )}
                         </div>
                     )}
+                   
+                   
                 </Container>
             </main>
             </div>
-            
-
-            {/* 4. FOOTER VISIBLE */}
-           
         </div>
          <Footer />
         </>

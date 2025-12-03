@@ -1045,7 +1045,7 @@ function GestionAdminPage() {
 
          setNoticia(noticia.map(e =>
             e.id === selectedItem.id 
-                 ? { ...e, ...updatePayload } // <-- ¡FIX CLAVE!
+                 ? { ...e, ...updatePayload } 
             : e
          ));
          if (itemType === 'noticia') {
@@ -1693,7 +1693,7 @@ function GestionAdminPage() {
                             handleEdit={handleEditNoticia} 
                             handleDelete={handleEliminarNoticia} 
                             link={'/gestionNoticias'}
-                            linkNuevo={'/nuevoEstudio'} 
+                            linkNuevo={'/nuevaNoticia'} 
                             showNewButton={true}
                         />
                     </div>

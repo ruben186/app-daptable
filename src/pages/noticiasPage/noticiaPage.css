@@ -34,6 +34,7 @@
 .card-image {
     height: 180px;
     object-fit: cover;
+    background-color: #004d4d;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
 }
@@ -67,6 +68,6 @@
 
 /* 5. Mensajes de Estado */
 .loading-text, .no-news-message {
-    color: var(--light-text);
+    
     text-align: center;
 }

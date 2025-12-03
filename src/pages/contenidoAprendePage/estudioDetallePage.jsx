@@ -32,6 +32,25 @@ const EstudioDetallePage = () => {
     fetchItem();
   }, [id]);
 
+  useEffect(() => {
+    const fetchItem = async () => {
+      if (!id) return;
+      setLoading(true);
+      try {
+        const ref = doc(db, 'materialNoticias', id);
+        const snap = await getDoc(ref);
+        if (snap.exists()) setItem({ id: snap.id, ...snap.data() });
+        else setItem(null);
+      } catch (e) {
+        console.error('Error cargando detalle:', e);
+        setItem(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchItem();
+  }, [id]);
+
   const renderVideo = (url) => {
     if (!url) return null;
     if (/youtube\.com|youtu\.be/.test(url)) {

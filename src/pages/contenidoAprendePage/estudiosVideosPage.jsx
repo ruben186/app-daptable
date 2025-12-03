@@ -81,7 +81,7 @@ const EstudiosVideosPage = () => {
   };
 
   const DataCard = ({ item }) => {
-    const fecha = item.creadoEn?.toDate ? new Date(item.creadoEn.toDate()).toLocaleString() : (item.creadoEn ? String(item.creadoEn) : '');
+    const fecha = item.fecha?.toDate ? new Date(item.fecha.toDate()).toLocaleString() : (item.fecha ? String(item.fecha) : '');
     // Extraer posible thumbnail de YouTube (si es youtube) para mostrar en el área superior
     let thumbnail = null;
     try {
