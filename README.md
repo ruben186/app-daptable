@@ -50,3 +50,12 @@ firebase init
 npm run build
 firebase deploy
 ```
+---
+## Version del proyecto
+1.0
+
+---
+## Integrantes
+Anderson Vega
+
+Ruben Carrillo
