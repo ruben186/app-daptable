@@ -33,6 +33,7 @@ import NoticiaPage  from './pages/noticiasPage/noticiaPage.jsx';
 import OpinionPage  from './pages/OpinionPage/opinionPage.jsx';
 import GestionNoticiasPage from './pages/gestionNoticiasPage/gestionNoticiasPage.jsx';
 import NuevaNoticiaPage from './pages/gestionNoticiasPage/nuevaNoticiaPage.jsx';
+import EstadisticaPage from './pages/EstadisticaPage/EstadisticaPage.jsx';
 
 function App() {
   return (
@@ -126,6 +127,12 @@ function App() {
         <Route path="/gestionAdmin" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <GestionAdminPage />
+          </ProtectedRoute>
+        } />
+
+          <Route path="/EstadisticaPage" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <EstadisticaPage />
           </ProtectedRoute>
         } />
 

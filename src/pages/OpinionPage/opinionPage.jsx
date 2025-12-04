@@ -11,7 +11,7 @@ import { logActivity } from '../../firebase/historialService';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import IconoMala from '../../assets/Iconos/ExperienciaMala.png';
 import IconoBuena from '../../assets/Iconos/ExperienciaBuena.png';
-
+import IconoExcelente from '../../assets/Iconos/ExperienciaExcelente.png';
 
 
 const OpinionPage = () => {
@@ -37,8 +37,8 @@ const OpinionPage = () => {
     setStatusMessage('Enviando...');
 
     try {
-      // Referencia a la colección 'usuarios'
-      const usuariosCollectionRef = collection(db, 'usuarios');
+      // Referencia a la colección 'experiencia'
+      const usuariosCollectionRef = collection(db, 'experiencia');
 
       // Añadir un nuevo documento con la opinión y la justificación
       // Asumo que el campo en Firebase se llama 'opinion'
@@ -60,6 +60,8 @@ const OpinionPage = () => {
   };
 
   return (
+     <>
+          <NavBar />
     <div className="opinion-container">
       <header className="opinion-header">
         <button className="back-button">{'< Volver'}</button>
@@ -74,9 +76,11 @@ const OpinionPage = () => {
           onClick={() => handleOpinionSelect('MALA')}
         >
           {/* Aquí iría la imagen y texto de "MALA" */}
-          <div className="icon-placeholder">😭</div>
-          <span className="option-text mala">MALA</span>
+         < img src={IconoMala} alt="Mala experiencia" />
+        
         </div>
+
+
 
         {/* Opción BUENA */}
         <div 
@@ -84,8 +88,8 @@ const OpinionPage = () => {
           onClick={() => handleOpinionSelect('BUENA')}
         >
           {/* Aquí iría la imagen y texto de "BUENA" */}
-          <div className="icon-placeholder">😊</div>
-          <span className="option-text buena">BUENA</span>
+        
+           < img src={IconoBuena} alt="Buena experiencia" />
         </div>
 
         {/* Opción EXCELENTE */}
@@ -94,13 +98,12 @@ const OpinionPage = () => {
           onClick={() => handleOpinionSelect('EXCELENTE')}
         >
           {/* Aquí iría la imagen y texto de "EXCELENTE" */}
-          <div className="icon-placeholder">☀️</div>
-          <span className="option-text excelente">EXCELENTE</span>
+            < img src={IconoExcelente} alt="Excelente experiencia" />
+           
         </div>
       </div>
 
-      {/* --- Campo de Justificación --- */}
-      <div className="justification-section">
+      {/* --- Campo de Justificación --- */}      <div className="justification-section">
         <label htmlFor="justification-input">¿Porque?</label>
         <textarea
           id="justification-input"
@@ -118,10 +121,17 @@ const OpinionPage = () => {
         disabled={!opinion || statusMessage === 'Enviando...'}
       >
         Enviar
+        
       </button>
 
+      
+
       {statusMessage && <p className="status-message">{statusMessage}</p>}
+        
     </div>
+ 
+      <Footer />
+    </>
   );
 };
 

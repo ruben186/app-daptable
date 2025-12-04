@@ -190,7 +190,22 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
             <button className="personas-drawer-item" onClick={() => { navigate('/gestionAdmin'); setOpen(false); }}>
               Gestión de Administrador
             </button>
+          
             </>
+           )}          
+            
+          
+          {/* Admin quick links (original Personas options) */}
+          {userRole === 'admin' && (
+            <>
+            <button className="personas-drawer-item" onClick={() => { navigate('/EstadisticaPage'); setOpen(false); }}>
+              Indiadores
+            </button>
+            </>
+
+
+
+
           )}
         </div>
       </aside>
