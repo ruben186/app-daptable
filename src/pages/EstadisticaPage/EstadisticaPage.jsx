@@ -5,31 +5,78 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { Container, Button } from 'react-bootstrap';
 // En EstadisticaPage.jsx
-
+import { fetchTopVistasGlobal } from '../../firebase/statsService';
+import { handleCompatibilityCheck, getLogoUrlByMarca } from '../components/compatibilidades';
+import { logActivity } from '../../firebase/historialService';
+import IconoPantallaV from '../../assets/Iconos/iconoPantallaVerde.png';
+import IconoBateriaV from '../../assets/Iconos/IconoBateriaV.png';
+import IconoFlexBotonesV from '../../assets/Iconos/flexBotonesV.png';
+import IconoflexcargaV from '../../assets/Iconos/flexdeCargaV.png'; 
+import IconopuertocargaV from '../../assets/Iconos/pindecargaV.png'; 
+import IconovidrioTV from '../../assets/Iconos/vidrioTV.png'; 
+import IconovisorV from '../../assets/Iconos/visorV.png'; 
+import IconoauricularV from '../../assets/Iconos/auricularV.png'; 
+import IconoPiezaA from '../../assets/Iconos/IconoPiezaA.png'; 
+import './EstadisticaPage.css';
 import { db } from '../../firebase';
 // import Swal from 'sweetalert2'; 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../firebase'; // Asegúrate de tener la ruta correcta a 'auth'
-import { logActivity } from '../../firebase/historialService';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 // Lista de piezas relevantes para el conteo de vistas
-const RELEVANT_PIECES = [
-    'pantalla', 'vidrio templado', 'bateria', 'visor', 
-    'flex de carga', 'flex de botones', 'auricular', 'puerto de carga'
-];
+const PIEZA_ICONOS = {
+    'PANTALLA': IconoPantallaV,
+    'BATERIA': IconoBateriaV,
+    'FLEX DE BOTONES': IconoFlexBotonesV,
+    'FLEX BOTONES': IconoFlexBotonesV,
+    'FLEX DE CARGA': IconoflexcargaV,
+    'PIN DE CARGA': IconopuertocargaV,
+    'PUERTO DE CARGA': IconopuertocargaV,
+    'VIDRIO TEMPLADO': IconovidrioTV,
+    'AURICULAR': IconoauricularV,
+    'VISOR': IconovisorV,
+    'MAS': IconoPiezaA,
+    'OTRO': IconoPiezaA,
+};
 
 const EstadisticasPage = () => {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
     // Nuevo estado para manejar errores específicos de la colección 'historial'
     const [historialError, setHistorialError] = useState(null); 
+     const [user] = useAuthState(auth);
+      const [topVistas, setTopVistas] = useState([]); 
+      const [loadingVistas, setLoadingVistas] = useState(true);
+      const [selectedActivityId, setSelectedActivityId] = useState(null);
+      const [modelos, setModelos] = useState([]);
 
     // Función para calcular el porcentaje
     const calculatePercentage = (count, total) => {
         if (total === 0) return '0%';
         return ((count / total) * 100).toFixed(1) + '%';
     };
+    useEffect(() => {
+            const loadTopVistas = async () => {
+                setLoadingVistas(true);
+                const top = await fetchTopVistasGlobal(5);
+                setTopVistas(top);
+                setLoadingVistas(false);
+            };
+    
+            const fetchModelos = async () => {
+              try {
+                  const snap = await getDocs(collection(db, 'tablas'));
+                  const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                  setModelos(data);
+              } catch (e) {
+                  console.error('No se pudieron cargar modelos (tablas):', e);
+              }
+            };
+    
+            fetchModelos();
+            loadTopVistas();
+        }, [user]);
 
     useEffect(() => {
         const fetchStatistics = async () => {
@@ -59,53 +106,7 @@ const EstadisticasPage = () => {
                 console.error("Error al cargar datos de experiencia:", err);
                 // Si esta colección falla, al menos quedan los contadores en 0.
             }
-
-            // --- 3. Fetching Vistas de Piezas (Colección 'historial') ---
-            try {
-                const historialCollectionRef = collection(db, "historial");
-                const snapshot = await getDocs(historialCollectionRef);
-
-                // Map para agregar vistas: Key = "pieza|marca|modelo"
-                const viewsMap = new Map();
-
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const pieza = data.pieza ? data.pieza.toLowerCase() : '';
-                    
-                    // Solo contamos las vistas para las piezas relevantes
-                    if (RELEVANT_PIECES.includes(pieza)) {
-                        const modelo = data.modelo || 'Modelo Desconocido';
-                        const marca = data.marca || 'Marca Genérica';
-                        const key = `${pieza}|${marca}|${modelo}`;
-
-                        const currentViews = viewsMap.get(key) || 0;
-                        viewsMap.set(key, currentViews + 1);
-                    }
-                });
-
-                // Convertir el Map a array y ordenarlo por vistas
-                piezasPopulares = Array.from(viewsMap.entries())
-                    .map(([key, vistas]) => {
-                        const [pieza, marca, modelo] = key.split('|');
-                        // Formato de nombre: "pantalla (Marca Modelo)"
-                        return { nombre: `${pieza.charAt(0).toUpperCase() + pieza.slice(1)} (${marca} ${modelo})`, vistas };
-                    })
-                    .sort((a, b) => b.vistas - a.vistas); 
-
-                // Si no hay documentos en la colección, mostramos un mensaje específico
-                if (piezasPopulares.length === 0 && snapshot.docs.length > 0) {
-                     setHistorialError("No se encontraron vistas para las piezas relevantes.");
-                } else if (snapshot.docs.length === 0) {
-                     setHistorialError("La colección 'historial' está vacía.");
-                }
-
-            } catch (err) {
-                // 🚨 Caso requerido: Si la colección 'historial' no se encuentra,
-                // solo se muestra el resultado de la experiencia (que ya se cargó/calculó).
-                setHistorialError("Error al cargar datos del historial de piezas. Se mostrarán solo los datos de experiencia.");
-                console.error("Error al cargar datos de historial:", err);
-                // piezasPopulares queda como un array vacío [].
-            }
+                
 
             // --- 4. Establecer el Estado Final ---
             setStats({
@@ -132,6 +133,35 @@ const EstadisticasPage = () => {
         );
     }
     
+        const handleActivityClick = (id) => {
+            // Establece el ID de la actividad como seleccionada. 
+            // Si haces clic en una actividad que ya está seleccionada, puedes deseleccionarla:
+            setSelectedActivityId(id);
+        };
+    
+        const handleHistoryClick = (historialItem) => {
+            // En tu historial debes tener guardada la Marca, el Modelo y la Pieza
+            const { Marca, Modelo, Pieza } = historialItem;
+    
+            // 1. Encontrar el objeto completo del modelo en la lista de `modelos`
+            const userActual = modelos.find(m => 
+                (m.modelo || '').toString().trim() === Modelo || (m.nombre || '').toString().trim() === Modelo
+                // O busca por ID, si lo guardas en el historial
+            );
+    
+            if (!userActual) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Modelo no encontrado',
+                    text: `No se pudo encontrar la información completa del modelo: ${Modelo}.`
+                });
+                return;
+            }
+            // 2. Llamar a la función de utilidad
+            handleCompatibilityCheck(Pieza, userActual, modelos, logActivity, user);
+        };
+
+    
     // Los cálculos para votos siempre se hacen porque experienciaVotos siempre tiene datos (cero o reales)
     const totalVotes = stats.experienciaVotos.total;
     const malaPercent = calculatePercentage(stats.experienciaVotos.MALA, totalVotes);
@@ -141,90 +171,131 @@ const EstadisticasPage = () => {
     return (
         <>
             <NavBar />
-            
-            <div className="opinion-container">
-                
-                <h1 style={{ color: '#00d49f', marginBottom: '40px', fontSize: '2em' }}>
-                    📈 Indicadores y Estadísticas
-                </h1>
-
-                {/* --- SECCIÓN 1: PIEZA MÁS VISTA (Historial) --- */}
-                <div className="stats-section">
-                    <h2>🥇 Piezas de Celular Más Vistas</h2>
+            <div className='bg-gradient2'>
+                <div className="opinion-container">
                     
-                    {/* Condición de Renderizado */}
-                    {stats.piezasPopulares.length > 0 ? (
-                        <>
-                            <p style={{ color: '#c7d2d2', marginBottom: '20px' }}>
-                                Vistas de piezas por Marca y Modelo.
-                            </p>
-                            {stats.piezasPopulares.map((item, index) => (
-                                <div key={index} className="stat-item">
-                                    <span className="stat-rank">{index + 1}.</span>
-                                    <span className="stat-name">**{item.nombre}**</span>
-                                    <span className="stat-views">{item.vistas.toLocaleString()} vistas</span>
-                                </div>
-                            ))}
-                        </>
-                    ) : (
-                         <p style={{ color: historialError ? '#ff6b6b' : '#c7d2d2', fontStyle: 'italic' }}>
-                            {historialError || "No hay datos de vistas disponibles en la colección 'historial'."}
+                    <h1 style={{ color: '#00d49f', marginBottom: '40px', fontSize: '2em' }}>
+                        📈 Indicadores y Estadísticas
+                    </h1>
+
+                    {/* --- SECCIÓN 1: PIEZA MÁS VISTA (Historial) --- */}
+                    <Container className="my-5 container-topVistas">
+                        <h2 className="text-center mb-4 pt-4">
+                            Las Piezas Más Consultadas Globalmente
+                        </h2>
+                        
+                        {loadingVistas ? (
+                            <div className="text-center">
+                                <div className="spinner-border text-info me-2" role="status"></div>
+                                Cargando estadísticas...
+                            </div>
+                        ) : (
+                            <div className="top-vistas-grid scroll-horizontal-on-overflow">
+                                {topVistas.length > 0 ? (
+                                    topVistas.map((pieza, index) => {
+                                        const marcaLogoUrl = getLogoUrlByMarca(pieza.Marca);
+                                        const isActive = pieza.id === selectedActivityId;
+                                        // Lógica para determinar el icono de la pieza
+                                        const piezaKey = pieza.Pieza?.toUpperCase();
+                                        const piezaIcono = PIEZA_ICONOS[piezaKey] || PIEZA_ICONOS['OTRO']
+                                        return(
+                                        <div 
+                                            key={pieza.id} 
+                                            className={`actividad-item item-vistas ${isActive ? 'active' : ''}`}
+                                            onClick={(e) => {
+                                                handleHistoryClick(pieza);
+                                                handleActivityClick(pieza.id);
+                                            }}
+                                        >
+                                            <div className="actividad-item-superior vistas-superior">
+                                                <img 
+                                                src={piezaIcono} 
+                                                alt={pieza.Pieza || 'Pieza'} 
+                                                className="icono-pieza-historial icono-vistas" 
+                                                />
+                                            </div>
+                                            
+                                            <div className="actividad-item-inferior vistas-inferior top-item-details">
+                                                <strong className='text-center'>{pieza.Modelo || 'Modelo Desconocido'}</strong>
+                                                <br />
+                                                <span className="top-pieza-nombre">Pieza: {pieza.Pieza || 'N/A'}</span>
+                                                <br />
+                                                
+                                                <div className="detalle-pieza-marca"> 
+                                                    <span>Marca:</span>
+                                                    {marcaLogoUrl && (
+                                                        <img 
+                                                        src={marcaLogoUrl} 
+                                                        alt={pieza.Marca || 'Marca'}
+                                                        className="logo-marca-historial" 
+                                                        />
+                                                    )}
+                                                    <span>{pieza.Marca || 'Marca Desconocida'}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )
+                                })
+                                ) : (
+                                    <p className="text-center text-muted">Aún no hay suficientes datos de consulta.</p>
+                                )}
+                            </div>
+                        )}
+                        </Container>
+
+                    <hr style={{ borderTop: '1px solid #123e3d', margin: '40px 0' }} />
+
+                    {/* --- SECCIÓN 2: EXPERIENCIA DE USUARIO MÁS VOTADA (Experiencia) --- */}
+                    <div className="stats-section">
+                        <h2>⭐ Experiencia de Usuario Votada</h2>
+                        <p style={{ color: '#c7d2d2', marginBottom: '20px' }}>
+                            Distribución de las valoraciones de nuestros usuarios (Total: **{totalVotes} votos**).
                         </p>
-                    )}
-                </div>
 
-                <hr style={{ borderTop: '1px solid #123e3d', margin: '40px 0' }} />
-
-                {/* --- SECCIÓN 2: EXPERIENCIA DE USUARIO MÁS VOTADA (Experiencia) --- */}
-                <div className="stats-section">
-                    <h2>⭐ Experiencia de Usuario Votada</h2>
-                    <p style={{ color: '#c7d2d2', marginBottom: '20px' }}>
-                        Distribución de las valoraciones de nuestros usuarios (Total: **{totalVotes} votos**).
-                    </p>
-
-                    <div className="vote-bar-container">
-                        {/* Excelente */}
-                        <div className="vote-bar-item">
-                            <div className="vote-label" style={{ color: '#00d49f' }}>Excelente ({stats.experienciaVotos.EXCELENTE})</div>
-                            <div className="progress-bar-wrapper">
-                                <div 
-                                    className="progress-bar excellent" 
-                                    style={{ width: excelentePercent }}
-                                >
-                                    {excelentePercent}
+                        <div className="vote-bar-container">
+                            {/* Excelente */}
+                            <div className="vote-bar-item">
+                                <div className="vote-label" style={{ color: '#00d49f' }}>Excelente ({stats.experienciaVotos.EXCELENTE})</div>
+                                <div className="progress-bar-wrapper">
+                                    <div 
+                                        className="progress-bar excellent" 
+                                        style={{ width: excelentePercent }}
+                                    >
+                                        {excelentePercent}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        {/* ... (Buena y Mala siguen el mismo patrón de renderizado) ... */}
-                        <div className="vote-bar-item">
-                            <div className="vote-label" style={{ color: '#c7d2d2' }}>Buena ({stats.experienciaVotos.BUENA})</div>
-                            <div className="progress-bar-wrapper">
-                                <div 
-                                    className="progress-bar good" 
-                                    style={{ width: buenaPercent }}
-                                >
-                                    {buenaPercent}
+                            {/* ... (Buena y Mala siguen el mismo patrón de renderizado) ... */}
+                            <div className="vote-bar-item">
+                                <div className="vote-label" style={{ color: '#c7d2d2' }}>Buena ({stats.experienciaVotos.BUENA})</div>
+                                <div className="progress-bar-wrapper">
+                                    <div 
+                                        className="progress-bar good" 
+                                        style={{ width: buenaPercent }}
+                                    >
+                                        {buenaPercent}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="vote-bar-item">
-                            <div className="vote-label" style={{ color: '#ff6b6b' }}>Mala ({stats.experienciaVotos.MALA})</div>
-                            <div className="progress-bar-wrapper">
-                                <div 
-                                    className="progress-bar bad" 
-                                    style={{ width: malaPercent }}
-                                >
-                                    {malaPercent}
+                            <div className="vote-bar-item">
+                                <div className="vote-label" style={{ color: '#ff6b6b' }}>Mala ({stats.experienciaVotos.MALA})</div>
+                                <div className="progress-bar-wrapper">
+                                    <div 
+                                        className="progress-bar bad" 
+                                        style={{ width: malaPercent }}
+                                    >
+                                        {malaPercent}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
+                </div>
+               
             </div>
-            
-            <Footer />
+             <Footer />
         </>
     );
 };

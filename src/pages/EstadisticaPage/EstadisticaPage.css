@@ -1,0 +1,32 @@
+
+.top-vistas-grid {
+    display: flex; /* Para ponerlos en fila */
+    flex-wrap: nowrap;
+    gap: 20px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    justify-content: center;
+    margin-top: 30px;
+    padding-bottom: 10px;
+}
+
+.container-topVistas{
+  background-color: #08645e;
+  padding-bottom: 12px;
+  border-radius: 20px;
+}
+.icono-vistas{
+    height: 100px;
+}
+.vistas-superior{
+    height: 50%;
+}
+.vistas-inferior {
+    align-items: start;
+    text-align: start;
+   font-size: 0.85rem;
+   height: 50%;
+}
+.item-vistas{
+    height: auto;
+}

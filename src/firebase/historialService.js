@@ -1,5 +1,5 @@
 import { db } from '../firebase'; // Asegúrate que esta ruta es correcta
-import { doc,setDoc, addDoc, Timestamp } from 'firebase/firestore';
+import { doc,setDoc, addDoc, Timestamp, updateDoc, increment } from 'firebase/firestore';
 
 
 /**
@@ -30,7 +30,6 @@ export const logActivity = async (userId, data) => {
         return;
     }
 
-    // Validación crítica: Necesitamos los campos clave para generar un ID único.
     if (!data.Marca || !data.Modelo || !data.Pieza) {
         console.error("Error: Datos incompletos para generar ID de historial. Se requiere Marca, Modelo y Pieza.");
         return;
@@ -38,31 +37,46 @@ export const logActivity = async (userId, data) => {
 
     // 1. Crear el ID de documento único
     const docId = createHistorialId(data.Marca, data.Modelo, data.Pieza);
+    
+    // 2. Definir la referencia al documento específico
+    const historialDocRef = doc(
+        db, 
+        'usuarios', 
+        userId, 
+        'historial_consultas',
+        docId
+    );
+    
+    // Datos a guardar en el primer setDoc si no existe (o si se quiere actualizar todo el contenido)
+    const baseDataToSave = {
+        ...data,
+        vistas: 1, // Valor inicial de vistas
+        timestamp: Timestamp.fromDate(new Date()), // Timestamp de la consulta actual
+    };
+
+    // Datos a actualizar
+    const dataToUpdate = {
+        vistas: increment(1), // Incrementa el contador en 1
+        timestamp: Timestamp.fromDate(new Date()), // Actualiza el timestamp de la última vista
+    };
 
     try {
-        // 2. Definir la referencia al documento específico (usando el ID calculado)
-        const historialDocRef = doc(
-            db, 
-            'usuarios', 
-            userId, 
-            'historial_consultas',
-            docId // <-- ¡Usamos el ID único aquí!
-        );
-
-        // Datos a guardar/actualizar
-        const dataToSave = {
-            ...data,
-            // Sobrescribir el timestamp a la hora de la consulta actual
-            timestamp: Timestamp.fromDate(new Date()), 
-        };
-
-        // 3. Usar setDoc con { merge: true }
-        // Si el documento existe (porque el ID es el mismo), lo actualiza (solo el timestamp).
-        // Si no existe, lo crea.
-        await setDoc(historialDocRef, dataToSave, { merge: true });
+        // 3. Intentar actualizar el contador y el timestamp
+        // Si el documento NO existe, esta operación FALLARÁ con 'not-found'.
+        await updateDoc(historialDocRef, dataToUpdate);
         
-        console.log(`Actividad actualizada/registrada con éxito. ID de documento: ${docId}`);
+        console.log(`Actividad actualizada (vistas incrementadas). ID de documento: ${docId}`);
+
     } catch (error) {
-        console.error("Error al registrar/actualizar la actividad en Firestore:", error);
+        // 4. Si el documento NO existe (o hay otro error que impide updateDoc), 
+        // lo creamos usando setDoc.
+        if (error.code === 'not-found' || error.message.includes('No document to update')) {
+            await setDoc(historialDocRef, baseDataToSave);
+            console.log(`Actividad creada (primera vista). ID de documento: ${docId}`);
+        } else {
+             // Revertimos al comportamiento anterior para cualquier otro error
+             await setDoc(historialDocRef, baseDataToSave, { merge: true });
+             console.error("Error al registrar/actualizar la actividad en Firestore, usando setDoc fallback:", error);
+        }
     }
 };

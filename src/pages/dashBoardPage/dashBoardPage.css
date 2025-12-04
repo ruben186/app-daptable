@@ -353,7 +353,7 @@
 /* MAIN CONTENT */
 .main-content {
     background: linear-gradient(180deg,#070D11 79%, #022522 100%);
-    min-height: calc(100vh - 120px);
+    min-height: calc(49.9vh - 120px);
     display: flex;
     justify-content: center;
     align-items: center;

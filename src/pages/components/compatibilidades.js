@@ -133,7 +133,8 @@ export const handleCompatibilityCheck = (tipoPieza, userActual, modelos, logActi
         background: '#124945ff', // Color de fondo personalizado
         color: '#ffffffff', // Color del texto personalizado
         confirmButtonColor: 'rgba(197, 81, 35, 1)',
-        width: 680
+        width: 680,
+        allowOutsideClick: false
     });
 
     // Registro de actividad (si se provee la función)
