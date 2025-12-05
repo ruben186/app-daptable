@@ -64,7 +64,7 @@ function DashboardPage() {
                 <div>
                   <h1 className="welcome-title">BIENVENIDO A APP-DAPTABLE</h1>
                   <p className="welcome-text">
-                      herramienta para agilizar el trabajo a la hora  de reparar tu celular
+                      Herramienta para agilizar el trabajo a la hora  de reparar tu celular
                       ¿Cansado/a de adivinar qué repuesto o accesorio es compatible con tu celular? 
                       ¡Nosotros tenemos la respuesta! En nuestra plataforma, encontrar la compatibilidad perfecta es rápido y sencillo.
                   </p>

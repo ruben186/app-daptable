@@ -8,6 +8,7 @@
   display: flex;
   align-items: center;
   padding: 0 8px;
+  justify-content: center;
 }   
 .pill {
   display: flex;
@@ -170,8 +171,8 @@
   display:flex;
   align-items:center;
   justify-content: center;
-  gap:8px;
-  margin-left: 80px;
+  gap:20px;
+  margin-left: 20px;
 }
 
 .brand-right .brand-logo {
@@ -353,7 +354,7 @@
 /* MAIN CONTENT */
 .main-content {
     background: linear-gradient(180deg,#070D11 79%, #022522 100%);
-    min-height: calc(49.9vh - 120px);
+    min-height: calc(80vh - 100px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -362,7 +363,7 @@
     color: #42F1DD;
 }
 
-.main-content>div {
+.main-content div {
     width: 100%;
     max-width: 1120px;
 }
@@ -464,33 +465,40 @@
     object-fit: contain; /* Asegura que la imagen sea visible sin cortarse y manteniendo proporciones */
     flex-shrink: 0;      /* Evita que el logo se encoja si hay mucho texto */
 }
-@media (max-width: 1366px) {
-.pill {
-    min-width: 50px; 
-    width: 100%; 
-    padding: 0 10px;
-    gap: 4px;
-  }
-  
+.logout-btn {
+    background-color: #0c8a7f; 
+    color: #8eece1;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9em;
+    padding: 5px 10px;
+    border-radius: 4px;
+    width: 140px;
+    transition: all 0.3s ease;
 }
-@media (max-width: 1280px) {
+.logout-btn:hover {
+    background-color: #013d38;
+    color: #fff;
+}
+@media (max-width: 1400px) {
   /* Hacemos las pills más compactas para ganar espacio */
    .personas-toggle {
     right: 90px;
   }
-  .personas-drawer { width: 40%; left: -40%; }
+  .personas-drawer { width: 20%; left: -20%; }
   .personas-drawer.open { left: 0; }
   .personas-drawer-header{
     padding: 11.5px 12px;
   }
   .personas-drawer-item {
     width: 100%;
-    font-size: 1.5rem;
-    padding: 16px 14px;
+    font-size: 1rem;
+    padding: 10px 14px;
+    margin-top: 20px;
   }
   .carousel-inner {
     min-height: 50px;
-    height: 355px;     
+    height: 290px;     
   }
   .dashboard-navbar {
     height: 70px;
@@ -499,7 +507,7 @@
     justify-content: center !important;
   }
   .navbar-center{
-    padding: 0;;
+    padding: 0;
   }
   .search-input {
     width: 200px; /* Reducir el ancho fijo */
@@ -516,14 +524,14 @@
     max-width: 900px !important;
   }
   .welcome-text{
-    font-size: 1.3rem;
+    font-size: 1rem;
   }
   .welcome-title{
-    font-size: 1.7rem;
+    font-size: 1.2rem;
   }
   .main-content{
     padding: 20px 10px 40px 10px;
-    min-height: calc(80vh - 110px);
+    min-height: calc(48.7vh - 110px);
   }
   .pill {
     min-width: 50px; 
@@ -543,12 +551,12 @@
 
   /* Ajustamos la caja de búsqueda para que sea más flexible */
   .search-wrapper {
-    flex: 1 1 auto; /* Permite que tome el espacio disponible si las pills se ocultan */
+    flex: 1 1 auto; 
   }
 
   .search-input {
     padding: 8px 18px;
-    width: 300px; /* Reducir el ancho fijo */
+    width: 300px; 
   }
 }
 

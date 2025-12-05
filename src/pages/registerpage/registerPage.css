@@ -177,6 +177,23 @@ select.form-control { appearance:none; -webkit-appearance:none; -moz-appearance:
 .form-card > img.logo { width:120px; margin:0 auto 12px; }
 
 /* Responsive layout: stack columns and hide right logo on narrow screens */
+@media (max-width: 1400px) {
+    .form-left .mb-4{margin-bottom: 0.7rem !important ;}
+    .form-left .mb-3{margin-bottom: 0.4rem !important ;}
+    .form-control2{font-size: 0.95rem;}
+    .form-left, .form-right { max-width: 720px; }
+    .form-left h3{
+        font-size: 20px;
+    }
+    .d-grid .btn-primary{
+        margin-top: 10px !important;
+    }
+    .bg-gradient2{padding: 20px 24px;}
+    .form-label{font-size: 0.9rem !important;}
+    .form-right { display:flex; justify-content:center; margin-bottom: 15px; }
+    .logo-box { width:420px; height:420px; margin:0 auto 12px; border-width:6px; }
+    .btn-outline-secondary { left:12px; top:12px; font-size:18px; }
+}
 @media (max-width: 1280px) {
     
     .form-left, .form-right { max-width: 720px; }
