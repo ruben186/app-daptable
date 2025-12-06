@@ -212,7 +212,7 @@ function Xiaomi() {
                         <div className="header-tabla"></div>
                         <div className='header-tabla2'>
                             <div className="nombre-tabla">
-                                <img src={getLogoForBrand()} className='mover-logo-xiaomi' width="54px" height="54px" alt="Logo Marca" />
+                                <img src={getLogoForBrand()} loading="lazy" className='mover-logo-xiaomi' width="54px" height="54px" alt="Logo Marca" />
                                 <h5 className='texto-separado'>
                                     Si un icono es <span style={{ color: 'red' }}>rojo</span> quiere decir que no hay información de Compatibilidad.
                                 </h5>
@@ -262,6 +262,7 @@ function Xiaomi() {
                                                     src={getIconoDinamico(aux, 'pantalla')}
                                                     width="22px"
                                                     height="34px"
+                                                    loading="lazy"
                                                     alt="Estado Pantalla"
                                                     className="icon-hover-lift"
                                                 />
@@ -275,6 +276,7 @@ function Xiaomi() {
                                                     src={getIconoDinamico(aux, 'bateria')}
                                                     width="24px"
                                                     height="34px"
+                                                    loading="lazy"
                                                     alt="Estado Bateria"
                                                     className="icon-hover-lift"
                                                 />
@@ -288,6 +290,7 @@ function Xiaomi() {
                                                     src={getIconoDinamico(aux, 'flexBotones')}
                                                     width="34px"
                                                     height="34px"
+                                                    loading="lazy"
                                                     alt="Estado Flex"
                                                     className="icon-hover-lift"
                                                   
@@ -306,6 +309,7 @@ function Xiaomi() {
                                                   src={IconoPiezaA}
                                                   width="34px"
                                                   height="34px"
+                                                  loading="lazy"
                                                   alt="Más detalles"
                                                   className="icon-hover-lift"
                                               />

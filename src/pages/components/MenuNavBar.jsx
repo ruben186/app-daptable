@@ -65,7 +65,6 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef(null);
   const { userRole, isRoleLoading } = useUserRole();
-
   const isAuthenticatedUser = userRole && userRole !== 'invitado';
 
   useEffect(() => {
@@ -118,7 +117,13 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
         </div>
 
         <div className="personas-drawer-list">
-          {/* Top-level items */}
+          {isRoleLoading ? (
+            // Si está cargando, puedes mostrar solo el 'Inicio' o un indicador de carga
+            <div className='welcome-text' style={{marginTop: '22px'}}>
+                Cargando Opciones...
+            </div>
+          ) : (
+            <>
           {showBrandsInDrawer && (
                 <>
                   <ExpandableGroup title="Marcas" id="marcas" drawerOpen={open}>
@@ -204,7 +209,8 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
 
 
           )}
-        </div>
+          </> )}
+       </div>
       </aside>
     </div>
   );

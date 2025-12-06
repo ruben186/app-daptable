@@ -528,7 +528,23 @@ function GestionAdminPage() {
             }
         }
     };
-    
+    const MIN_AGE = 1;
+    const MAX_AGE = 120;
+
+    const validateAge = (birthDateString) => {
+      if (!birthDateString) return false;
+
+      const birthDate = new Date(birthDateString);
+      const today = new Date();
+
+      // Calcula la diferencia en milisegundos
+      const ageInMilliseconds = today.getTime() - birthDate.getTime();
+      
+      // Convierte milisegundos a años
+      const ageInYears = ageInMilliseconds / (1000 * 60 * 60 * 24 * 365.25);
+
+      return ageInYears >= MIN_AGE && ageInYears <= MAX_AGE;
+    };
     const handleSaveChangesUser = async () => {
         if (!selectedItem || itemType !== 'usuario') return;
 
@@ -1616,7 +1632,7 @@ function GestionAdminPage() {
             <main className="main-content-dashboard bg-gradient2">
                 <div className="admin-container">
                     <div className="header-admin">
-                        <h1>Sistema de Gestion Administrador</h1>
+                        <h1>Sistema de Gestión Administrador</h1>
                     </div>
                     
                     <div className="dashboard-grid">

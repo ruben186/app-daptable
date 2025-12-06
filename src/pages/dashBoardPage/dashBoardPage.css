@@ -180,6 +180,7 @@
   height:55px;
   border-radius:50%;
   border: 3px solid #129e92;
+  background-color: #070D11;
   object-fit:cover;
   display: inline-block;
   vertical-align: top;
@@ -415,41 +416,147 @@
   border-bottom: 10px solid #07433E;
   overflow: hidden;
   background: #070D11;
+  position: relative;
 }
-.carousel-inner {
-  min-height: 380px; 
-  height: 400px;     
+.slick-slide-item{
+  transition: transform 0.5s ease-in-out; /* 💡 Define la transición suave */
+  cursor: pointer;
 }
-.carousel-item {
-  height: 100%;
-  overflow: hidden;
-  backface-visibility: hidden;
-  transform: scale(132%);
-  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+.slick-slide-item img,a:focus-visible{
+  outline: none !important;
 }
-.carousel-item img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-position: center;
-  object-fit: contain;            
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out; 
+.slick-slide-item img {
+    /* Estado por defecto: más pequeño */
+    transform: scale(0.95); /* 💡 Escala la imagen lateral al 85% */
+    transition: transform 0.5s ease-in-out; /* 💡 Define la transición suave */
+    opacity: 0.6; /* Opcional: Oscurece o hace transparente las laterales */
 }
-.carousel-item:hover img {transform: scale(1.02); cursor: pointer;}
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-  filter: drop-shadow(0 2px 6px #29978a);
+
+/* --- 2. Regla para la imagen CENTRAL (estado final/enfocado) --- */
+
+/* Selecciona el slide que tiene la clase slick-center y luego su imagen */
+.slick-center .slick-slide-item img {
+    /* Estado final: 100% de tamaño */
+    transform: scale(1.0);
+    opacity: 1;    
+    filter: none;
 }
-.carousel-item-next img,
-.carousel-item-prev img {
-  /* La opacidad y escala iniciales cuando el slide aún no es el activo */
-  opacity: 0;
-  transform: scale(1.05); /* Ligeramente más grande */
+
+
+.slick-slide-item:hover{
+    transform: scale(1.03); 
 }
-.carousel-item.active img {
-  /* Vuelve al estado normal */
-  opacity: 1;
-  transform: scale(1); 
+.slick-slider {
+    padding-bottom: 0 !important;
+}
+
+.slick-dots li button {
+    background: none;
+    border: none;
+    padding: 0; 
+    width: auto; /* Permite que el ancho lo defina la barra interna */
+}
+.slick-dots li button:before {
+    content: none;
+}
+
+.custom-slick-bar {
+    display: block;
+    width: 26px; /* Ancho de la barra */
+    height: 4px; /* Altura de la barra */
+    background: #636363;
+    border-radius: 2px;
+    transition: background-color 0.3s ease;
+}
+
+/* Estilo para la barra activa */
+.slick-dots li.slick-active .custom-slick-bar {
+    background: #D9D9D9;
+}
+
+/* Alineación de los dots (si los moviste al centro) */
+.slick-dots {
+    bottom: unset; /* Desactiva la posición inferior por defecto */
+    text-align: center;
+}
+.slick-prev-custom {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 15%; /* Porcentaje del ancho que ocupará el área clicable */
+    height: 100%;
+    cursor: pointer;
+    z-index: 5; 
+    display: flex;
+    align-items: center; /* Centrado vertical */
+    justify-content: flex-start;
+    transition: background-color 0.2s ease;
+    
+    /* 💡 Gradiente de sombra desvaneciente (Negro transparente -> Transparente) */
+    background: linear-gradient(to right, 
+        rgba(0, 0, 0, 0.6) 0%, /* Negro 40% al borde */
+        rgba(0, 0, 0, 0) 100% /* Totalmente transparente al centro */
+    );
+}
+
+/* Estilo Base para la Flecha SIGUIENTE (Derecha) */
+.slick-next-custom {
+    position: absolute;
+    top: 0;
+    right: 0; /* Anclado a la derecha */
+    width: 15%; /* Porcentaje del ancho que ocupará el área clicable */
+    height: 100%;
+    cursor: pointer;
+    z-index: 5;
+    display: flex;
+    align-items: center; /* Centrado vertical */
+    justify-content: flex-end;
+    transition: background-color 0.2s ease;
+    
+    /* 💡 Gradiente de sombra desvaneciente (Transparente -> Negro transparente) */
+    background: linear-gradient(to left, 
+        rgba(0, 0, 0, 0.6) 0%, /* Negro 40% al borde */
+        rgba(0, 0, 0, 0) 100% /* Totalmente transparente al centro */
+    );
+}
+
+/* 3. Efecto Hover (Opcional) */
+.slick-prev-custom:hover,
+.slick-next-custom:hover {
+    /* Oscurecer ligeramente el gradiente al pasar el ratón */
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+.slick-next-custom:hover {
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+/* 4. Si quieres ocultar las flechas por defecto de slick, solo por si acaso */
+.slick-prev:before, .slick-next:before {
+    content: ''; 
+    display: none;
+}
+.arrow-icon {
+    /* Quitamos position: absolute y usamos padding para la alineación final */
+    font-size: 2.5rem; /* Tamaño del ícono */
+    color: white; /* Color blanco para que destaque sobre la sombra negra */
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.8); /* Sombra para mejor visibilidad */
+    transition: transform 0.2s ease;
+}
+/* Empuja el ícono de la izquierda hacia el borde del carrusel */
+.arrow-icon.left {
+    padding-left: 20px; 
+}
+
+/* Empuja el ícono de la derecha hacia el borde del carrusel */
+.arrow-icon.right {
+    padding-right: 20px;
+}
+
+/* Opcional: Feedback visual al hacer hover */
+.slick-prev-custom:hover .arrow-icon,
+.slick-next-custom:hover .arrow-icon {
+    transform: scale(1.1);
 }
 
 
@@ -544,7 +651,7 @@
   }
   .main-content{
     padding: 20px 10px 40px 10px;
-    min-height: calc(48.7vh - 110px);
+    min-height: calc(80vh - 110px);
   }
   .pill {
     min-width: 50px; 

@@ -12,35 +12,26 @@ const EstudioDetallePage = () => {
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     const fetchItem = async () => {
       if (!id) return;
       setLoading(true);
+      
       try {
-        const ref = doc(db, 'estudios', id);
-        const snap = await getDoc(ref);
-        if (snap.exists()) setItem({ id: snap.id, ...snap.data() });
-        else setItem(null);
-      } catch (e) {
-        console.error('Error cargando detalle:', e);
-        setItem(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchItem();
-  }, [id]);
-
-  useEffect(() => {
-    const fetchItem = async () => {
-      if (!id) return;
-      setLoading(true);
-      try {
-        const ref = doc(db, 'materialNoticias', id);
-        const snap = await getDoc(ref);
-        if (snap.exists()) setItem({ id: snap.id, ...snap.data() });
-        else setItem(null);
+        let docRef = doc(db, 'estudios', id);
+        let docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setItem({ id: docSnap.id, ...docSnap.data() });
+        } else {
+          docRef = doc(db, 'materialNoticias', id);
+          docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+              setItem({ id: docSnap.id, ...docSnap.data() });
+          } else {
+              setItem(null);
+          }
+        }
       } catch (e) {
         console.error('Error cargando detalle:', e);
         setItem(null);

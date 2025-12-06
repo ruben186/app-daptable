@@ -24,14 +24,14 @@ import logoZTE from '../../assets/logos/zteLogo.png';
 
 function NavBar() {
   const navigate = useNavigate();
-  const [user] = useAuthState(auth);
+  const [user, authLoading] = useAuthState(auth);
   const location = useLocation();
   const { userRole, isRoleLoading } = useUserRole();
   const [activeBrand, setActiveBrand] = useState(null);
   const [searchValue, setSearchValue] = useState('');
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 992);
   const isAuthenticatedUser = userRole && userRole !== 'invitado';
-
+  const isLoading = authLoading || isRoleLoading;
   
 
 
@@ -205,21 +205,35 @@ function NavBar() {
                     }
                   }}
                 />
-                <img src={IconoBuscar} className="ImgLupa" alt="iconoBusqueda" style={{cursor:'pointer'}} onClick={() => handleSearchSubmit()} />
+                <img src={IconoBuscar} className="ImgLupa" loading="lazy" alt="iconoBusqueda" style={{cursor:'pointer'}} onClick={() => handleSearchSubmit()} />
               </div>
             </div>
 
             {/* brand a la derecha y logout */}
             
-            <div className="brand-right d-none d-lg-block">
-              <Navbar.Brand onClick={() => { 
-                    navigate(isAuthenticatedUser ? '/perfil' : '/'); 
-                  }}
-                  style={{ cursor: 'pointer' }}>
-                  {isAuthenticatedUser? <img src={userPhoto} alt="Logo" className="brand-logo" /> : <button className="logout-btn">Iniciar Sesión</button>}
-                  
-              </Navbar.Brand> 
-            </div>
+            <div className="brand-right">
+            <Navbar.Brand 
+              onClick={() => { 
+                if (!isLoading) {
+                navigate(isAuthenticatedUser ? '/perfil' : '/'); 
+                }
+              }}
+              style={{ cursor: isLoading ? 'wait' : 'pointer' }}
+            >
+              {isLoading ? (
+                // Opción A: Mostrar un Placeholder (Mejor UX)
+                <div className="placeholder-animation">
+                   
+                </div>
+                ) : (
+                // Opción B: Mostrar el contenido final
+                isAuthenticatedUser ? 
+                  <img src={userPhoto} alt="Foto de Perfil" className="brand-logo" /> 
+                  : 
+                  <button className="logout-btn">Iniciar Sesión</button>
+              )}
+            </Navbar.Brand> 
+          </div>
            
          
         </Container>

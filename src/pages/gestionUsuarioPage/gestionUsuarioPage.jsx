@@ -109,6 +109,24 @@ function GestionUsuariosPage() {
          setShowModal(true);
     };
 
+    const MIN_AGE = 1;
+    const MAX_AGE = 120;
+
+    const validateAge = (birthDateString) => {
+      if (!birthDateString) return false;
+
+      const birthDate = new Date(birthDateString);
+      const today = new Date();
+
+      // Calcula la diferencia en milisegundos
+      const ageInMilliseconds = today.getTime() - birthDate.getTime();
+      
+      // Convierte milisegundos a años
+      const ageInYears = ageInMilliseconds / (1000 * 60 * 60 * 24 * 365.25);
+
+      return ageInYears >= MIN_AGE && ageInYears <= MAX_AGE;
+    };
+
     const handleSaveChanges = async () => {
          try {
              const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
@@ -137,6 +155,17 @@ function GestionUsuariosPage() {
                      });
                      return;
                  }
+                 if (!validateAge(selectedAux.fechaNacimiento)) {
+                        Swal.fire({
+                            title: "Error",
+                            text: `La fecha de nacimiento es invalida.`,
+                            icon: "error",
+                            background: '#052b27ff',
+                            color: '#ffdfdfff',
+                            confirmButtonColor: '#0b6860ff',
+                        });
+                        return;
+                    }
                  if (!soloNumeros.test(selectedAux.telefono)) {
                      Swal.fire({
                      title:"Error", 
@@ -148,6 +177,7 @@ function GestionUsuariosPage() {
                      });
                      return;
                  }
+
                  if(selectedAux.telefono.length > 10){
                      Swal.fire({
                      title:"Error", 

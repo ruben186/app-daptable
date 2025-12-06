@@ -206,13 +206,14 @@ const NuevaNoticiaPage = () => {
 					<Form onSubmit={handleSubmit} className="mt-3">
 						<Form.Group className="mb-3">
 							<Form.Label>Título</Form.Label>
-							<input type="text" className="form-control2" value={titulo} onChange={e => setTitulo(e.target.value)}/>
+							<input type="text" spellCheck='true' className="form-control2" value={titulo} onChange={e => setTitulo(e.target.value)}/>
 						</Form.Group>
 
 						<Form.Group className="mb-3">
 							<Form.Label>Descripción</Form.Label>
 								<textarea
 									className="form-control2 textarea-comentarios"
+									spellCheck='true'
 									rows={3}
 									value={descripcion}
 									onChange={e => setDescripcion(e.target.value)} 

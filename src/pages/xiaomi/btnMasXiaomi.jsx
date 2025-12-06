@@ -360,12 +360,14 @@ function BtnMasXiaomi() {
                                                     // LÓGICA DE IMAGEN: usar `computedSrc` que respeta la falta de código de compatibilidad
                                                     src={computedSrc} 
                                                     alt={parte.nombre || "Repuesto"} 
+                                                    loading="lazy"
                                                     className="part-icon"
                                                     // Respaldo final: si la URL de Firebase falla (404), usa IconoPiezaA
                                                     onError={(e) => {
                                                         e.target.onerror = null; 
                                                         e.target.src = IconoPiezaA; 
                                                     }}
+                                                    
                                                 />
                                             </Button>
                                         </div>

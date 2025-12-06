@@ -1,12 +1,13 @@
 
 import { useNavigate } from 'react-router-dom';
 import { Navbar, Nav, Container, NavDropdown, Carousel } from 'react-bootstrap';
-import { FaSignOutAlt } from 'react-icons/fa';
 import React, { useEffect, useState } from 'react'; // <-- AGREGAR useEffect y useState
 import { collection, getDocs, query, where } from 'firebase/firestore'; // <-- AGREGAR
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { db } from '../../firebase'; //
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
+import Slider from 'react-slick';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import logo from '../../assets/logos/logoapp-daptable.jpeg';
 import userDefault from '../../assets/logos/user.png'; 
@@ -39,6 +40,7 @@ function DashboardPage() {
   const [user] = useAuthState(auth);
   const [featuredItems, setFeaturedItems] = useState([]);
   const userPhoto = user?.photoURL || userDefault;
+  const navigate = useNavigate();
 
   // Agregamos el console.log para verificar qué foto se está usando
   console.log(
@@ -54,7 +56,7 @@ function DashboardPage() {
         const q = query(collection(db, 'materialNoticias'), where('tipo', '==', 'video')); 
         const snap = await getDocs(q);
         let items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
+        
         // 1. PROCESAR Y FILTRAR: Solo mantener los ítems con miniatura válida
         const imageItems = items
           .map(item => {
@@ -67,7 +69,8 @@ function DashboardPage() {
                 id: item.id,
                 title: item.nombre || 'Video sin título',
                 imageUrl: thumbnailUrl,
-                linkUrl: item.url, // O el link de detalle si es diferente
+                tipo: item.tipo,
+                url: item.url
               };
             }
             return null; // Si no hay miniatura, se descarta
@@ -85,7 +88,89 @@ function DashboardPage() {
     fetchItems();
   }, []); // Se ejecuta solo al montar el componente
 
-  
+  const PrevArrow = ({ onClick }) => (
+    // La clase 'slick-prev-custom' tendrá el estilo de gradiente izquierdo
+    <div 
+        className="slick-prev-custom" 
+        onClick={onClick} 
+        style={{ zIndex: 10 }} // Asegura que esté por encima de las imágenes
+    >
+        <FaChevronLeft className="arrow-icon left" />
+    </div>
+);
+
+// Componente de Flecha SIGUIENTE (NextArrow)
+const NextArrow = ({ onClick }) => (
+    // La clase 'slick-next-custom' tendrá el estilo de gradiente derecho
+    <div 
+        className="slick-next-custom" 
+        onClick={onClick} 
+        style={{ zIndex: 10 }} // Asegura que esté por encima de las imágenes
+    >
+        <FaChevronRight className="arrow-icon right" />
+    </div>
+);
+
+  const sliderSettings = {
+     dots: true,
+     infinite: featuredItems.length > 3, 
+     speed: 500,
+     slidesToShow: 3, 
+     slidesToScroll: 1,
+     autoplay: true, 
+     autoplaySpeed: 5000,
+     centerMode: true,
+     centerPadding: '0px',
+     prevArrow: <PrevArrow />,
+     nextArrow: <NextArrow />,
+     cssEase: 'ease-in-out',
+     customPaging: function(i) {
+      return (
+        <button>
+          <span className="custom-slick-bar"></span>
+        </button>
+      );
+    },
+
+    // 2. Usa appendDots para mover el <ul> que contiene los dots
+    appendDots: dots => (
+      <div style={{
+          position: 'absolute', 
+          bottom: 0,  
+          width: '100%',
+          zIndex: 10, 
+          textAlign: 'center'
+        }}
+      >
+        <ul style={{ margin: "0px" }}> {dots} </ul>
+      </div>
+    ),
+    
+     responsive: [
+       {
+         breakpoint: 1024,
+         settings: {
+           slidesToShow: 2, // En tabletas, mostrar 2
+           slidesToScroll: 1,
+         }
+       },
+       {
+         breakpoint: 600,
+         settings: {
+           slidesToShow: 1, // En móviles, mostrar 1
+           slidesToScroll: 1
+         }
+       }
+     ]
+  };
+  const goToDetalle = (item) => {
+      if (!item || !item.id) return;
+      if(item.tipo == 'video'){
+          navigate(`/aprende/video/${item.id}`);
+      }else{
+          window.open(item.url, '_blank')
+      }
+  };
   return (
     <>
       <div className="page-offset">
@@ -93,27 +178,31 @@ function DashboardPage() {
          
           <div className='mt-5'> 
             <div className="carousel-outer">
-              <Carousel>
-                {featuredItems.map((article) => (
-                  <Carousel.Item key={article.id}>
-                    {/* El enlace puede llevar a la noticia externa o a la página de detalle interna */}
-                    <a 
-                      href={article.linkUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      // O usa onClick si quieres la navegación interna: onClick={() => navigate(`/aprende/video/${article.id}`)}
-                    >
-                      <img 
-                        src={article.imageUrl} 
-                        alt={article.title} 
-                        loading='eager'
-                      />
-                    </a>
-                  </Carousel.Item>
-                ))}
-              </Carousel>
+              {featuredItems.length > 0 ? (
+               <Slider {...sliderSettings}>
+                 {featuredItems.map((item) => (
+                   <div key={item.id} className="slick-slide-item">
+                     <a
+                       onClick={() => goToDetalle(item)} 
+                       rel="noopener noreferrer" 
+                       style={{display: 'block' }}
+                     >
+                       <img 
+                         src={item.imageUrl} 
+                         alt={item.title} 
+                         loading='eager'
+                         // Aseguramos que la imagen ocupe el espacio del slide
+                         style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
+                       />
+                     </a>
+                   </div>
+                 ))}
+               </Slider>
+               ) : (
+                 <p className="text-center welcome-text">Cargando videos destacados...</p>
+               )}
+             </div>
             </div>
-          </div>
             {/* CONTENIDO PRINCIPAL */}
             <main className="main-content">
                 <div>

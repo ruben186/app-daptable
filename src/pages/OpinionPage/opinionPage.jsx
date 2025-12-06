@@ -76,7 +76,7 @@ const OpinionPage = () => {
           onClick={() => handleOpinionSelect('MALA')}
         >
           {/* Aquí iría la imagen y texto de "MALA" */}
-         < img src={IconoMala} alt="Mala experiencia" />
+         < img src={IconoMala} loading="lazy"  alt="Mala experiencia" />
         
         </div>
 
@@ -89,7 +89,7 @@ const OpinionPage = () => {
         >
           {/* Aquí iría la imagen y texto de "BUENA" */}
         
-           < img src={IconoBuena} alt="Buena experiencia" />
+           < img src={IconoBuena} loading="lazy" alt="Buena experiencia" />
         </div>
 
         {/* Opción EXCELENTE */}
@@ -98,7 +98,7 @@ const OpinionPage = () => {
           onClick={() => handleOpinionSelect('EXCELENTE')}
         >
           {/* Aquí iría la imagen y texto de "EXCELENTE" */}
-            < img src={IconoExcelente} alt="Excelente experiencia" />
+            < img src={IconoExcelente} loading="lazy" alt="Excelente experiencia" />
            
         </div>
       </div>

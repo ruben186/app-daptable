@@ -424,6 +424,7 @@ function GestionPiezasPage() {
                                 <Form.Control
                                     type="text"
                                     name="nombre"
+                                    spellCheck='true'
                                     value={selectedItem.nombre || ''}
                                     onChange={handleModalChange}
                                 />
@@ -434,6 +435,7 @@ function GestionPiezasPage() {
                                 <Form.Control
                                     type="text"
                                     name="campo"
+                                    spellCheck='true'
                                     value={selectedItem.campos[0].campo || ''}
                                     onChange={handleModalChange}
                                 />
@@ -444,6 +446,7 @@ function GestionPiezasPage() {
                                 <Form.Control
                                     type="text"
                                     name="codigo"
+                                    spellCheck='true'
                                     value={selectedItem.campos[0].codigo || ''}
                                     onChange={handleModalChange}
                                     disabled

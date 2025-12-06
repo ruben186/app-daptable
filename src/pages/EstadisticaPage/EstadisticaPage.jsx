@@ -210,6 +210,7 @@ const EstadisticasPage = () => {
                                             <div className="actividad-item-superior vistas-superior">
                                                 <img 
                                                 src={piezaIcono} 
+                                                loading="lazy"
                                                 alt={pieza.Pieza || 'Pieza'} 
                                                 className="icono-pieza-historial icono-vistas" 
                                                 />
@@ -226,6 +227,7 @@ const EstadisticasPage = () => {
                                                     {marcaLogoUrl && (
                                                         <img 
                                                         src={marcaLogoUrl} 
+                                                        loading="lazy"
                                                         alt={pieza.Marca || 'Marca'}
                                                         className="logo-marca-historial" 
                                                         />

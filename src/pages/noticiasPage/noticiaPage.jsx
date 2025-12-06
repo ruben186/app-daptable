@@ -79,7 +79,7 @@ function NoticiasPage() {
         if(item.tipo == 'video'){
             navigate(`/aprende/video/${item.id}`);
         }else{
-            window.open(item.url, '_self')
+            window.open(item.url, '_blank')
         }
     };
     const DataCard = ({ item }) => {
@@ -174,6 +174,7 @@ function NoticiasPage() {
                                             {article.image && (
                                                 <img 
                                                     src={article.image}
+                                                    loading="lazy"
                                                     className="card-img-top card-image"
                                                     alt={article.title} 
                                                     
@@ -201,6 +202,7 @@ function NoticiasPage() {
                                                 <a 
                                                     href={article.url} 
                                                     rel="noopener noreferrer" 
+                                                    target="_blank" 
                                                     className="btn btn-sm fw-bold  align-self-start card-link-btn" // USAMOS CLASE CSS
                                                 >
                                                     Ver Fuente ➡️
