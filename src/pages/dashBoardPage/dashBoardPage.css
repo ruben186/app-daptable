@@ -172,13 +172,14 @@
   align-items:center;
   justify-content: center;
   gap:20px;
-  margin-left: 20px;
+  margin-left: 50px;
 }
 
 .brand-right .brand-logo {
-  width:58px;
-  height:58px;
-  border-radius:10%;
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  border: 3px solid #129e92;
   object-fit:cover;
   display: inline-block;
   vertical-align: top;
@@ -423,23 +424,35 @@
   height: 100%;
   overflow: hidden;
   backface-visibility: hidden;
+  transform: scale(132%);
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .carousel-item img {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;             
-  transition: transform 0.8s ease, opacity 0.6s ease; 
+  object-position: center;
+  object-fit: contain;            
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out; 
 }
 .carousel-item:hover img {transform: scale(1.02); cursor: pointer;}
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
   filter: drop-shadow(0 2px 6px #29978a);
 }
-.carousel-control-prev,
-.carousel-control-next {
-  width: 6%;
+.carousel-item-next img,
+.carousel-item-prev img {
+  /* La opacidad y escala iniciales cuando el slide aún no es el activo */
+  opacity: 0;
+  transform: scale(1.05); /* Ligeramente más grande */
 }
+.carousel-item.active img {
+  /* Vuelve al estado normal */
+  opacity: 1;
+  transform: scale(1); 
+}
+
+
 
 /* offset para navbar fijo */
 .page-offset {

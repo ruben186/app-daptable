@@ -115,6 +115,7 @@ function NoticiasPage() {
                         <hr />
                         <a 
                             onClick={() => goToDetalle(item)}
+                            target="_blank" 
                             rel="noopener noreferrer" 
                             className="btn btn-sm fw-bold  align-self-start card-link-btn" // USAMOS CLASE CSS
                         >

@@ -46,7 +46,10 @@ function ForgotPasswordPage() {
         html: `Te hemos enviado instrucciones para recuperar tu contraseña, tienes 60 minutos. <strong>¡Podría estar en SPAM!</strong>`,
         icon: "success",
         timer: 5000,
-        showConfirmButton: false
+        showConfirmButton: false,
+        background: '#052b27ff', // Color de fondo personalizado
+        color: '#ffffffff', // Color del texto personalizado
+        confirmButtonColor: '#0b6860ff'
       });
       setEmail('');
     } catch (error) {

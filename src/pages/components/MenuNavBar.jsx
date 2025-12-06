@@ -137,12 +137,9 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
 
          <button 
              className="personas-drawer-item" 
-            onClick={() => { 
-                navigate(isAuthenticatedUser ? '/perfil' : '/'); 
-                setOpen(false); 
-             }}
+            onClick={() => { navigate('/dashboard');}}
           >
-             {isAuthenticatedUser? 'Mi Perfil' : 'Iniciar Sesión'}
+            Inicio
           </button>
          
           
