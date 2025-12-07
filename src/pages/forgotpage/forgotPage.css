@@ -35,7 +35,7 @@ body, .bg-page {
     max-width: var(--card-max-width);
     background: #05211F; /* verde oscuro translúcido */
     padding: 48px 40px;
-    border-radius: 28px;
+    border-radius: 100px;
     text-align: center;
     margin: 24px auto;
     box-sizing: border-box;

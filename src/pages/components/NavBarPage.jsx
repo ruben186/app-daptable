@@ -230,7 +230,7 @@ function NavBar() {
                 isAuthenticatedUser ? 
                   <img src={userPhoto} alt="Foto de Perfil" className="brand-logo" /> 
                   : 
-                  <button className="logout-btn">Iniciar Sesión</button>
+                  <button className="logout-btn d-none d-lg-flex">Iniciar Sesión</button>
               )}
             </Navbar.Brand> 
           </div>

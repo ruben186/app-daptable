@@ -336,8 +336,17 @@ function PerfilPage() {
    const handleLogout = async () => {
         // Ejecuta la lógica de cierre de sesión SÓLO si el usuario confirmó
         try {
-            await signOut(auth);
             navigate('/');
+            await signOut(auth);
+            Swal.fire({
+            title: 'Sesión Cerrada',
+            text: "Sesión cerrada exitosamente.",
+            icon: 'success',
+            timer: 2500,
+            background: '#052b27ff', // Color de fondo personalizado
+            color: '#ffff', // Color del texto personalizado
+            showConfirmButton: false,
+            })
             console.log("Sesión cerrada exitosamente.");
         } catch (error) {
             console.error("Error al cerrar sesión:", error);

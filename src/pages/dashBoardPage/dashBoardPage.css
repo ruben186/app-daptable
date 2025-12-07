@@ -591,9 +591,9 @@
     border: none;
     cursor: pointer;
     font-size: 0.9em;
-    padding: 5px 10px;
+    padding: 5px 7px;
     border-radius: 4px;
-    width: 140px;
+    width: auto;
     transition: all 0.3s ease;
 }
 .logout-btn:hover {
@@ -633,11 +633,17 @@
     width: 200px; /* Reducir el ancho fijo */
   }
   .brand-right {
-    margin-left: 40px;
+    margin-left: 20px;
   }
+
   .brand-right .brand-logo {
     width:58px;
     height:58px;
+  }
+  .logout-btn{
+    font-size: 0.6em;
+    width: auto;
+    padding: 5px 7px;
   }
   .container{
     margin: 0 !important;

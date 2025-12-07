@@ -290,7 +290,7 @@ a:hover {
         --container-max-width: 600px; 
         --form-max-width: 70%;
     }
-    .login-container{width: 45%;}
+    .login-container{width: 33%;}
     .login-title{ font-size: 1.35rem; }
     .logo{ max-width: 30%; }
     .login-logo{ max-width: 25%; }
@@ -329,7 +329,7 @@ a:hover {
     .login-btn{ font-size: 1rem; padding: 10px 0; }
     .login-google-btn{ font-size: 1rem; }
     .login-google-btn label{ left: 50%; transform: translateX(-50%); max-width: 75%; font-size: 0.95rem; }
-    .login-container{ padding: 0 12px; }
+    .login-container{ padding: 0 12px; width: 100%; }
 }
 
 .login-register {
