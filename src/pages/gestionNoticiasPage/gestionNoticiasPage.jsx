@@ -18,7 +18,6 @@ function GestionNoticiasPage() {
   const [filtered, setFiltered] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
-  const NODE_SERVER_URL = 'http://localhost:3001/api/upload-pdf';
 
   // Modal para edición/visualización
   const [showModal, setShowModal] = useState(false);
@@ -107,20 +106,6 @@ function GestionNoticiasPage() {
       setShowModal(true);
     }
   };
-
-  const handleTempFileChange = (e) => {
-     const f = e.target.files && e.target.files[0];
-     if (f && f.type === 'application/pdf') {
-       setTempFile(f);
-       setUploadProgress(0);
-     } else {
-       setTempFile(null);
-       if (f) {
-         Swal.fire({ title: "Formato inválido", text: "Solo se permiten archivos PDF.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
-       }
-     }
-  };
-
   const handleSave = async () => {
     if (!selected || !selected.id) return;
      if (!selected.nombre || !selected.descripcion || !selected.url) {
@@ -128,38 +113,6 @@ function GestionNoticiasPage() {
       return;
     }   
      let downloadURL = selected.url;    
-     // 1. Subida del PDF (Solo si es PDF y se seleccionó un nuevo archivo)
-     if (selected.tipo === 'pdf' && tempFile) {
-       setUploading(true);
-       setUploadProgress(10);
-       try {
-         const formData = new FormData();
-         formData.append('archivo', tempFile); 
-         
-         if (selected.url) {
-           formData.append('oldFileUrl', selected.url);
-          }
-
-         const response = await fetch(NODE_SERVER_URL, {
-           method: 'POST',
-           body: formData,
-         });
-
-         setUploadProgress(50); 
-         const data = await response.json();    
-         if (!response.ok || !data.success || !data.url) {
-           throw new Error(data.message || "Error al subir el nuevo PDF.");
-         }
-         downloadURL = data.url; // Nueva URL del archivo subido
-         setUploadProgress(90);
-       } catch (error) {
-         console.error("Error al subir PDF:", error);
-         setUploading(false);
-         setUploadProgress(0);
-         Swal.fire({ title: "Error de Subida", text: "No se pudo subir el nuevo PDF.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
-         return; // Detiene el proceso si falla la subida
-       }
-     }
     try {
       const ref = doc(db, 'materialNoticias', selected.id);
       const payload = {
@@ -337,22 +290,6 @@ function GestionNoticiasPage() {
                       {selected.url && (
                           <a className='login-invited-btn' href={selected.url} target="_blank" rel="noreferrer">Ver recurso</a>
                       )}
-                    </Form.Group>
-                  
-                    <Form.Group className="mb-2">
-                    <Form.Label>Reemplazar PDF</Form.Label>
-                    <Form.Control 
-                      type="file" 
-                      accept="application/pdf"
-                      onChange={handleTempFileChange}
-                      disabled={uploading}
-                    />
-                    {tempFile && <p className="text-info small mt-1">Archivo seleccionado: **{tempFile.name}**</p>}
-                    {uploading && (
-                     <div className="mt-2">
-                       <ProgressBar className='bar-carga' now={uploadProgress} label={`${uploadProgress}%`} />
-                     </div>
-                    )}
                     </Form.Group>
                   </>
                 )}

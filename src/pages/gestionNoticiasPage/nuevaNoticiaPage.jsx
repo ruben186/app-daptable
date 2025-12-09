@@ -12,11 +12,11 @@ const NuevaNoticiaPage = () => {
 	const [descripcion, setDescripcion] = useState('');
 	const [tipo, setTipo] = useState('video'); // 'video' o 'pdf'
 	const [videoLink, setVideoLink] = useState('');
+	const [pdfLink, setPdfLink] = useState('');
 	const [file, setFile] = useState(null);
 	const [uploadProgress, setUploadProgress] = useState(0);
 	const [uploading, setUploading] = useState(false);
 	const navigate = useNavigate();
-	const NODE_SERVER_URL = 'http://localhost:3001/api/upload-pdf';
 
 	const resetForm = () => {
 		setTitulo('');
@@ -26,13 +26,6 @@ const NuevaNoticiaPage = () => {
 		setFile(null);
 		setUploadProgress(0);
 		setUploading(false);
-	};
-
-	const handleFileChange = (e) => {
-		const f = e.target.files && e.target.files[0];
-		if (f) {
-			setFile(f);
-		}
 	};
 
 	const isYouTube = (url) => {
@@ -69,26 +62,15 @@ const NuevaNoticiaPage = () => {
 				return;
 			}
 		} else {
-			if (!file) {
+			if (!pdfLink.trim()) {
 				Swal.fire({
-				title:"Falta archivo", 
-				text: "Por favor selecciona un PDF.", 
+				title:"Falta link", 
+				text: "Por favor añade el enlace del pdf.", 
 				icon: "error",
 				background: '#052b27ff', // Color de fondo personalizado
 				color: '#ffdfdfff', // Color del texto personalizado
 				confirmButtonColor: '#0b6860ff',
 			});
-				return;
-			}
-			if (file.type !== 'application/pdf') {
-				Swal.fire({
-					title:"Formato inválido", 
-					text: "Solo se permiten archivos PDF.", 
-					icon: "error",
-					background: '#052b27ff', // Color de fondo personalizado
-					color: '#ffdfdfff', // Color del texto personalizado
-					confirmButtonColor: '#0b6860ff',
-				});
 				return;
 			}
 		}
@@ -97,35 +79,12 @@ const NuevaNoticiaPage = () => {
 			if (tipo === 'pdf') {
 				// Subir a Firebase Storage
 				setUploading(true);
-				let downloadURL = ''; 
-
-                const formData = new FormData();
-                // 'archivo' DEBE coincidir con el campo de Multer en server.js: upload.single('archivo')
-                formData.append('archivo', file); 
-
-                const response = await fetch(NODE_SERVER_URL, {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                // Asumimos que la subida fue instantánea para fines de la barra de progreso 
-                // (No hay evento 'state_changed' con fetch, solo inicio y fin)
-                setUploadProgress(50); 
-                
-                const data = await response.json();
-
-                if (!response.ok || !data.success) {
-                    // Si el servidor Node.js devuelve un error
-                    throw new Error(data.message || "Error desconocido al subir el archivo.");
-                }
-
-                downloadURL = data.url
 				// Guardar en Firestore
 				await addDoc(collection(db, 'materialNoticias'), {
 					nombre: titulo,
 					descripcion: descripcion,
 					tipo: 'pdf',
-					url: downloadURL,
+					url: pdfLink.trim(),
 					fecha: serverTimestamp()
 				});
 				setUploading(false);
@@ -241,15 +200,14 @@ const NuevaNoticiaPage = () => {
 						{tipo === 'pdf' && (
 							<>
 								<Form.Group className="mb-3">
-									<Form.Label>Seleccionar PDF</Form.Label>
-									<input type="file" className="form-control2" accept="application/pdf"onChange={handleFileChange}/>
+									<Form.Label>Enlace del PDF</Form.Label>
+									<input type="text" className="form-control2" value={pdfLink} onChange={e => setPdfLink(e.target.value)}/>
 								</Form.Group>
-								{uploading && < ProgressBar className='bar-carga' now={uploadProgress} label={`${uploadProgress}%`} />}
 							</>
 						)}
 
 						<div className="d-flex gap-2">
-							<Button type="submit" className='btn-success' disabled={uploading}>{uploading ? 'Subiendo...' : 'Guardar'}</Button>
+							<Button type="submit" className='btn-success' >Guardar</Button>
 							<Button className='cancelar-btn' onClick={() => navigate('/gestionAdmin')}>Cancelar</Button>
 						</div>
 					</Form>

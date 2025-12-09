@@ -734,19 +734,6 @@ function GestionAdminPage() {
             }
         }
     };
-
-    const handleTempFileChange = (e) => {
-     const f = e.target.files && e.target.files[0];
-     if (f && f.type === 'application/pdf') {
-        setTempFile(f);
-        setUploadProgress(0);
-        } else {
-        setTempFile(null);
-        if (f) {
-            Swal.fire({ title: "Formato inválido", text: "Solo se permiten archivos PDF.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
-        }
-        }
-    };
     
     const handleSaveChangesEstudio = async () => {
         if (!selectedItem || itemType !== 'estudio') return;
@@ -762,24 +749,8 @@ function GestionAdminPage() {
         setUploading(true);
         setUploadProgress(10);
         try {
-            const formData = new FormData();
-            formData.append('archivo', tempFile); 
-            
-            if (selectedItem.url) {
-            formData.append('oldFileUrl', selectedItem.url);
-            }
-
-            const response = await fetch(NODE_SERVER_URL, {
-            method: 'POST',
-            body: formData,
-            });
 
             setUploadProgress(50); 
-            const data = await response.json();    
-            if (!response.ok || !data.success || !data.url) {
-            throw new Error(data.message || "Error al subir el nuevo PDF.");
-            }
-            downloadURL = data.url; // Nueva URL del archivo subido
             setUploadProgress(90);
         } catch (error) {
             console.error("Error al subir PDF:", error);
@@ -1247,30 +1218,6 @@ function GestionAdminPage() {
                     </Form.Group>
                     ) : (
                     <>
-                        <Form.Group className="mb-2">
-                        <Form.Label>Enlace del PDF (URL) </Form.Label>
-                        <Form.Control type="text" name="url" value={selectedItem.url || ''} onChange={(e) => setSelectedItem(s => ({ ...s, url: e.target.value }))} />
-                        {/* Mostrar enlace directo si existe */}
-                        {selectedItem.url && (
-                            <a className='login-invited-btn' href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
-                        )}
-                        </Form.Group>
-                    
-                        <Form.Group className="mb-2">
-                        <Form.Label>Reemplazar PDF</Form.Label>
-                        <Form.Control 
-                        type="file" 
-                        accept="application/pdf"
-                        onChange={handleTempFileChange}
-                        disabled={uploading}
-                        />
-                        {tempFile && <p className="text-info small mt-1">Archivo seleccionado: *{tempFile.name}*</p>}
-                        {uploading && (
-                        <div className="mt-2">
-                        <ProgressBar className='bar-carga' now={uploadProgress} label={`${uploadProgress}%`} />
-                        </div>
-                        )}
-                        </Form.Group>
                     </>
                     )}
                 </Form>
@@ -1324,22 +1271,6 @@ function GestionAdminPage() {
                         {/* Mostrar enlace directo si existe */}
                         {selectedItem.url && (
                             <a className='login-invited-btn' href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
-                        )}
-                        </Form.Group>
-                    
-                        <Form.Group className="mb-2">
-                        <Form.Label>Reemplazar PDF</Form.Label>
-                        <Form.Control 
-                        type="file" 
-                        accept="application/pdf"
-                        onChange={handleTempFileChange}
-                        disabled={uploading}
-                        />
-                        {tempFile && <p className="text-info small mt-1">Archivo seleccionado: *{tempFile.name}*</p>}
-                        {uploading && (
-                        <div className="mt-2">
-                        <ProgressBar className='bar-carga' now={uploadProgress} label={`${uploadProgress}%`} />
-                        </div>
                         )}
                         </Form.Group>
                     </>
