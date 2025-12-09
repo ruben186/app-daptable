@@ -71,10 +71,6 @@
 	width: 100%;
     resize: none; 
 }
-.bar-carga{
-	background-color: #0b5550 !important;
-	--bs-progress-bar-bg: #2ca395 !important;
-}
 
 /* 2. Estilo de la Tarjeta del PDF */
 .pdf-card {

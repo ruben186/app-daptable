@@ -18,19 +18,15 @@ function NoticiasPage() {
     const location = useLocation();
     const [filteredVideos, setFilteredVideos] = useState([]);
     const navigate = useNavigate();
-    
-    // 🔑 Mantenemos la clave dura para la funcionalidad
-    const API_KEY = '3cfd08bc2fdcf982ec047ca6d998187a'; 
+
 
     useEffect(() => {
         const fetchNews = async () => {
             const query = 'tecnología OR Celulares OR reparacion celulares'; 
-            const encodedQuery = encodeURIComponent(query);
-            
-            const url = `https://gnews.io/api/v4/search?q=${encodedQuery}&lang=es&max=9&apikey=${API_KEY}`;
+            const proxyUrl = `/api-proxy.php?q=${encodeURIComponent(query)}`;
 
             try {
-                const response = await fetch(url);
+                const response = await fetch(proxyUrl);
                 const data = await response.json();
                 
                 if (data.articles) {
@@ -47,14 +43,8 @@ function NoticiasPage() {
                 setLoading(false);
             }
         };
-
-        if (API_KEY) {
-            fetchNews();
-        } else {
-            console.error("La clave de GNews no está disponible.");
-            setLoading(false);
-        }
-    }, [API_KEY]); 
+        fetchNews();
+    }, []); 
 
     useEffect(() => {
     const fetchVideos = async () => {

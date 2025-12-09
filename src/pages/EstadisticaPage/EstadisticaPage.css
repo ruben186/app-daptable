@@ -9,7 +9,21 @@
     margin-top: 30px;
     padding-bottom: 10px;
 }
-
+.estadisticas-container{
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 50px 20px;
+    background-color: #052e2a;
+    color: #42F1DD;
+    min-height: 100vh;
+    border-radius: 20px;
+    box-sizing: border-box;
+    text-align: center;
+}
+.bar-carga{
+	background-color: #0b5550 !important;
+	--bs-progress-bar-bg: #2ca395 !important;
+}
 .container-topVistas{
   background-color: #08645e;
   padding-bottom: 12px;

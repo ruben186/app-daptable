@@ -1218,6 +1218,14 @@ function GestionAdminPage() {
                     </Form.Group>
                     ) : (
                     <>
+                        <Form.Group className="mb-2">
+                        <Form.Label>Enlace del PDF (URL) </Form.Label>
+                        <Form.Control type="text" name="url" value={selectedItem.url || ''} onChange={(e) => setSelectedItem(s => ({ ...s, url: e.target.value }))} />
+                        {/* Mostrar enlace directo si existe */}
+                        {selectedItem.url && (
+                            <a className='login-invited-btn' href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
+                        )}
+                        </Form.Group>
                     </>
                     )}
                 </Form>

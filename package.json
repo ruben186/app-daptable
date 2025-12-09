@@ -1,7 +1,8 @@
 {
-  "name": "hooks",
+  "name": "app-daptable",
   "version": "0.1.0",
   "private": true,
+  "homepage": "./",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.8.0",
@@ -23,10 +24,7 @@
     "react-slick": "^0.31.0",
     "slick-carousel": "^1.8.1",
     "sweetalert2": "^11.22.4",
-    "web-vitals": "^2.1.4",
-    "axios": "^1.13.2",
-    "cors": "^2.8.5",
-    "firebase-functions": "^7.0.1"
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { Container, Button } from 'react-bootstrap';
+import { Container, ProgressBar } from 'react-bootstrap';
 // En EstadisticaPage.jsx
 import { fetchTopVistasGlobal } from '../../firebase/statsService';
 import { handleCompatibilityCheck, getLogoUrlByMarca } from '../components/compatibilidades';
@@ -55,6 +55,9 @@ const EstadisticasPage = () => {
     const calculatePercentage = (count, total) => {
         if (total === 0) return '0%';
         return ((count / total) * 100).toFixed(1) + '%';
+    };
+    const getNumericPercentage = (percentString) => {
+        return parseFloat(percentString.replace('%', ''));
     };
     useEffect(() => {
             const loadTopVistas = async () => {
@@ -172,7 +175,7 @@ const EstadisticasPage = () => {
         <>
             <NavBar />
             <div className='bg-gradient2'>
-                <div className="opinion-container">
+                <div className="estadisticas-container">
                     
                     <h1 style={{ color: '#00d49f', marginBottom: '40px', fontSize: '2em' }}>
                         📈 Indicadores y Estadísticas
@@ -251,48 +254,60 @@ const EstadisticasPage = () => {
                     <div className="stats-section">
                         <h2>⭐ Experiencia de Usuario Votada</h2>
                         <p style={{ color: '#c7d2d2', marginBottom: '20px' }}>
-                            Distribución de las valoraciones de nuestros usuarios (Total: **{totalVotes} votos**).
-                        </p>
-
+                            Distribución de las valoraciones de nuestros usuarios (Total: *{totalVotes} votos*).
+                        </p>                    
                         <div className="vote-bar-container">
                             {/* Excelente */}
                             <div className="vote-bar-item">
-                                <div className="vote-label" style={{ color: '#00d49f' }}>Excelente ({stats.experienciaVotos.EXCELENTE})</div>
-                                <div className="progress-bar-wrapper">
-                                    <div 
-                                        className="progress-bar excellent" 
-                                        style={{ width: excelentePercent }}
-                                    >
-                                        {excelentePercent}
-                                    </div>
+                                <div className="vote-label" style={{ color: '#00d49f' }}>
+                                    Excelente ({stats.experienciaVotos.EXCELENTE})
                                 </div>
-                            </div>
-                            {/* ... (Buena y Mala siguen el mismo patrón de renderizado) ... */}
-                            <div className="vote-bar-item">
-                                <div className="vote-label" style={{ color: '#c7d2d2' }}>Buena ({stats.experienciaVotos.BUENA})</div>
                                 <div className="progress-bar-wrapper">
-                                    <div 
-                                        className="progress-bar good" 
-                                        style={{ width: buenaPercent }}
-                                    >
-                                        {buenaPercent}
-                                    </div>
+                                {/* USO DE PROGRESS BAR DE BOOTSTRAP: EXCELENTE */}
+                                <ProgressBar 
+                                    now={getNumericPercentage(excelentePercent)} 
+                                    label={excelentePercent} 
+                                    variant="success" 
+                                    // Asegura que se vea bien en tu tema
+                                    className="excellent-bar bar-carga" 
+                                />
                                 </div>
                             </div>
 
+                            {/* Buena */}
                             <div className="vote-bar-item">
-                                <div className="vote-label" style={{ color: '#ff6b6b' }}>Mala ({stats.experienciaVotos.MALA})</div>
+                                 <div className="vote-label" style={{ color: '#c7d2d2' }}>
+                                  Buena ({stats.experienciaVotos.BUENA})
+                                 </div>
+                                 <div className="progress-bar-wrapper">
+                                    {/* USO DE PROGRESS BAR DE BOOTSTRAP: BUENA */}
+                                    <ProgressBar 
+                                        now={getNumericPercentage(buenaPercent)} 
+                                        label={buenaPercent} 
+                                        // Usar una variante secundaria o de información para un color neutro/claro
+                                        variant="info" 
+                                        className="good-bar bar-carga"
+                                    />
+                                 </div>
+                            </div>                  
+                            {/* Mala */}
+                            <div className="vote-bar-item">
+                                <div className="vote-label" style={{ color: '#ff6b6b' }}>
+                                    Mala ({stats.experienciaVotos.MALA})
+                                </div>
                                 <div className="progress-bar-wrapper">
-                                    <div 
-                                        className="progress-bar bad" 
-                                        style={{ width: malaPercent }}
-                                    >
-                                        {malaPercent}
-                                    </div>
+                                     {/* USO DE PROGRESS BAR DE BOOTSTRAP: MALA */}
+                                     <ProgressBar 
+                                        now={getNumericPercentage(malaPercent)} 
+                                        label={malaPercent} 
+                                        variant="danger" 
+                                        className="bad-bar bar-carga"
+                                     />
                                 </div>
                             </div>
                         </div>
                     </div>
+
 
                 </div>
                

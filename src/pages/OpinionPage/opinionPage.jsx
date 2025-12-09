@@ -103,26 +103,30 @@ const OpinionPage = () => {
         </div>
       </div>
 
-      {/* --- Campo de Justificación --- */}      <div className="justification-section">
-        <label htmlFor="justification-input">¿Porque?</label>
+      {/* --- Campo de Justificación --- */}     
+       <div className="justification-section ">
         <textarea
           id="justification-input"
+          className='form-control2 textarea-comentarios'
           value={justification}
           onChange={(e) => setJustification(e.target.value)}
-          placeholder="Escribe tu razón aquí..."
+          placeholder="Porque?"
           rows="4"
         />
       </div>
 
       {/* --- Botón y Mensaje de Estado --- */}
-      <button 
-        className="submit-button" 
+       <div className="d-grid gap-2">
+
+        <button 
+        className="btn-primary submit-button" 
         onClick={handleSubmit} 
         disabled={!opinion || statusMessage === 'Enviando...'}
       >
         Enviar
-        
       </button>
+       </div>
+      
 
       
 

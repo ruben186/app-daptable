@@ -7,7 +7,6 @@ import Swal from 'sweetalert2';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 import { db } from '../../firebase';
-import axios from 'axios';
 import './contenidoAprendePage.css';
 const ContenidoAprendePage = () => {
 	const [titulo, setTitulo] = useState('');
