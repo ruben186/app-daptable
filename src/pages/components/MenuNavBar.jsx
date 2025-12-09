@@ -11,21 +11,21 @@ import logoVivo from '../../assets/logos/VivoLogo.png';
 import logoZTE from '../../assets/logos/zteLogo.png';
 
 const MarcaItem = ({ logoSrc, brand, navigate, setActiveBrand, setOpen }) => (
-    <button 
-        className="personas-drawer-item brand-item"
-        onClick={() => {
-            navigate(`/xiaomi?brand=${brand}`);
-            setActiveBrand(brand); // Actualiza el estado en el NavBar principal
-            setOpen(false); // Cierra el menú lateral
-        }}
-    >
-        {/* Usamos una clase específica para el logo en el drawer */}
-        <img src={logoSrc} alt={brand} className="drawer-brand-icon" /> 
-        {brand.charAt(0).toUpperCase() + brand.slice(1)} {/* Muestra el nombre */}
-    </button>
+  <button 
+    className="personas-drawer-item brand-item"
+    onClick={() => {
+      navigate(`/xiaomi?brand=${brand}`);
+      setActiveBrand(brand); // Actualiza el estado en el NavBar principal
+      setOpen(false); // Cierra el menú lateral
+    }}
+  >
+    {/* Clase específica para el logo en el drawer */}
+    <img src={logoSrc} alt={brand} className="drawer-brand-icon" /> 
+    {brand.charAt(0).toUpperCase() + brand.slice(1)} 
+  </button>
 );
 
-// Componente local: grupo expandible accesible
+// grupo expandible accesible
 function ExpandableGroup({ title, id, children, drawerOpen }) {
   const [expanded, setExpanded] = useState(false);
   const contentRef = useRef(null);
@@ -37,7 +37,6 @@ function ExpandableGroup({ title, id, children, drawerOpen }) {
 
   return (
     <div id={`group-${id}`}>
-      {/* usar clases existentes: personas-group-title / personas-drawer-item.group-title */}
       <button
         className={`personas-drawer-item ${expanded ? 'open' : ''}`}
         aria-expanded={expanded}
@@ -85,7 +84,7 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
   }, []);
   
 
-  // Drawer lateral: muestra overlay y panel que se desliza desde la izquierda
+  // Muestra overlay y panel que se desliza desde la izquierda
   return (
     <div ref={wrapperRef}>
       <button
@@ -118,98 +117,83 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
 
         <div className="personas-drawer-list">
           {isRoleLoading ? (
-            // Si está cargando, puedes mostrar solo el 'Inicio' o un indicador de carga
             <div className='welcome-text' style={{marginTop: '22px'}}>
-                Cargando Opciones...
+              Cargando Opciones...
             </div>
           ) : (
-            <>
-          {showBrandsInDrawer && (
-                <>
-                  <ExpandableGroup title="Marcas" id="marcas" drawerOpen={open}>
-                      {/* ... todos tus MarcaItem ... */}
-                      <MarcaItem logoSrc={logoxiami} brand="xiaomi" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
-                      <MarcaItem logoSrc={logosamgsumg} brand="samsung" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
-                      <MarcaItem logoSrc={logohuawei} brand="huawei" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
-                      <MarcaItem logoSrc={logomotorola} brand="motorola" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
-                      <MarcaItem logoSrc={logoOppo} brand="oppo" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
-                      <MarcaItem logoSrc={logoRealme} brand="realme" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
-                      <MarcaItem logoSrc={logoVivo} brand="vivo" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
-                      <MarcaItem logoSrc={logoZTE} brand="zte" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
-                  </ExpandableGroup>
-                </>
+          <>
+            {showBrandsInDrawer && (
+              <>
+                <ExpandableGroup title="Marcas" id="marcas" drawerOpen={open}>
+                  <MarcaItem logoSrc={logoxiami} brand="xiaomi" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                  <MarcaItem logoSrc={logosamgsumg} brand="samsung" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                  <MarcaItem logoSrc={logohuawei} brand="huawei" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                  <MarcaItem logoSrc={logomotorola} brand="motorola" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                  <MarcaItem logoSrc={logoOppo} brand="oppo" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                  <MarcaItem logoSrc={logoRealme} brand="realme" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                  <MarcaItem logoSrc={logoVivo} brand="vivo" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                  <MarcaItem logoSrc={logoZTE} brand="zte" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                </ExpandableGroup>
+              </>
             )}
 
-         <button 
-             className="personas-drawer-item" 
-            onClick={() => { navigate('/dashboard');}}
-          >
-            Inicio
-          </button>
-         
-          
-          
-          {(userRole === 'admin' || userRole === 'usuario') && (
-            <>
-            <button className="personas-drawer-item" onClick={() => { navigate('/OpinionPage'); setOpen(false); }}>
-            Nos interesa tu opinión
+            <button 
+              className="personas-drawer-item" 
+              onClick={() => { navigate('/dashboard');}}
+            >
+              Inicio
             </button>
-            </>
-          )}
+          
+            {(userRole === 'admin' || userRole === 'usuario') && (
+              <>
+                <button className="personas-drawer-item" onClick={() => { navigate('/OpinionPage'); setOpen(false); }}>
+                  Nos interesa tu opinión
+                </button>
+              </>
+            )}
 
-          <button className="personas-drawer-item" onClick={() => { navigate('/NoticiaPage'); setOpen(false); }}>
-            Noticias
-          </button>
-       
-          {/* Group: Aprende (expandable) */}
-          <ExpandableGroup title="Aprende" id="aprende" drawerOpen={open}>
-            <button className="personas-drawer-item"  onClick={() => { navigate('/aprende/pdfs'); setOpen(false); }}>
-              Paso a paso (PDF)
+            <button className="personas-drawer-item" onClick={() => { navigate('/NoticiaPage'); setOpen(false); }}>
+              Noticias
             </button>
-            <button className="personas-drawer-item"   onClick={() => { navigate('/aprende/videos'); setOpen(false); }}>
-              Shorts (Videos)
-            </button>
-          </ExpandableGroup>
-  
-          {/* Group: Ayúdanos (expandable) */}
-          {(userRole === 'admin' || userRole === 'usuario') &&(
-            <>
-            <ExpandableGroup title="Ayúdanos" id="ayudanos" className="personas-drawer-item" drawerOpen={open}>
-            <button className="personas-drawer-item" onClick={() => { navigate('/sugerirPieza'); setOpen(false); }}>
-              Aumentar base de datos
-            </button>
-          </ExpandableGroup>
-            </>
-          )}
-          
-
-          {/* Admin quick links (original Personas options) */}
-          {userRole === 'admin' && (
-            <>
-            <button className="personas-drawer-item" onClick={() => { navigate('/gestionAdmin'); setOpen(false); }}>
-              Gestión de Administrador
-            </button>
-          
-            </>
-           )}          
+        
+            {/*Aprende Expandable*/}
+            <ExpandableGroup title="Aprende" id="aprende" drawerOpen={open}>
+              <button className="personas-drawer-item"  onClick={() => { navigate('/aprende/pdfs'); setOpen(false); }}>
+                Paso a paso (PDF)
+              </button>
+              <button className="personas-drawer-item"   onClick={() => { navigate('/aprende/videos'); setOpen(false); }}>
+                Shorts (Videos)
+              </button>
+            </ExpandableGroup>
+    
+            {/* Ayúdanos Expandable */}
+            {(userRole === 'admin' || userRole === 'usuario') &&(
+              <>
+                <ExpandableGroup title="Ayúdanos" id="ayudanos" className="personas-drawer-item" drawerOpen={open}>
+                  <button className="personas-drawer-item" onClick={() => { navigate('/sugerirPieza'); setOpen(false); }}>
+                    Aumentar base de datos
+                  </button>
+                </ExpandableGroup>
+              </>
+            )}
             
-          
-          {/* Admin quick links (original Personas options) */}
-          {userRole === 'admin' && (
-            <>
-            <button className="personas-drawer-item" onClick={() => { navigate('/EstadisticaPage'); setOpen(false); }}>
-              Indiadores
-            </button>
-            </>
 
-
-
-
-          )}
+            {/* Botones de Admin */}
+            {userRole === 'admin' && (
+              <>
+                <button className="personas-drawer-item" onClick={() => { navigate('/gestionAdmin'); setOpen(false); }}>
+                  Gestión de Administrador
+                </button>
+                <button className="personas-drawer-item" onClick={() => { navigate('/EstadisticaPage'); setOpen(false); }}>
+                  Indiadores
+                </button>
+              </>
+            )}          
           </> )}
-       </div>
+        </div>
       </aside>
     </div>
   );
 }
+
 export default MenuNavbar;

@@ -1,6 +1,5 @@
-import { db } from '../firebase'; // Asegúrate que esta ruta es correcta
-import { doc,setDoc, addDoc, Timestamp, updateDoc, increment } from 'firebase/firestore';
-
+import { db } from '../firebase';
+import { doc,setDoc, Timestamp, updateDoc, increment } from 'firebase/firestore';
 
 /**
  * Genera un ID determinista (siempre el mismo) a partir de los datos clave.
@@ -8,7 +7,7 @@ import { doc,setDoc, addDoc, Timestamp, updateDoc, increment } from 'firebase/fi
  * @param {string} marca 
  * @param {string} modelo 
  * @param {string} pieza 
- * @returns {string} ID seguro para Firestore.
+ * @returns {string} 
  */
 const createHistorialId = (marca, modelo, pieza) => {
     // Normalizar a mayúsculas y concatenar las claves
@@ -16,14 +15,14 @@ const createHistorialId = (marca, modelo, pieza) => {
     
     // Codificación para asegurar que el ID sea válido y no contenga caracteres especiales
     try {
-        // btoa (Base64) + reemplazo de caracteres inseguros
         return btoa(key).replace(/\//g, '_').replace(/\+/g, '-');
     } catch (e) {
         console.error("Error al codificar ID, usando string plano:", e);
-        // Fallback: usar el string y quitar caracteres no permitidos
+        // usar el string y quitar caracteres no permitidos
         return key.replace(/[^a-zA-Z0-9_-]/g, ''); 
     }
 };
+
 export const logActivity = async (userId, data) => {
     if (!userId) {
         console.error("Error: UID de usuario no proporcionado para registrar actividad.");
@@ -47,11 +46,11 @@ export const logActivity = async (userId, data) => {
         docId
     );
     
-    // Datos a guardar en el primer setDoc si no existe (o si se quiere actualizar todo el contenido)
+    // Datos a guardar en el primer setDoc si no existe 
     const baseDataToSave = {
         ...data,
-        vistas: 1, // Valor inicial de vistas
-        timestamp: Timestamp.fromDate(new Date()), // Timestamp de la consulta actual
+        vistas: 1, 
+        timestamp: Timestamp.fromDate(new Date()), 
     };
 
     // Datos a actualizar
@@ -62,21 +61,17 @@ export const logActivity = async (userId, data) => {
 
     try {
         // 3. Intentar actualizar el contador y el timestamp
-        // Si el documento NO existe, esta operación FALLARÁ con 'not-found'.
         await updateDoc(historialDocRef, dataToUpdate);
-        
         console.log(`Actividad actualizada (vistas incrementadas). ID de documento: ${docId}`);
 
     } catch (error) {
-        // 4. Si el documento NO existe (o hay otro error que impide updateDoc), 
-        // lo creamos usando setDoc.
+        // 4. Si el documento NO existe, lo creamos usando setDoc.
         if (error.code === 'not-found' || error.message.includes('No document to update')) {
             await setDoc(historialDocRef, baseDataToSave);
-            console.log(`Actividad creada (primera vista). ID de documento: ${docId}`);
         } else {
-             // Revertimos al comportamiento anterior para cualquier otro error
-             await setDoc(historialDocRef, baseDataToSave, { merge: true });
-             console.error("Error al registrar/actualizar la actividad en Firestore, usando setDoc fallback:", error);
+            // Revertimos al comportamiento anterior para cualquier otro error
+            await setDoc(historialDocRef, baseDataToSave, { merge: true });
+            console.error("Error al registrar/actualizar la actividad en Firestore:", error);
         }
     }
 };

@@ -7,6 +7,7 @@ import IconologoOppo from '../../assets/logos/OPPOLogo.png';
 import IconologoRealme from '../../assets/logos/Realme_logo.png';
 import IconologoVivo from '../../assets/logos/VivoLogo.png';
 import IconologoZte from '../../assets/logos/zteLogo.png';
+
 const MARCA_LOGOS = {
     'xiaomi': IconologoXiami,
     'redmi': IconologoXiami, 
@@ -18,17 +19,19 @@ const MARCA_LOGOS = {
     'vivo': IconologoVivo,
     'zte': IconologoZte,
 };
+
 export const getLogoUrlByMarca = (marca) => {
     // Normaliza la marca a minúsculas para la búsqueda
     const normalizedMarca = marca ? marca.toLowerCase() : '';
     return MARCA_LOGOS[normalizedMarca] || null; 
 };
-// Función auxiliar para normalizar nombres de piezas (extraída de BtnMasXiaomi)
+
+// Función auxiliar para normalizar nombres de piezas 
 export const normalizePieceName = (nombrePieza) => {
     if (!nombrePieza) return '';
     const normalized = nombrePieza.toString().toLowerCase().trim();
     
-    // Mapeo de nombres posibles a nombres de BD (Asegúrate que estas son las claves de tu BD)
+    // Mapeo de nombres posibles a nombres de BD
     if (normalized.includes('pantalla')) return 'PANTALLA';
     if (normalized.includes('bateria') || normalized.includes('batería')) return 'BATERIA';
     if (normalized.includes('flex') && normalized.includes('boton')) return 'FLEX DE BOTONES';
@@ -42,7 +45,7 @@ export const normalizePieceName = (nombrePieza) => {
     return normalized.toUpperCase();
 };
 
-// Helper para obtener la info de la pieza dentro de un documento de `tablas` (extraída de BtnMasXiaomi)
+// Helper para obtener la info de la pieza dentro de un documento de `tablas`
 export const getPiezaInfoFromModel = (modelEntry, nombrePiezaBD) => {
     if (!modelEntry || !Array.isArray(modelEntry.campos)) return null;
     return modelEntry.campos.find(c => 
@@ -50,16 +53,16 @@ export const getPiezaInfoFromModel = (modelEntry, nombrePiezaBD) => {
     );
 };
 
-// Normalizador para comparar códigos de forma exacta (trim + lower)
+// Normalizador para comparar códigos de forma exacta
 const normalizeCode = (c) => (c === undefined || c === null) ? '' : String(c).trim().toLowerCase();
 
 /**
  * Lógica principal para buscar y mostrar compatibilidades.
- * @param {string} tipoPieza - El nombre de la pieza (e.g., 'Pantalla').
- * @param {object} userActual - El objeto del modelo actualmente seleccionado (de la colección 'tablas').
+ * @param {string} tipoPieza - El nombre de la pieza
+ * @param {object} userActual - El objeto del modelo actualmente seleccionado 
  * @param {Array<object>} modelos - La lista completa de todos los modelos de la colección 'tablas'.
- * @param {function} [logActivityFn] - Opcional: Función para registrar la actividad del usuario.
- * @param {object} [userAuth] - Opcional: El objeto de autenticación del usuario.
+ * @param {function} [logActivityFn] - Función para registrar la actividad del usuario.
+ * @param {object} [userAuth] - El objeto de autenticación del usuario.
  */
 export const handleCompatibilityCheck = (tipoPieza, userActual, modelos, logActivityFn, userAuth) => {
     
@@ -73,7 +76,6 @@ export const handleCompatibilityCheck = (tipoPieza, userActual, modelos, logActi
     }
 
     const nombreCampoBD = normalizePieceName(tipoPieza);
-
     const piezaInfoActual = getPiezaInfoFromModel(userActual, nombreCampoBD);
     const codigoCompatibilidad = piezaInfoActual?.codigoCompatibilidad;
 
@@ -82,22 +84,22 @@ export const handleCompatibilityCheck = (tipoPieza, userActual, modelos, logActi
             icon: 'info',
             title: 'Sin Información',
             text: `El modelo (${userActual.modelo}) no tiene registrado un código de compatibilidad para ${nombreCampoBD}.`,
-            background: '#052b27ff', // Color de fondo personalizado
-            color: '#ffdfdfff', // Color del texto personalizado
+            background: '#052b27ff', 
+            color: '#ffdfdfff',
             confirmButtonColor: '#0b6860ff'
         });
         return;
     }
     const marcaLogoUrl = getLogoUrlByMarca(userActual.marca);
-    // Buscar hermanos (modelos con el mismo código de compatibilidad)
+    
+    // Buscar modelos con el mismo código de compatibilidad
     const normTarget = normalizeCode(codigoCompatibilidad);
     const modelosCompatibles = modelos.filter(u => {
-        // Excluir el modelo actual de la lista mostrada (si es posible, aunque es opcional)
-        // if (u.id === userActual.id) return false; 
-        
+        // Excluir el modelo actual de la lista mostrada 
+        if (u.id === userActual.id) return false; 
         const infoPiezaUsuario = getPiezaInfoFromModel(u, nombreCampoBD);
         const codigo = infoPiezaUsuario?.codigoCompatibilidad;
-        
+
         return normalizeCode(codigo) === normTarget;
     });
 
