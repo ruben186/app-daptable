@@ -4,7 +4,6 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
-import { Button } from 'react-bootstrap';
 import './contenidoAprendePage.css';
 
 const EstudioDetallePage = () => {
@@ -27,9 +26,9 @@ const EstudioDetallePage = () => {
           docRef = doc(db, 'materialNoticias', id);
           docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
-              setItem({ id: docSnap.id, ...docSnap.data() });
+            setItem({ id: docSnap.id, ...docSnap.data() });
           } else {
-              setItem(null);
+            setItem(null);
           }
         }
       } catch (e) {
@@ -65,10 +64,9 @@ const EstudioDetallePage = () => {
     <>
       <NavBar />
       <button type="button" className="btn-outline-volver" onClick={() => navigate(-1)}>
-            &lt; Volver
+        &lt; Volver
       </button>
       <main className="container containerVideo2 ">
-          
         {loading && <p>Cargando...</p>}
         {!loading && !item && <p>Material no encontrado.</p>}
         {item && (

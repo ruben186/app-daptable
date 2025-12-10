@@ -1,6 +1,6 @@
 
 .top-vistas-grid {
-    display: flex; /* Para ponerlos en fila */
+    display: flex; 
     flex-wrap: nowrap;
     gap: 20px;
     overflow-x: auto;
@@ -9,6 +9,7 @@
     margin-top: 30px;
     padding-bottom: 10px;
 }
+
 .estadisticas-container{
     max-width: 1000px;
     margin: 0 auto;
@@ -20,27 +21,24 @@
     box-sizing: border-box;
     text-align: center;
 }
+
 .bar-carga{
 	background-color: #0b5550 !important;
 	--bs-progress-bar-bg: #2ca395 !important;
 }
+
 .container-topVistas{
   background-color: #08645e;
   padding-bottom: 12px;
   border-radius: 20px;
 }
-.icono-vistas{
-    height: 70px;
-}
-.vistas-superior{
-    height: 50%;
-}
+
+.icono-vistas{height: 70px;}
+.vistas-superior{height: 50%;}
 .vistas-inferior {
     align-items: start;
     text-align: start;
-   font-size: 0.85rem;
-   height: 50%;
+    font-size: 0.85rem;
+    height: 50%;
 }
-.item-vistas{
-    height: auto;
-}
+.item-vistas{height: auto;}

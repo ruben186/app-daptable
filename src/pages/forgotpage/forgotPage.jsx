@@ -2,7 +2,6 @@ import { useState } from 'react';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import './forgotPage.css';
-import logo from '../../assets/logos/user.png';
 import { auth } from '../../firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
 
@@ -12,30 +11,28 @@ function ForgotPasswordPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!email) {
-
       Swal.fire({
-              title:"Campo vacío", 
-              text: "Por favor ingresa tu correo.", 
-              icon: "warning",
-              background: '#1c6d65ff', // Color de fondo personalizado
-              color: '#ffdfdfff', // Color del texto personalizado
-              confirmButtonColor: '#0b6860ff',
-            });
+        title:"Campo vacío", 
+        text: "Por favor ingresa tu correo.", 
+        icon: "warning",
+        background: '#1c6d65ff',
+        color: '#ffdfdfff', 
+        confirmButtonColor: '#0b6860ff',
+      });
       return;
     }
 
     const formatoCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formatoCorreo.test(email)) {
-       Swal.fire({
-              title:"Correo inválido", 
-              text: "Por favor escribe un correo válido.", 
-              icon: "error",
-              background: '#052b27ff', // Color de fondo personalizado
-              color: '#ffdfdfff', // Color del texto personalizado
-              confirmButtonColor: '#0b6860ff',
-            });
+      Swal.fire({
+        title:"Correo inválido", 
+        text: "Por favor escribe un correo válido.", 
+        icon: "error",
+        background: '#052b27ff', 
+        color: '#ffdfdfff', 
+        confirmButtonColor: '#0b6860ff',
+      });
       return;
     }
 
@@ -47,8 +44,8 @@ function ForgotPasswordPage() {
         icon: "success",
         timer: 5000,
         showConfirmButton: false,
-        background: '#052b27ff', // Color de fondo personalizado
-        color: '#ffffffff', // Color del texto personalizado
+        background: '#052b27ff', 
+        color: '#ffffffff', 
         confirmButtonColor: '#0b6860ff'
       });
       setEmail('');
@@ -61,7 +58,7 @@ function ForgotPasswordPage() {
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100 bg-page" style={{position: 'relative'}}>
       <button type="button" className="btn-outline-secondary" onClick={() => navigate(-1)}>
-          &lt; Volver
+        &lt; Volver
       </button>
       <div className="form-card">
         <h3 className="mb-2">Recupera tu Cuenta</h3>

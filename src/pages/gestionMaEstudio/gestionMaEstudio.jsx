@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { collection, getDocs, deleteDoc, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { Container, Table, Button, Modal, Form, InputGroup, ProgressBar } from 'react-bootstrap';
+import { Container, Table, Button, Modal, Form, InputGroup } from 'react-bootstrap';
 import Swal from 'sweetalert2';
-import { FaEdit, FaTrash, FaUserCircle, FaPlus, FaSearch } from 'react-icons/fa';
+import { FaPlus } from 'react-icons/fa';
 import { db } from '../../firebase';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
@@ -17,19 +17,13 @@ function GestionMaEstudioPage() {
   const [estudios, setEstudios] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(false);
-
   // Modal para edición/visualización
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState(null);
 
-  const [tempFile, setTempFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     const fetch = async () => {
-      setLoading(true);
       try {
         const snap = await getDocs(collection(db, 'estudios'));
         const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -37,14 +31,11 @@ function GestionMaEstudioPage() {
         setFiltered(rows);
       } catch (err) {
         console.error('Error fetching estudios:', err);
-      } finally {
-        setLoading(false);
-      }
+      } 
     };
     fetch();
   }, []);
   
-
   useEffect(() => {
     const q = (searchTerm || '').toLowerCase().trim();
     if (!q) {
@@ -83,17 +74,12 @@ function GestionMaEstudioPage() {
       Swal.fire({ title:"Error", text: "No se pudo eliminar el registro", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff'});
     }
   };
+
   const handleCloseModal = () => {
-     setShowModal(false);
-     setTempFile(null);
-     setUploadProgress(0);
-     setUploading(false);
-   };
+    setShowModal(false);
+  };
+
   const handleOpenModal = async (item) => {
-    setTempFile(null); // Asegura que no haya un archivo pendiente de una sesión anterior
-    setUploadProgress(0); 
-    setUploading(false);
-    // Cargar documento actualizado por si hubo cambios
     try {
       const docRef = doc(db, 'estudios', item.id);
       const snap = await getDoc(docRef);
@@ -109,11 +95,11 @@ function GestionMaEstudioPage() {
 
   const handleSave = async () => {
     if (!selected || !selected.id) return;
-     if (!selected.nombre || !selected.descripcion || !selected.url) {
+    if (!selected.nombre || !selected.descripcion || !selected.url) {
       Swal.fire({ title:"Campos incompletos", text: "Todos los campos deben ser llenados.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
       return;
-    }   
-     let downloadURL = selected.url;    
+    } 
+    let downloadURL = selected.url;    
     try {
       const ref = doc(db, 'estudios', selected.id);
       const payload = {
@@ -122,21 +108,16 @@ function GestionMaEstudioPage() {
         tipo: selected.tipo || '',
         url: downloadURL || '',
         fecha: selected.fecha || ''
-        
       };
+
       await updateDoc(ref, payload);
       setEstudios(prev => prev.map(e => e.id === selected.id ? { ...e, ...payload } : e));
       setFiltered(prev => prev.map(e => e.id === selected.id ? { ...e, ...payload } : e));
-      setUploadProgress(100);
-      setUploading(false);
       handleCloseModal();
 
-     
       Swal.fire({ title:"Guardado", text: "Cambios guardados correctamente", icon: "success", background: '#052b27ff', color: '#ffffffff', confirmButtonColor: '#0b6860ff'});
     } catch (err) {
       console.error(err);
-      setUploading(false);
-      setUploadProgress(0);
       Swal.fire({ title:"Error", text: "No se pudieron guardar los cambios", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff'});
     }
   };
@@ -174,33 +155,33 @@ function GestionMaEstudioPage() {
                 <img src={IconoLibro} width="44px" height="44px" alt="Libro" />
                 <h2>Material de Estudio</h2>
               </div>
-               <div className="d-flex align-items-center">
-                    <div className="count-info2">
-                        <span className="count-number2">{filtered.length}</span> M.Estudios Registradas
-                    </div>
+              <div className="d-flex align-items-center">
+                <div className="count-info2">
+                  <span className="count-number2">{filtered.length}</span> M.Estudios Registradas
                 </div>
+              </div>
             </div>
 
             <div className="header-tabla2">
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <Button variant="success" className="btn-nuevo" onClick={() => navigate('/nuevoEstudio')}>
-                    <FaPlus className="plus-new" /> Nuevo
+                  <FaPlus className="plus-new" /> Nuevo
                 </Button>
                 <Button className="btn-success exportar-btn"  onClick={() => exportToCSV(filtered)}>Exportar CSV</Button>
                 <button type="button" className="btn-volver" onClick={() => navigate(-1)}>
-                    Volver
+                  Volver
                 </button>
               </div>
 
               <InputGroup className="search-input-group" style={{ maxWidth: 300 }}>
                 <Form.Control
-                    type="text"
-                    placeholder="Buscar..."
-                    value={searchTerm}
-                     onChange={(e) => setSearchTerm(e.target.value)} 
-                    className="search-buscar"
+                  type="text"
+                  placeholder="Buscar..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)} 
+                  className="search-buscar"
                 />
-                <img width="28px" height="28px" src={IconoBuscar} className='btn-icon-buscar' />
+                <img width="28px" height="28px" alt='icono-buscar' src={IconoBuscar} className='btn-icon-buscar' />
               </InputGroup>
             </div>
 
@@ -222,9 +203,9 @@ function GestionMaEstudioPage() {
                     <td style={{ maxWidth: 420, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.descripcion}</td>
                     <td>{item.tipo || '-'}</td>
                     <td>{item.fecha.toDate().toLocaleDateString('es-ES', { 
-                          year: 'numeric', 
-                          month: 'long', 
-                          day: 'numeric' 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
                       }) || '-'}
                     </td>
                     <td>{item.url ? <a className='login-invited-btn' href={item.url} target="_blank" rel="noreferrer">Enlace</a> : '-'}</td>
@@ -262,13 +243,12 @@ function GestionMaEstudioPage() {
               <Form.Group className="mb-2">
                 <Form.Label>Tipo</Form.Label>
                 <Form.Select 
-                   value={selected.tipo || 'video'} 
-                   onChange={(e) => setSelected(s => ({ ...s, tipo: e.target.value, url: '' }))} // Limpiar URL si el tipo cambia
-                   disabled={uploading} // No permitir cambiar si se está subiendo
-                 >
-                   <option value="video">Video</option>
-                   <option value="pdf">PDF</option>
-                 </Form.Select>
+                  value={selected.tipo || 'video'} 
+                  onChange={(e) => setSelected(s => ({ ...s, tipo: e.target.value, url: '' }))} 
+                >
+                  <option value="video">Video</option>
+                  <option value="pdf">PDF</option>
+                </Form.Select>
               </Form.Group>
                 {selected.tipo === 'video' ? (
                   <Form.Group className="mb-2">
@@ -276,7 +256,6 @@ function GestionMaEstudioPage() {
                     <Form.Control 
                       value={selected.url || ''} 
                       onChange={(e) => setSelected(s => ({ ...s, url: e.target.value }))} 
-                      disabled={uploading}
                     />
                     {selected.url && (
                       <a className='login-invited-btn' href={selected.url} target="_blank" rel="noreferrer">Ver recurso</a>
@@ -287,23 +266,20 @@ function GestionMaEstudioPage() {
                     <Form.Group className="mb-2">
                       <Form.Label>Enlace del PDF (URL) </Form.Label>
                       <Form.Control type="text" name="url" value={selected.url || ''} onChange={(e) => setSelected(s => ({ ...s, url: e.target.value }))} />
-                      {/* Mostrar enlace directo si existe */}
                       {selected.url && (
-                          <a className='login-invited-btn' href={selected.url} target="_blank" rel="noreferrer">Ver recurso</a>
+                        <a className='login-invited-btn' href={selected.url} target="_blank" rel="noreferrer">Ver recurso</a>
                       )}
                     </Form.Group>
-                  
                   </>
                 )}
             </Form>
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal} disabled={uploading}>Cancelar</Button>
-          <Button variant="primary" onClick={handleSave} disabled={uploading}>Guardar</Button>
+          <Button variant="secondary" onClick={handleCloseModal}>Cancelar</Button>
+          <Button variant="primary" onClick={handleSave}>Guardar</Button>
         </Modal.Footer>
       </Modal>
-
       <Footer />
     </>
   );

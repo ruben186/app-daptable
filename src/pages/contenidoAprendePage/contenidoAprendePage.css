@@ -1,11 +1,11 @@
-
-/* Contenedor principal de las tarjetas de estudio */
 .body-new-MEstudio {
 	margin-top: 30px;
 }
+
 .container-new-MEstudio {
 	max-width: 1000px !important;
 }
+
 .custom-datacard {
 	border-radius: 12px;
 	overflow: hidden;
@@ -13,6 +13,7 @@
 	transition: transform 200ms ease, box-shadow 200ms ease;
 	background: transparent;
 }
+
 .custom-datacard:hover {
 	transform: translateY(-6px);
 	box-shadow: 0 10px 28px rgba(2,7,9,0.7);
@@ -30,23 +31,28 @@
 	align-items: center;
 	justify-content: center;
 }
+
 .custom-datacard .datacard-bottom h5 {
 	color: #3BD5C4;
 	font-weight: 600;
 	font-size: 1.05rem;
 }
+
 .containerVideo{
     margin-top: 60px;
 	color: #3BD5C4;
 }
+
 .containerVideo2{
 	margin: 0px auto;
 	color: #3BD5C4;
 }
+
 .containerVideo2 strong{
 	font-size: 1.2rem;
 	color: #3BD5C4;
 }
+
 .btn-outline-volver{
 	margin:80px 0 0 80px;
     border: none;
@@ -57,6 +63,7 @@
     border-radius: 8px;
     font-size: 18px;
 }
+
 .btn-outline-volver:hover{ background-color: #09665E; }
 
 .descripcion-video{
@@ -72,9 +79,7 @@
     resize: none; 
 }
 
-/* 2. Estilo de la Tarjeta del PDF */
 .pdf-card {
-    /* Fondo más oscuro que el fondo principal para darle profundidad */
     background-color:  #0b5550 !important; 
     border: none;
     border-radius: 0 0 15px 15px !important;
@@ -82,13 +87,11 @@
 	color: #3BD5C4 !important;
 }
 
-/* Efecto hover sutil */
 .pdf-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 0 5px ; /* Sombra con toque de acento */
 }
 
-/* 3. Estilos de Texto dentro de la Tarjeta */
 .pdf-card-title {
     font-weight: 600;
     margin-bottom: 0.5rem;
@@ -103,37 +106,36 @@
     font-size: 0.75rem;
 }
 
-
-/* Ajustes responsivos para el grid */
-@media (max-width: 576px) {
-	.datacard-thumb { height: 180px !important; }
-}
-@media (min-width: 577px) and (max-width: 992px) {
-	.datacard-thumb { height: 200px !important; }
-}
-
-/* Vista detalle */
 .estudio-detalle-container {
 	max-width: 1100px;
 	margin: 0 auto;
 }
+
 .estudio-detalle-title {
 	font-size: 1.8rem;
 	margin-bottom: 1rem;
 }
+
 .estudio-detalle-meta {
 	color: #666;
 	margin-bottom: 1rem;
 }
 
-/* Ratio para el iframe/video en detalle */
 .estudio-video-wrapper {
 	width: 100%;
 	aspect-ratio: 16/9;
 	margin-bottom: 1rem;
 }
 
-/* Accesibilidad: foco visible en tarjetas */
 .custom-datacard:focus {
 	outline: 3px solid rgba(63,232,221,0.35);
+}
+
+/* Ajustes responsivos */
+@media (max-width: 576px) {
+	.datacard-thumb { height: 180px !important; }
+}
+
+@media (min-width: 577px) and (max-width: 992px) {
+	.datacard-thumb { height: 200px !important; }
 }

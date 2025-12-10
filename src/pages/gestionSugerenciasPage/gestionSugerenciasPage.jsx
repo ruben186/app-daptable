@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react';
-// Importaciones de Firebase corregidas para la lookup por ID de documento
 import { collection, getDocs, deleteDoc, doc, updateDoc, query, where, documentId } from 'firebase/firestore'; 
 import { useNavigate } from 'react-router-dom';
-import { Container, Table, Button, Form, Modal, Alert, InputGroup } from 'react-bootstrap';
-import { FaSave } from 'react-icons/fa'; // FaPlus no se usa, lo elimino para limpieza
+import { Container, Table, Button, Form, Modal, InputGroup } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import { db } from '../../firebase'; 
-// Importaciones de diseño y componentes
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 import IconoBuscar from '../../assets/Iconos/iconoLupa.png';
@@ -15,11 +12,8 @@ import IconoEliminar from '../../assets/Iconos/iconoEliminar.png';
 import IconoSugerencia from '../../assets/Iconos/iconoPieza.png'; 
 import './gestionSugerenciasPage.css';
 
-
-// --- UTILITY (Para formatear fechas) ---
 const formatFecha = (timestamp) => {
     if (!timestamp) return 'N/A';
-    
     let dateValue;
 
     // Adaptación para manejar diferentes formatos de timestamp de Firebase/JS Date
@@ -66,16 +60,16 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
         if (sugerencia) {
             setFormData({
                 id: sugerencia.id,
-                // Datos del Sugerente (Solo Lectura)
+                // Datos del Sugerente 
                 nombreUsuario: sugerencia.nombreUsuario || '', 
                 emailUsuario: sugerencia.emailUsuario || '',
                 
-                // Campos Editables (Original y Adaptable)
+                // Campos Editables 
                 nombreCelular: sugerencia.nombreCelular || '',
                 pieza: sugerencia.pieza || '',
-                marcaOriginal: sugerencia.marca || '', // Marca de Origen
+                marcaOriginal: sugerencia.marca || '',
                 modeloOriginal: sugerencia.modelo || '',
-                marcaAdaptable: sugerencia.adaptableMarca || '', // Marca de Destino
+                marcaAdaptable: sugerencia.adaptableMarca || '',
                 modeloAdaptable: sugerencia.adaptableModelo || '',
 
                 comentarios: sugerencia.comentarios || '',

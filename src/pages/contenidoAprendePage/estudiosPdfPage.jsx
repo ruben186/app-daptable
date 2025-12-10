@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, where} from 'firebase/firestore';
 import { db } from '../../firebase';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
-import { Card, Button} from 'react-bootstrap';
+import { Card} from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
 import './contenidoAprendePage.css';
 
@@ -13,7 +13,6 @@ const EstudiosPdfPage = () => {
   const [filteredPdfs, setFilteredPdfs] = useState([]); 
   const location = useLocation();
   
-
   useEffect(() => {
     const fetchPdfs = async () => {
       setLoading(true);
@@ -32,21 +31,21 @@ const EstudiosPdfPage = () => {
     };
     fetchPdfs();
   }, []);
+
   useEffect(() => {
     const ps = new URLSearchParams(location.search);
     const searchTerm = ps.get('q')?.toLowerCase() || '';    
     if (searchTerm && pdfs.length > 0) {
-      // Filtrar por nombre o descripción (búsqueda local en el cliente)
+      // Filtrar por nombre o descripción
       const results = pdfs.filter(pdf => 
         pdf.nombre?.toLowerCase().includes(searchTerm) || 
         pdf.descripcion?.toLowerCase().includes(searchTerm)
       );
       setFilteredPdfs(results);
     } else {
-      // Si no hay término de búsqueda o si pdfs acaba de cargarse, mostrar todos
+      // Si no hay término de búsqueda, mostrar todos
       setFilteredPdfs(pdfs);
     }
-
   }, [location.search, pdfs]);
 
   const ps = new URLSearchParams(location.search);
@@ -75,11 +74,12 @@ const EstudiosPdfPage = () => {
                     >
                       Ver
                     </button>}
+
                     <div className="text-end mt-2">
-                       <small className=" pdf-card-date">
+                      <small className=" pdf-card-date">
                         {p.fecha?.toDate ? new Date(p.fecha.toDate()).toLocaleDateString('es-ES') : ''}
-                       </small>
-                     </div>
+                      </small>
+                    </div>
                   </div>
                   )}
                  

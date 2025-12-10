@@ -55,20 +55,17 @@
 }
 
 .nav-dropdown-pill .dropdown-toggle::after {
-  display: none; /* ocultar la flecha default para controlar el layout */
+  display: none;
 }
 
 .dropdown-menu[data-bs-popper]{
   left: -20% !important; /* ajustar posición del menú desplegable */
 }
 
- 
-
 .nav-dropdown-pill .pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  /* mantener padding y border-radius similar a otras pills */
   padding: 8px 18px;
   border-radius: 24px;
 }
@@ -102,8 +99,7 @@
   border-radius: 24px;
   background: #09665E;
   color: #3BD5C4;
-  width: 160px; /* ancho controlado para consistencia */
- 
+  width: 160px;
 }
 
 .nav-dropdown-pill .dropdown-item .pill:hover {
@@ -112,13 +108,11 @@
   transform: translateY(-2px);
 }
 
-/* Asegurar que la clase pill-link alinee el toggle correctamente */
 .pill-link.nav-dropdown-pill {
   display: inline-flex;
   align-items: center;
 }
  
-/* NAVBAR internal */
 .navbar-center {
   width: 100%;
   display: flex;
@@ -138,8 +132,6 @@
   text-decoration: none !important;
 }
 
-
-
 .search-wrapper {
   flex: 1 1 520px;
   display: flex;
@@ -158,15 +150,18 @@
   box-shadow: inset 0 1px 0 rgba(1, 39, 30, 0.02);
   width: 425px;
 }
+
 .search-input::placeholder {
   color: #25b9ad;
 }
+
 .ImgLupa {
   width: 30px;
   height: 30px;
   margin-left: -35px;
   cursor: pointer;
 }
+
 .brand-right {
   display:flex;
   align-items:center;
@@ -186,68 +181,46 @@
   vertical-align: top;
   
 }
-.logout-container .logout-link:hover {
-    background-color: rgba(0,0,0,0.22);
-    color: #eaffff;
-}
-.wrapper-logo{
-  display: flex; 
-  align-items: center; 
-  position: absolute;
-  right: 100px;
-}
-.logout-container .logout-link:hover{
-    border: 2px solid rgba(0,0,0,0.4);
-    transform: scale(1.05);
-}
-/* DROPDOWN */
-.navbar-dark .dropdown-menu {
-    background-color: rgba(50,50,50,0.95);
-    border: none;
-    min-width: 160px;
+.page-offset {
+  padding-top: 20px;
 }
 
-.navbar-dark .dropdown-menu .dropdown-item {
-    color: #e9fdfb;
-    background-color: transparent;
-    transition: background-color 0.18s, color 0.18s;
+.perfil-btn {
+  background-color: #0c8a7f; 
+  color: #8eece1;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9em;
+  padding: 5px 7px;
+  border-radius: 4px;
+  width: auto;
+  transition: all 0.3s ease;
+}
+.perfil-btn:hover {
+  background-color: #013d38;
+  color: #fff;
 }
 
-.navbar-dark .dropdown-menu .dropdown-item:hover {
-    background-color: rgba(70,203,255,0.12);
-    color: #001b19;
+/* MENU NavBar */
+.menu-toggle {
+  background: none;
+  position: relative;
+  right: 80px; 
+  bottom: 4px;
+  border: none;
+  border-radius: 10px;
+  width: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.18s ease;
 }
-
-/* PERSONAS CUSTOM MENU */
-.personas-toggle {
- background: none;
- position: relative;
- right: 80px; 
- bottom: 4px;
- border: none;
- border-radius: 10px;
- width: 60px;
- display: flex;
- justify-content: center;
- align-items: center;
- transition: all 0.18s ease;
-}
-.personas-toggle:hover {
+.menu-toggle:hover {
   background: #13d5c2; 
   color: #00201d; 
 }
-.personas-panel {
-  position: absolute;
-  top: 52px;
-  left: 0;
-  background: linear-gradient(180deg, #054c47, #0b3f3a);
-  border-radius: 6px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
-  min-width: 200px;
-  overflow: hidden;
-  z-index: 1200;
-}
-.personas-item {
+
+.menu-item {
   width: 100%;
   text-align: left;
   padding: 12px 16px;
@@ -259,8 +232,8 @@
   border-top: 1px solid rgba(255,255,255,0.03);
 }
 
-.personas-item:first-child { border-top: none; }
-.personas-item:hover { background: #15CABB; color: #001b19; }
+.menu-item:first-child { border-top: none; }
+.menu-item:hover { background: #15CABB; color: #001b19; }
 
 .chevM {
   width: 10px;
@@ -277,8 +250,8 @@
 }
 .chevM.open { transform: rotate(-135deg); bottom: 0px;  }
 
-/* DRAWER PERSONAS */
-.personas-overlay {
+/* DRAWER MENU*/
+.menu-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0);
@@ -286,11 +259,11 @@
   transition: background 0.22s ease, visibility 0.22s ease;
   z-index: 1100;
 }
-.personas-overlay.visible { background: rgba(0,0,0,0.45); visibility: visible; }
+.menu-overlay.visible { background: rgba(0,0,0,0.45); visibility: visible; }
 
-.personas-drawer {
+.menu-drawer {
   position: fixed;
-  left: -320px; /* hidden */
+  left: -320px;
   top: 0;
   height: 100vh;
   width: 320px;
@@ -301,15 +274,37 @@
   display: flex;
   flex-direction: column;
 }
-.personas-drawer.open { left: 0; }
+.menu-drawer.open { left: 0; }
 
-.personas-drawer-header { display:flex; justify-content:flex-start; padding:10px 16px; background: #21A499; flex-shrink: 0; }
-.drawer-close { background: transparent; border:none; color: #cffff8; font-size: 18px; cursor: pointer; }
+.menu-drawer-header { 
+  display:flex; 
+  justify-content:flex-start; 
+  padding:10px 16px; 
+  background: #21A499; 
+  flex-shrink: 0; 
+}
 
-.personas-drawer-list { display:flex; flex-direction:column; gap:0; padding: 6px 0 40px 0; flex-grow: 1; 
-  overflow-y: auto; overflow-x: hidden; scrollbar-width: thin;
-    scrollbar-color: #0d8d80 #0E4D48; }
-.personas-drawer-item {
+.drawer-close { 
+  background: transparent; 
+  border:none; color: 
+  #cffff8; 
+  font-size: 18px; 
+  cursor: pointer; 
+}
+
+.menu-drawer-list { 
+  display:flex; 
+  flex-direction:column; 
+  gap:0; 
+  padding: 6px 0 40px 0; 
+  flex-grow: 1; 
+  overflow-y: auto; 
+  overflow-x: hidden; 
+  scrollbar-width: thin;
+  scrollbar-color: #0d8d80 #0E4D48; 
+}
+
+.menu-drawer-item {
   padding: 14px 18px;
   text-align: center;
   border: none;
@@ -322,31 +317,43 @@
   font-size: 20px;
   margin-top: 30px;
 }
-.personas-drawer-item:hover {
+.menu-drawer-item:hover {
   background: #13d5c2; color: #0E4D48; transform: translateX(6px);
 }
-
-/* Mantener estilo hover cuando el item está abierto */
-.personas-drawer-item.open {
+.menu-drawer-item.open {
   background: #13d5c2;
   color: #0E4D48;
   transform: translateX(6px);
-
 }
-
-/* Items hijos de los grupos (más oscuros que el botón padre) */
-.personas-drawer-list div[role="region"] > .personas-drawer-item {
-  padding-left: 36px; /* sangría para distinguir hijo */
+/* Items hijos de los grupos */
+.menu-drawer-list div[role="region"] > .menu-drawer-item {
+  padding-left: 36px; 
   background: #115C56;
   color: #3BD5C4;
   margin: 0;
 }
-.personas-drawer-list div[role="region"] > .personas-drawer-item:hover {
+.menu-drawer-list div[role="region"] > .menu-drawer-item:hover {
   background: #12a793; color: #0E4D48; transform: translateX(6px);
 }
 
+.menu-drawer-item.brand-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding-left: 36px;
+}
 
-.personas-wrapper { 
+.drawer-brand-icon {
+  max-width: 30px; 
+  max-height: 30px;
+  width: auto; 
+  height: 100%;        
+  object-fit: contain;
+  flex-shrink: 0;    
+}
+
+.menu-wrapper { 
   display: flex; 
   align-items: center; 
   position: absolute;
@@ -355,61 +362,46 @@
 
 /* MAIN CONTENT */
 .main-content {
-    background: linear-gradient(180deg,#070D11 79%, #022522 100%);
-    min-height: calc(80vh - 100px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 30px 20px 60px 20px;
-    text-align: center;
-    color: #42F1DD;
+  background: linear-gradient(180deg,#070D11 79%, #022522 100%);
+  min-height: calc(80vh - 100px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 20px 60px 20px;
+  text-align: center;
+  color: #42F1DD;
 }
 
 .main-content div {
-    width: 100%;
-    max-width: 1120px;
+  width: 100%;
+  max-width: 1120px;
 }
 
 .main-logo {
-    max-width: 260px;
-    height: auto;
-    margin-bottom: 12px;
+  max-width: 260px;
+  height: auto;
+  margin-bottom: 12px;
 }
 
 .welcome-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #42F1DD;
-    text-align: center;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #42F1DD;
+  text-align: center;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .welcome-text {
-    font-size: 1.2rem;
-    color: #42F1DD;
-    text-align: center;
-    line-height: 1.5;
-    max-width: 920px;
-    margin: 0 auto;
+  font-size: 1.2rem;
+  color: #42F1DD;
+  text-align: center;
+  line-height: 1.5;
+  max-width: 920px;
+  margin: 0 auto;
 }
 
-.user-info {
-    color: #e6fffe;
-    font-weight: 700;
-    font-size: 1.05rem;
-    margin-top: 10px;
-}
-
-/* FOOTER */
-.footer-content {
-    background:#012F2B;
-    color: #42F1DD;
-    text-align: center;
-    padding: 18px 12px;
-    width: 100%;
-}
 /*Carrusel*/
 .carousel-outer {
   border-top: 10px solid #07433E;
@@ -418,199 +410,135 @@
   background: #070D11;
   position: relative;
 }
+
 .slick-slide-item{
-  transition: transform 0.5s ease-in-out; /* 💡 Define la transición suave */
+  transition: transform 0.5s ease-in-out;
   cursor: pointer;
 }
 .slick-slide-item img,a:focus-visible{
   outline: none !important;
 }
 .slick-slide-item img {
-    /* Estado por defecto: más pequeño */
-    transform: scale(0.95); /* 💡 Escala la imagen lateral al 85% */
-    transition: transform 0.5s ease-in-out; /* 💡 Define la transición suave */
-    opacity: 0.6; /* Opcional: Oscurece o hace transparente las laterales */
+  transform: scale(0.95); 
+  transition: transform 0.5s ease-in-out;
+  opacity: 0.6; 
 }
 
-/* --- 2. Regla para la imagen CENTRAL (estado final/enfocado) --- */
-
-/* Selecciona el slide que tiene la clase slick-center y luego su imagen */
 .slick-center .slick-slide-item img {
-    /* Estado final: 100% de tamaño */
-    transform: scale(1.0);
-    opacity: 1;    
-    filter: none;
+  transform: scale(1.0);
+  opacity: 1;    
+  filter: none;
 }
 
+.slick-slide-item:hover{transform: scale(1.03);}
 
-.slick-slide-item:hover{
-    transform: scale(1.03); 
-}
-.slick-slider {
-    padding-bottom: 0 !important;
-}
+.slick-slider {padding-bottom: 0 !important;}
 
 .slick-dots li button {
-    background: none;
-    border: none;
-    padding: 0; 
-    width: auto; /* Permite que el ancho lo defina la barra interna */
+  background: none;
+  border: none;
+  padding: 0; 
+  width: auto;
 }
-.slick-dots li button:before {
-    content: none;
-}
+
+.slick-dots li button:before {content: none;}
 
 .custom-slick-bar {
-    display: block;
-    width: 26px; /* Ancho de la barra */
-    height: 4px; /* Altura de la barra */
-    background: #636363;
-    border-radius: 2px;
-    transition: background-color 0.3s ease;
+  display: block;
+  width: 26px;
+  height: 4px; 
+  background: #636363;
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
 }
+.slick-dots li.slick-active .custom-slick-bar {background: #D9D9D9;}
 
-/* Estilo para la barra activa */
-.slick-dots li.slick-active .custom-slick-bar {
-    background: #D9D9D9;
-}
+.slick-dots {bottom: unset; text-align: center;}
 
-/* Alineación de los dots (si los moviste al centro) */
-.slick-dots {
-    bottom: unset; /* Desactiva la posición inferior por defecto */
-    text-align: center;
-}
 .slick-prev-custom {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 15%; /* Porcentaje del ancho que ocupará el área clicable */
-    height: 100%;
-    cursor: pointer;
-    z-index: 5; 
-    display: flex;
-    align-items: center; /* Centrado vertical */
-    justify-content: flex-start;
-    transition: background-color 0.2s ease;
-    
-    /* 💡 Gradiente de sombra desvaneciente (Negro transparente -> Transparente) */
-    background: linear-gradient(to right, 
-        rgba(0, 0, 0, 0.6) 0%, /* Negro 40% al borde */
-        rgba(0, 0, 0, 0) 100% /* Totalmente transparente al centro */
-    );
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 15%; 
+  height: 100%;
+  cursor: pointer;
+  z-index: 5; 
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  transition: background-color 0.2s ease;
+  background: linear-gradient(to right, 
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(0, 0, 0, 0) 100% 
+  );
 }
-
-/* Estilo Base para la Flecha SIGUIENTE (Derecha) */
 .slick-next-custom {
-    position: absolute;
-    top: 0;
-    right: 0; /* Anclado a la derecha */
-    width: 15%; /* Porcentaje del ancho que ocupará el área clicable */
-    height: 100%;
-    cursor: pointer;
-    z-index: 5;
-    display: flex;
-    align-items: center; /* Centrado vertical */
-    justify-content: flex-end;
-    transition: background-color 0.2s ease;
-    
-    /* 💡 Gradiente de sombra desvaneciente (Transparente -> Negro transparente) */
-    background: linear-gradient(to left, 
-        rgba(0, 0, 0, 0.6) 0%, /* Negro 40% al borde */
-        rgba(0, 0, 0, 0) 100% /* Totalmente transparente al centro */
-    );
+  position: absolute;
+  top: 0;
+  right: 0; 
+  width: 15%; 
+  height: 100%;
+  cursor: pointer;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  transition: background-color 0.2s ease;
+  background: linear-gradient(to left, 
+    rgba(0, 0, 0, 0.6) 0%, 
+    rgba(0, 0, 0, 0) 100% 
+  );
 }
+.slick-prev-custom:hover {background: linear-gradient(to right, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);}
+.slick-next-custom:hover {background: linear-gradient(to left, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);}
+.slick-prev:before, .slick-next:before {content: ''; display: none;}
 
-/* 3. Efecto Hover (Opcional) */
-.slick-prev-custom:hover,
-.slick-next-custom:hover {
-    /* Oscurecer ligeramente el gradiente al pasar el ratón */
-    background: linear-gradient(to right, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
-}
-
-.slick-next-custom:hover {
-    background: linear-gradient(to left, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
-}
-
-/* 4. Si quieres ocultar las flechas por defecto de slick, solo por si acaso */
-.slick-prev:before, .slick-next:before {
-    content: ''; 
-    display: none;
-}
 .arrow-icon {
-    /* Quitamos position: absolute y usamos padding para la alineación final */
-    font-size: 2.5rem; /* Tamaño del ícono */
-    color: white; /* Color blanco para que destaque sobre la sombra negra */
-    text-shadow: 0 0 5px rgba(0, 0, 0, 0.8); /* Sombra para mejor visibilidad */
-    transition: transform 0.2s ease;
+  font-size: 2.5rem;
+  color: white; 
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+  transition: transform 0.2s ease;
 }
-/* Empuja el ícono de la izquierda hacia el borde del carrusel */
-.arrow-icon.left {
-    padding-left: 20px; 
+.arrow-icon.left {padding-left: 20px;}
+.arrow-icon.right {padding-right: 20px;}
+.slick-prev-custom:hover .arrow-icon, 
+.slick-next-custom:hover .arrow-icon {transform: scale(1.1);}
+
+.user-info {
+  color: #e6fffe;
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-top: 10px;
 }
 
-/* Empuja el ícono de la derecha hacia el borde del carrusel */
-.arrow-icon.right {
-    padding-right: 20px;
+/* FOOTER */
+.footer-content {
+  background:#012F2B;
+  color: #42F1DD;
+  text-align: center;
+  padding: 18px 12px;
+  width: 100%;
 }
 
-/* Opcional: Feedback visual al hacer hover */
-.slick-prev-custom:hover .arrow-icon,
-.slick-next-custom:hover .arrow-icon {
-    transform: scale(1.1);
+.card-error{
+  background-color: #073330 !important;
+  color: #ffdcdc !important;
+  border-radius: 30px;
 }
-
-
-
-/* offset para navbar fijo */
-.page-offset {
-  /* altura del navbar fijo + algo de margen */
-  padding-top: 20px;
+.boton-error{
+  color: #ffdcdc !important;
+  border-radius: 30px;
+  text-decoration: none;
 }
-
-.personas-drawer-item.brand-item {
-    display: flex;       /* Habilita flexbox para alinear el icono y el texto */
-    align-items: center;
-    justify-content: flex-start;
-    gap: 12px;
-    padding-left: 36px; /* Mantener la sangría de los elementos anidados */
-    /* Define un espacio reservado para el icono dentro del padding */
-}
-
-/* 2. Estilo para el logo dentro del drawer */
-.drawer-brand-icon {
-    max-width: 30px; 
-    max-height: 30px;
-    width: auto; 
-    height: 100%;        
-    object-fit: contain; /* Asegura que la imagen sea visible sin cortarse y manteniendo proporciones */
-    flex-shrink: 0;      /* Evita que el logo se encoja si hay mucho texto */
-}
-.logout-btn {
-    background-color: #0c8a7f; 
-    color: #8eece1;
-    border: none;
-    cursor: pointer;
-    font-size: 0.9em;
-    padding: 5px 7px;
-    border-radius: 4px;
-    width: auto;
-    transition: all 0.3s ease;
-}
-.logout-btn:hover {
-    background-color: #013d38;
-    color: #fff;
+.boton-error:hover{
+  text-decoration: none;
 }
 @media (max-width: 1400px) {
-  /* Hacemos las pills más compactas para ganar espacio */
-   .personas-toggle {
-    right: 90px;
-  }
-  .personas-drawer { width: 20%; left: -20%; }
-  .personas-drawer.open { left: 0; }
-  .personas-drawer-header{
-    padding: 11.5px 12px;
-  }
-  .personas-drawer-item {
+  .menu-toggle {right: 90px;}
+  .menu-drawer { width: 20%; left: -20%; }
+  .menu-drawer.open { left: 0; }
+  .menu-drawer-header{padding: 11.5px 12px;}
+  .menu-drawer-item {
     width: 100%;
     font-size: 1rem;
     padding: 10px 14px;
@@ -626,60 +554,45 @@
     display: flex;
     justify-content: center !important;
   }
-  .navbar-center{
-    padding: 0;
-  }
-  .search-input {
-    width: 200px; /* Reducir el ancho fijo */
-  }
-  .brand-right {
-    margin-left: 20px;
-  }
-
+  .navbar-center{padding: 0;}
+  .search-input {width: 200px;}
+  .brand-right {margin-left: 20px;}
   .brand-right .brand-logo {
     width:58px;
     height:58px;
   }
+
   .logout-btn{
     font-size: 0.6em;
     width: auto;
     padding: 5px 7px;
   }
+
   .container{
     margin: 0 !important;
     max-width: 900px !important;
   }
-  .welcome-text{
-    font-size: 1rem;
-  }
-  .welcome-title{
-    font-size: 1.2rem;
-  }
+
   .main-content{
     padding: 20px 10px 40px 10px;
     min-height: calc(80vh - 110px);
-  }
+  }  
+  .welcome-text{font-size: 1rem;}
+  .welcome-title{font-size: 1.2rem;}
+
   .pill {
     min-width: 50px; 
     width: 100%; 
     padding: 0 10px;
     gap: 4px;
   }
-  .pill small {
-    font-size: 0.9rem; /* Fuente más pequeña */
-  }
-
-  /* Reducimos el espacio entre las pills */
+  .pill small {font-size: 0.9rem;}
   .pills-container {
     gap: 6px;
     padding-left: 0;
   }
 
-  /* Ajustamos la caja de búsqueda para que sea más flexible */
-  .search-wrapper {
-    flex: 1 1 auto; 
-  }
-
+  .search-wrapper {flex: 1 1 auto; }
   .search-input {
     padding: 8px 18px;
     width: 300px; 
@@ -688,16 +601,11 @@
 
 
 @media (max-width: 992px) {
-  /* Hacemos las pills más compactas para ganar espacio */
-   .personas-toggle {
-    right: 90px;
-  }
-  .personas-drawer { width: 50%; left: -50%; }
-  .personas-drawer.open { left: 0; }
-  .personas-drawer-header{
-    padding: 11.5px 12px;
-  }
-  .personas-drawer-item {
+  .menu-toggle {right: 90px;}
+  .menu-drawer { width: 50%; left: -50%; }
+  .menu-drawer.open { left: 0; }
+  .menu-drawer-header{padding: 11.5px 12px;}
+  .menu-drawer-item {
     width: 100%;
     font-size: 1.6rem;
     padding: 16px 14px;
@@ -712,72 +620,49 @@
     display: flex;
     justify-content: center !important;
   }
-  .navbar-center{
-    margin-left: 60px;
-  }
-  .search-input {
-    width: 200px; /* Reducir el ancho fijo */
-  }
-  .brand-right {
-    margin-left: 40px;
-  }
+  .navbar-center{margin-left: 60px;}
+  .search-input {width: 200px;}
+  .brand-right {margin-left: 40px;}
   .brand-right .brand-logo {
     width:58px;
     height:58px;
   }
+
   .container{
     margin: 0 !important;
     max-width: 900px !important;
-  }
-  .welcome-text{
-    font-size: 1.3rem;
-  }
-  .welcome-title{
-    font-size: 1.7rem;
   }
   .main-content{
     padding: 20px 10px 40px 10px;
     min-height: calc(80vh - 110px);
   }
+  .welcome-text{font-size: 1.3rem;}
+  .welcome-title{font-size: 1.7rem;}
+
   .pill {
-    min-width: 50px; /* Reducido */
-    width: 100px; /* Reducido */
-    height: 40px; /* Reducido */
+    min-width: 50px; 
+    width: 100px; 
+    height: 40px; 
     gap: 4px;
   }
-  
-  .pill small {
-    font-size: 0.9rem; /* Fuente más pequeña */
-  }
-
-  /* Reducimos el espacio entre las pills */
+  .pill small {font-size: 0.9rem;}
   .pills-container {
     gap: 6px;
     padding-left: 0;
   }
-
-  /* Ajustamos la caja de búsqueda para que sea más flexible */
-  .search-wrapper {
-    flex: 1 1 auto; /* Permite que tome el espacio disponible si las pills se ocultan */
-  }
-
+  .search-wrapper {flex: 1 1 auto; }
   .search-input {
     padding: 8px 18px;
-    width: 300px; /* Reducir el ancho fijo */
+    width: 300px;
   }
 }
 
-
 @media (max-width: 576px) {
-  .personas-toggle {
-    right: 90px;
-  }
-  .personas-drawer { width: 80%; left: -80%; }
-  .personas-drawer.open { left: 0; }
-  .personas-drawer-header{
-    padding: 13px 12px;
-  }
-  .personas-drawer-item {
+  .menu-toggle {right: 90px;}
+  .menu-drawer { width: 80%; left: -80%; }
+  .menu-drawer.open { left: 0; }
+  .menu-drawer-header{padding: 13px 12px;}
+  .menu-drawer-item {
     width: 100%;
     font-size: 1rem;
     padding: 12px 14px;
@@ -786,38 +671,24 @@
     min-height: 50px;
     height: 175px;     
   }
-  .dashboard-navbar {
-    height: 70px;
-  }
-
-  .navbar-center{
-    margin-left: 50px;
-  }
-  .navbarContainer{
-    padding: 0;
-  }
-  .container{
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-  .search-input {
-    width: 200px; /* Reducir el ancho fijo */
-  }
-  .brand-right {
-    margin-left: 20px;
-  }
+  .dashboard-navbar {height: 70px;}
+  .navbar-center{margin-left: 50px;}
+  .navbarContainer{padding: 0;}
+  .search-input { width: 200px;}
+  .brand-right {margin-left: 20px;}
   .brand-right .brand-logo {
     width:48px;
     height:48px;
   }
-  .welcome-text{
-    font-size: 1rem;
-  }
-  .welcome-title{
-    font-size: 1.4rem;
+
+  .container{
+    padding: 0 !important;
+    margin: 0 !important;
   }
   .main-content{
     padding: 20px 10px 40px 10px;
     min-height: calc(80vh - 110px);
   }
+  .welcome-text{font-size: 1rem;}
+  .welcome-title{font-size: 1.4rem;}
 }

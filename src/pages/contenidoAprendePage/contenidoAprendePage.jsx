@@ -1,22 +1,19 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Form, Button, ProgressBar } from 'react-bootstrap';
+import { Form, Button} from 'react-bootstrap';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import Swal from 'sweetalert2';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 import { db } from '../../firebase';
 import './contenidoAprendePage.css';
+
 const ContenidoAprendePage = () => {
 	const [titulo, setTitulo] = useState('');
 	const [descripcion, setDescripcion] = useState('');
-	const [tipo, setTipo] = useState('video'); // 'video' o 'pdf'
+	const [tipo, setTipo] = useState('video');
 	const [videoLink, setVideoLink] = useState('');
 	const [pdfLink, setPdfLink] = useState('');
-	const [file, setFile] = useState(null);
-	const [uploadProgress, setUploadProgress] = useState(0);
-	const [uploading, setUploading] = useState(false);
 	const navigate = useNavigate();
 
 	const resetForm = () => {
@@ -24,16 +21,6 @@ const ContenidoAprendePage = () => {
 		setDescripcion('');
 		setTipo('video');
 		setVideoLink('');
-		setFile(null);
-		setUploadProgress(0);
-		setUploading(false);
-	};
-
-	const handleFileChange = (e) => {
-		const f = e.target.files && e.target.files[0];
-		if (f) {
-			setFile(f);
-		}
 	};
 
 	const isYouTube = (url) => {
@@ -50,8 +37,8 @@ const ContenidoAprendePage = () => {
 				title:"Falta título", 
 				text: "Por favor añade un título.", 
 				icon: "error",
-				background: '#052b27ff', // Color de fondo personalizado
-				color: '#ffdfdfff', // Color del texto personalizado
+				background: '#052b27ff',
+				color: '#ffdfdfff',
 				confirmButtonColor: '#0b6860ff',
 			});
 			return;
@@ -60,33 +47,31 @@ const ContenidoAprendePage = () => {
 		if (tipo === 'video') {
 			if (!videoLink.trim()) {
 				Swal.fire({
-				title:"Falta link", 
-				text: "Por favor añade el enlace del video.", 
-				icon: "error",
-				background: '#052b27ff', // Color de fondo personalizado
-				color: '#ffdfdfff', // Color del texto personalizado
-				confirmButtonColor: '#0b6860ff',
-			});
+					title:"Falta link", 
+					text: "Por favor añade el enlace del video.", 
+					icon: "error",
+					background: '#052b27ff',
+					color: '#ffdfdfff',
+					confirmButtonColor: '#0b6860ff',
+				});
 				return;
 			}
 		} else {
 			if (!pdfLink.trim()) {
 				Swal.fire({
-				title:"Falta link", 
-				text: "Por favor añade el enlace del PDF.", 
-				icon: "error",
-				background: '#052b27ff', // Color de fondo personalizado
-				color: '#ffdfdfff', // Color del texto personalizado
-				confirmButtonColor: '#0b6860ff',
-			});
+					title:"Falta link", 
+					text: "Por favor añade el enlace del PDF.", 
+					icon: "error",
+					background: '#052b27ff',
+					color: '#ffdfdfff',
+					confirmButtonColor: '#0b6860ff',
+				});
 				return;
 			}
 		}
 
 		try {
 			if (tipo === 'pdf') {
-				// Subir a Firebase Storage
-				setUploading(true);
 				// Guardar en Firestore
 				await addDoc(collection(db, 'estudios'), {
 					nombre: titulo,
@@ -95,19 +80,17 @@ const ContenidoAprendePage = () => {
 					url: pdfLink.trim(),
 					fecha: serverTimestamp()
 				});
-				setUploading(false);
 				Swal.fire({
 					title: "Guardado",
 					text: `Material de estudio guardado correctamente.`,
 					icon: "success",
-					background: '#052b27ff', // Color de fondo personalizado
-					color: '#ffff', // Color del texto personalizado
+					background: '#052b27ff',
+					color: '#ffff',
 				});
 				resetForm();
 				navigate('/gestionAdmin');
-				
 			} else {
-				// Guardar video link directamente
+				// Guardar video link
 				await addDoc(collection(db, 'estudios'), {
 					nombre: titulo,
 					descripcion: descripcion,
@@ -119,8 +102,8 @@ const ContenidoAprendePage = () => {
 					title: "Guardado",
 					text: `Video guardado correctamente.`,
 					icon: "success",
-					background: '#052b27ff', // Color de fondo personalizado
-					color: '#ffff', // Color del texto personalizado
+					background: '#052b27ff',
+					color: '#ffff',
 				});
 				resetForm();
 				navigate('/gestionAdmin');
@@ -131,23 +114,21 @@ const ContenidoAprendePage = () => {
 				title:"Error", 
 				text: "Ocurrió un error guardando el material.", 
 				icon: "error",
-				background: '#052b27ff', // Color de fondo personalizado
-				color: '#ffdfdfff', // Color del texto personalizado
+				background: '#052b27ff',
+				color: '#ffdfdfff',
 				confirmButtonColor: '#0b6860ff',
 			});
-			setUploading(false);
 		}
 	};
 
 	const renderVideoPreview = () => {
 		if (!videoLink) return null;
 		if (isYouTube(videoLink)) {
-			// Normalizar link para iframe embebido
+			// Normalizar link
 			let embed = videoLink;
 			if (videoLink.includes('watch?v=')) {
 				embed = videoLink.replace('watch?v=', 'embed/');
 			}
-			// Cambios mínimos: si es youtu.be
 			embed = embed.replace('youtu.be/', 'www.youtube.com/embed/');
 			return (
 				<div className="ratio ratio-16x9 mb-3">
@@ -171,6 +152,7 @@ const ContenidoAprendePage = () => {
 				<main className="container container-new-MEstudio py-4">
 					<h2>M. Estudio - Nuevo</h2>
 					<Form onSubmit={handleSubmit} className="mt-3">
+
 						<Form.Group className="mb-3">
 							<Form.Label>Título</Form.Label>
 							<input type="text" className="form-control2" value={titulo} onChange={e => setTitulo(e.target.value)}/>
@@ -220,7 +202,6 @@ const ContenidoAprendePage = () => {
 					</Form>
 				</main>
 			</div>
-			
 			<Footer />
 		</>
 	);

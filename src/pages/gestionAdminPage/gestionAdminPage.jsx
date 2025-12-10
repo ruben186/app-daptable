@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { collection, getDocs, updateDoc, deleteDoc, doc, getDoc} from 'firebase/firestore';
 import { getStorage, ref as storageRef, deleteObject } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
-import { Modal, Form, Button, ProgressBar } from 'react-bootstrap'; 
-import { FaEdit, FaTrash, FaUser, FaPlus, FaSearch, FaBook, FaBox } from 'react-icons/fa';
+import { Modal, Form, Button } from 'react-bootstrap'; 
+import {FaPlus} from 'react-icons/fa';
 import Swal from 'sweetalert2';
-import { auth, db } from '../../firebase';
+import { db } from '../../firebase';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
-// Asegúrate de que las rutas de los iconos sean correctas en tu proyecto
 import IconoBuscar from '../../assets/Iconos/iconoLupa.png';
 import IconoEditar from '../../assets/Iconos/iconoEditar.png';
 import IconoEliminar from '../../assets/Iconos/iconoEliminar.png';
@@ -18,8 +17,6 @@ import IconoUsuario from '../../assets/Iconos/usuario2.png';
 import IconoGrabadora from '../../assets/Iconos//iconograbadora.png';
 import './gestionAdminPage.css'; 
 
-
-// --- [ UTILIDADES REQUERIDAS DE TU CÓDIGO ] ---------------------------------
 const calcularEdad = (fechaNacimiento) => {
     if (!fechaNacimiento) return '';
     const hoy = new Date();
@@ -33,7 +30,6 @@ const calcularEdad = (fechaNacimiento) => {
     return edad;
 };
 
-// ** Nueva utilidad para la búsqueda en tiempo real (basada en el ejemplo anterior) **
 const normalizeString = (s) => {
     if (s === null || s === undefined) return '';
     try {
@@ -46,7 +42,6 @@ const normalizeString = (s) => {
           .trim()
           .replace(/\s+/g, ' ');
     } catch (e) {
-        // Fallback para entornos que no soportan \p{Diacritic}
         return String(s)
           .toLowerCase()
           .normalize('NFD')
@@ -60,21 +55,18 @@ const normalizeString = (s) => {
 
 const extractTextForSearch = (value) => {
     const parts = [];
-    
     const helper = (v) => {
         if (v === null || v === undefined) return;
         const t = typeof v;
         
         if (t === 'string' || t === 'number' || t === 'boolean') {
-            // Caso base: Si es un valor simple, lo agregamos.
+            // Si es un valor simple, se agrega.
             parts.push(normalizeString(v));
             
         } else if (Array.isArray(v)) {
             v.forEach(helper);
             
         } else if (t === 'object') {
-            // Si es un objeto (como {campo: "Pantalla", codigo: "..."}),
-            // iteramos recursivamente sobre CADA valor de sus propiedades.
             Object.values(v).forEach(helper);
         }
     };
@@ -83,12 +75,10 @@ const extractTextForSearch = (value) => {
     return parts.join(' '); 
 };
 
-// Componente reutilizable para cada sección del dashboard
+// DataCard reutilizable para cada tabla de gestión
 
 const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionName, handleEdit, handleDelete, link, linkNuevo, showNewButton }) => {
-    
     const [isSearchVisible, setIsSearchVisible] = useState(false); 
-
     const filteredData = data.filter((item) => {
         const q = (searchQuery || '').toLowerCase().trim();
         if (!q) return true;
@@ -96,9 +86,6 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
         const qlTerms = q.split(' ').filter(term => term.length > 0);
         return qlTerms.every(term => hayTexto.includes(term));
     });
-
-    // Determina si es una tarjeta de usuario para la visualización del nombre
-    const isUserCard = collectionName === 'usuarios';
 
     const toggleSearch = () => {
         setIsSearchVisible(!isSearchVisible);
@@ -113,14 +100,11 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
     const navigate = useNavigate();
 
     return (
-        // 💡 1. CONTENEDOR PRINCIPAL QUE GESTIONA LA SEPARACIÓN (Gap vertical)
+        // CONTENEDOR PRINCIPAL QUE GESTIONA LA SEPARACIÓN 
         <div className="admin-card-wrapper">
-            
-            {/* 2. BLOQUE PRINCIPAL: HEADER, BÚSQUEDA y LISTA (Cuerpo de la tarjeta) */}
             <div className="admin-card">
-                
                 <div className="card-header-admin">
-                    {/* Contenido del Header... */}
+                    {/* Contenido del Header*/}
                     <div className="card-header-left">
                         <span className="card-icon"><img src={icon} width="44px" height="44px" alt={`${title} Icon`} /></span> 
                         <h3 className="card-titulo">{title}</h3>
@@ -134,12 +118,12 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
                         )}
                         
                         <button className={`btn-icon search-toggle-btn ${isSearchVisible ? 'active-search' : ''}`} onClick={toggleSearch}>
-                             <img 
-                                 width="28px"
-                                 height="28px"
-                                 src={IconoBuscar}
-                                 alt="Buscar"
-                             />
+                            <img 
+                                width="28px"
+                                height="28px"
+                                src={IconoBuscar}
+                                alt="Buscar"
+                            />
                         </button>
                     </div>
                 </div>
@@ -157,16 +141,14 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
                     </div>
                 </div>
                 
-                {/* CUERPO DE LA LISTA */}
+                {/* Contenido del Cuerpo*/}
                 <div className="card-list">
                     {filteredData.slice(0, 4).map((item) => (
                         <div key={item.id} className="list-item">
                             <span className="item-text">
-                                {/* Lógica de visualización del texto del ítem */}
                                 {
                                   collectionName === 'usuarios' ? (item.nombreCompleto || item.email || item.id) : 
                                   collectionName === 'piezas' ? `${item.nombre || item.id} ${item.campo ? ' - ' + item.campo : ''}` :
-                                  // LÓGICA AGREGADA PARA COMPATIBILIDAD: Muestra el campo decorado 'displayText'
                                   collectionName === 'compatibilidad' ? (item.displayText || item.id) : 
                                   (item.nombre || item.id)
                                 }
@@ -193,107 +175,79 @@ const DataCard = ({ title, icon, data, searchQuery, setSearchQuery, collectionNa
                     ))}
                     {filteredData.length === 0 && <div className="list-item no-data">No hay {title.toLowerCase()} que coincidan.</div>}
                 </div>
-                
             </div> 
 
-
-            {/* 3. BLOQUE SEPARADO: PIE DE PÁGINA (Botón "Ver más") */}
+            {/* Footer de la carta */}
             <div className="card-footer-admin">
                 <button className="btn-ver-mas" onClick={() => navigate(link)}>
                    <span className='chevM'/> Ver más
                 </button>
             </div>
-
-            {/* 4. BLOQUE SEPARADO: CONTADOR DE REGISTROS */}
             <div className="count-info-box"> 
                  <div className="count-info">
                     <span className="count-number">{data.length}</span> {title} Registrados
                 </div>
             </div>
 
-        </div> // Fin de .admin-card-wrapper
+        </div>
     );
 };
 
-
 function GestionAdminPage() {
-
     const navigate = useNavigate();
-
-    // Estado centralizado de Usuarios
+    // Estados de Usuarios
     const [usuarios, setUsuarios] = useState([]);
     const [searchQueryUsuarios, setSearchQueryUsuarios] = useState('');
-    
     // Estados para otras colecciones
     const [piezas, setPiezas] = useState([]);
     const [piezasNombre, setPiezasNombre] = useState([]);
     const [marcaNames, setMarcaNames] = useState([]);
     const [searchQueryPiezas, setSearchQueryPiezas] = useState('');
-
-    // ** [NUEVOS ESTADOS] **
-    const [estudios, setEstudios] = useState([]); // Array de datos de estudios
+    // Estados de Material de Estudio
+    const [estudios, setEstudios] = useState([]); 
     const [searchQueryEstudios, setSearchQueryEstudios] = useState('');
-
-
-    
-    // ** [NUEVOS ESTADOS noticias] **
-    const [noticia, setNoticia] = useState([]); // Array de datos de estudios
+    // Estados de Material de Noticias
+    const [noticia, setNoticia] = useState([]);
     const [searchQueryNoticia, setSearchQueryNoticia] = useState('');
-    
-    const [compatibilidad, setCompatibilidad] = useState([]); // Array de datos de compatibilidad (sugerenciasPiezas)
+    //Estados de SugerenciasCompatibilidad
+    const [compatibilidad, setCompatibilidad] = useState([]);
     const [searchQueryCompatibilidad, setSearchQueryCompatibilidad] = useState('');
-    // ESTADO PARA LA LISTA PROCESADA
     const [decoratedCompatibilidad, setDecoratedCompatibilidad] = useState([]); 
-
-
-    const [loading, setLoading] = useState(false);
-    
     // Estados para Edición/Modal
     const [showModal, setShowModal] = useState(false);
-    const [selectedItem, setSelectedItem] = useState(null); // Almacena el item (usuario o pieza) a editar
-    const [itemType, setItemType] = useState(null); // 'usuario', 'pieza', 'estudio', o 'compatibilidad'
-
-    const [tempFile, setTempFile] = useState(null);
-    const [uploading, setUploading] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState(0);
-    const NODE_SERVER_URL = 'http://localhost:3001/api/upload-pdf';
+    const [selectedItem, setSelectedItem] = useState(null); 
+    const [itemType, setItemType] = useState(null); 
     
-    // Manejador genérico para cerrar el modal
+    // Cerrar Modal
     const handleCloseModal = () => {
         setShowModal(false);
         setSelectedItem(null);
         setItemType(null);
-        setTempFile(null);
-        setUploadProgress(0);
-        setUploading(false);
     };
 
-    // FUNCIÓN ASÍNCRONA PARA BUSCAR NOMBRE DE USUARIO (USADA EN COMPATIBILIDAD)
+    // Función para buscar nombre de usuario
     const fetchUserName = async (userId) => {
-    if (!userId) return 'Usuario Desconocido (ID no provisto)';
-    try {
-        // 1. Crea una referencia al documento en la colección 'usuarios'
-        const userDocRef = doc(db, 'usuarios', userId);
-        const userDoc = await getDoc(userDocRef);
+        if (!userId) return 'Usuario Desconocido (ID no provisto)';
+        try {
+            const userDocRef = doc(db, 'usuarios', userId);
+            const userDoc = await getDoc(userDocRef);
 
-        if (userDoc.exists()) {
-            const data = userDoc.data();
-            // 2. Retorna el nombre, el email o el ID (como fallback)
-            return data.nombreCompleto || data.email || userId; 
-        } else {
-            return `Usuario Desconocido (${userId})`;
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                return data.nombreCompleto || data.email || userId; 
+            } else {
+                return `Usuario Desconocido (${userId})`;
+            }
+        } catch (error) {
+            console.error(`Error al obtener usuario ${userId}:`, error);
+            return `Error al buscar usuario (${userId})`;
         }
-    } catch (error) {
-        console.error(`Error al obtener usuario ${userId}:`, error);
-        return `Error al buscar usuario (${userId})`;
-    }
-};
+    };
 
 
-    // 1. Carga de Usuarios
+    // Carga de Usuarios
     useEffect(() => {
         const fetchUsuarios = async () => {
-            setLoading(true);
             try {
                 const querySnapshot = await getDocs(collection(db, 'usuarios'));
                 const data = querySnapshot.docs
@@ -308,83 +262,68 @@ function GestionAdminPage() {
                 setUsuarios(data);
             } catch (error) {
                  console.error("Error al cargar usuarios:", error);
-            } finally {
-                setLoading(false);
             }
         };
         fetchUsuarios();
     }, []);
 
-    // 2. Carga de Piezas
+    // Carga de Piezas
     useEffect(() => {
-    const fetchPiezas = async () => {
-        setLoading(true);
-        try {
-            const querySnapshot = await getDocs(collection(db, 'tablas')); 
-            
-            const rawPiezas = querySnapshot.docs
-                .map(doc => ({
+        const fetchPiezas = async () => {
+            try {
+                const querySnapshot = await getDocs(collection(db, 'tablas')); 
+                const rawPiezas = querySnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 }));
-            
-            // Nuevo paso: Aplanar la estructura de datos
-            const flatPiezas = rawPiezas.flatMap(pieza => {
-                // Si 'campos' es un array válido y tiene elementos
-                if (Array.isArray(pieza.campos) && pieza.campos.length > 0) {
-                    return pieza.campos.map((campoItem, index) => ({
-                        // 1. Datos de nivel superior
-                        id: `${pieza.id}-${index}`, // ID ÚNICO para la fila: ID_Documento-Indice_Array
-                        parentId: pieza.id, // Referencia al ID del documento de Firestore
+                
+                const flatPiezas = rawPiezas.flatMap(pieza => {
+                    if (Array.isArray(pieza.campos) && pieza.campos.length > 0) {
+                        return pieza.campos.map((campoItem, index) => ({
+                            id: `${pieza.id}-${index}`,
+                            parentId: pieza.id,
+                            nombre: pieza.nombre || '',
+                            marca: pieza.marca || '',
+                            modelo: pieza.modelo || '',
+                            
+                            campo: campoItem.campo || '',
+                            codigo: campoItem.codigo || '',
+                            codigoCompatibilidad: campoItem.codigoCompatibilidad || '',
+                            
+                            campoIndex: index 
+                        }));
+                    }
+                    
+                    // Si la pieza no tiene campos, se ignora.
+                    return [{
+                        id: `${pieza.id}-0`, 
+                        parentId: pieza.id,
                         nombre: pieza.nombre || '',
                         marca: pieza.marca || '',
                         modelo: pieza.modelo || '',
-                        
-                        // 2. Datos anidados del array 'campos'
-                        campo: campoItem.campo || '',
-                        codigo: campoItem.codigo || '',
-                        codigoCompatibilidad: campoItem.codigoCompatibilidad || '',
-                        
-                        // 3. Índice original para el manejo de la edición
-                        campoIndex: index 
-                    }));
-                }
-                
-                // Si la pieza no tiene campos, aún la incluimos (si es necesario) o la ignoramos.
-                // Aquí la incluiremos como una sola fila 'vacía'.
-                return [{
-                    id: `${pieza.id}-0`, 
-                    parentId: pieza.id,
-                    nombre: pieza.nombre || '',
-                    marca: pieza.marca || '',
-                    modelo: pieza.modelo || '',
-                    campo: '', codigo: '', codigoCompatibilidad: '',
-                    campoIndex: 0
-                }];
-            }); 
-            setPiezas(flatPiezas);
-            const uniquePieceNames = [...new Set(flatPiezas.map(p => p.campo))].filter(Boolean); // Filtrar valores vacíos
-            setPiezasNombre(uniquePieceNames);
-            const uniqueMarcaNames = [...new Set(flatPiezas.map(p => p.marca))].filter(Boolean);
-            setMarcaNames(uniqueMarcaNames);
-        } catch (error) {
-            console.error("Error al cargar piezas (tablas):", error);
-            setPiezas([]); 
-            setPiezasNombre([]);
-        } finally {
-            setLoading(false);
-        }
-    };
-    fetchPiezas();
-}, []);
+                        campo: '', codigo: '', codigoCompatibilidad: '',
+                        campoIndex: 0
+                    }];
+                }); 
+                setPiezas(flatPiezas);
+                const uniquePieceNames = [...new Set(flatPiezas.map(p => p.campo))].filter(Boolean); 
+                setPiezasNombre(uniquePieceNames);
+                const uniqueMarcaNames = [...new Set(flatPiezas.map(p => p.marca))].filter(Boolean);
+                setMarcaNames(uniqueMarcaNames);
+            } catch (error) {
+                console.error("Error al cargar piezas (tablas):", error);
+                setPiezas([]); 
+                setPiezasNombre([]);
+            }
+        };
+        fetchPiezas();
+    }, []);
 
   
-    // 3. Carga de Estudios
+    // Carga de Estudios
     useEffect(() => {
         const fetchEstudios = async () => {
-            setLoading(true);
             try {
-                // Asumo una colección 'estudios' con documentos que tienen un campo 'nombre' y 'descripcion'
                 const querySnapshot = await getDocs(collection(db, 'estudios'));
                 const data = querySnapshot.docs.map(doc => ({
                     id: doc.id,
@@ -394,20 +333,15 @@ function GestionAdminPage() {
             } catch (error) {
                 console.error("Error al cargar estudios:", error);
                 setEstudios([]);
-            } finally {
-                setLoading(false);
             }
         };
         fetchEstudios();
     }, []);
 
-
-
+    // Carga de Noticias
     useEffect(() => {
         const fetchNoticia = async () => {
-            setLoading(true);
             try {
-                // Asumo una colección 'estudios' con documentos que tienen un campo 'nombre' y 'descripcion'
                 const querySnapshot = await getDocs(collection(db, 'materialNoticias'));
                 const data = querySnapshot.docs.map(doc => ({
                     id: doc.id,
@@ -417,19 +351,15 @@ function GestionAdminPage() {
             } catch (error) {
                 console.error("Error al cargar Noticias:", error);
                 setNoticia([]);
-            } finally {
-                setLoading(false);
             }
         };
         fetchNoticia();
     }, []);
 
-    // 4. Carga de Compatibilidad (Datos crudos)
+    // Carga de Sugerencias de Compatibilidad
     useEffect(() => {
         const fetchCompatibilidad = async () => {
-            setLoading(true);
             try {
-                // Colección 'sugerenciasPiezas'
                 const querySnapshot = await getDocs(collection(db, 'sugerenciasPiezas'));
                 const data = querySnapshot.docs.map(doc => ({
                     id: doc.id,
@@ -439,51 +369,40 @@ function GestionAdminPage() {
             } catch (error) {
                 console.error("Error al cargar compatibilidad:", error);
                 setCompatibilidad([]);
-            } finally {
-                setLoading(false);
             }
         };
         fetchCompatibilidad();
     }, []);
     
 
-    // 5. Proceso de Decoración de Compatibilidad
+    // Proceso de Decoración de Compatibilidad
     useEffect(() => {
-    const decorateCompatibilidad = async () => {
-        if (compatibilidad.length === 0) {
-            setDecoratedCompatibilidad([]);
-            return;
-        }
+        const decorateCompatibilidad = async () => {
+            if (compatibilidad.length === 0) {
+                setDecoratedCompatibilidad([]);
+                return;
+            }
 
-        const decoratedData = await Promise.all(compatibilidad.map(async (item) => {
-            // Se asume que el campo es 'idUsuario' o 'userId'
-            const userId = item.idUsuario || item.userId; 
+            const decoratedData = await Promise.all(compatibilidad.map(async (item) => {
+                const userId = item.idUsuario || item.userId; 
+                const nombreUsuario = await fetchUserName(userId);
+                return {
+                    ...item,
+                    nombreUsuario: nombreUsuario, 
+                    displayText: `${nombreUsuario} - ${item.nombreCelular || 'Celular Desconocido'} - ${item.modelo || 'Modelo Desconocido'}`,
+                };
+            }));
             
-            // 1. Llama a la función para resolver el nombre
-            const nombreUsuario = await fetchUserName(userId);
+            setDecoratedCompatibilidad(decoratedData);
+        };
 
-            // 2. Devuelve un nuevo objeto con el nombre y un campo de visualización
-            return {
-                ...item,
-                nombreUsuario: nombreUsuario, // Nuevo campo
-                // Este es el campo que se muestra en la DataCard
-                displayText: `${nombreUsuario} - ${item.nombreCelular || 'Celular Desconocido'} - ${item.modelo || 'Modelo Desconocido'}`,
-            };
-        }));
-        
-        setDecoratedCompatibilidad(decoratedData);
-    };
-
-    decorateCompatibilidad();
-}, [compatibilidad]);
-    // ------------------------------------------------------------------
-    // --- MANEJADORES DE USUARIO ---
-    // ------------------------------------------------------------------
-    
+        decorateCompatibilidad();
+    }, [compatibilidad]);
+ 
+    // MANEJO DE USUARIOS
     const handleEditUser = (user) => {
         setSelectedItem({
             ...user,
-            // Asegura que la edad se calcule al abrir
             edad: calcularEdad(user.fechaNacimiento) 
         });
         setItemType('usuario');
@@ -491,18 +410,18 @@ function GestionAdminPage() {
     };
 
     const handleEliminarUser = async (id) => {
-           const result = await Swal.fire({
-                title:"¿Estás Seguro?", 
-                text: "¡No podrás recuperar este registro de usuario!", 
-                icon: "warning",
-                showCancelButton: true,
-                background: '#052b27ff',
-                color: '#ffdfdfff',
-                confirmButtonColor: '#07433E',
-                cancelButtonColor: 'rgba(197, 81, 35, 1)',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar'
-            });
+        const result = await Swal.fire({
+            title:"¿Estás Seguro?", 
+            text: "¡No podrás recuperar este registro de usuario!", 
+            icon: "warning",
+            showCancelButton: true,
+            background: '#052b27ff',
+            color: '#ffdfdfff',
+            confirmButtonColor: '#07433E',
+            cancelButtonColor: 'rgba(197, 81, 35, 1)',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
         if (result.isConfirmed) {
             try {
                 await deleteDoc(doc(db, 'usuarios', id));
@@ -523,32 +442,27 @@ function GestionAdminPage() {
                     icon: "error",
                     background: '#052b27ff',
                     color: '#ffdfdfff',
-                    confirmButtonColor: '#0b6860ff',
+                    confirmButtonColor: '#0b6860ff'
                 });
             }
         }
     };
+
     const MIN_AGE = 1;
     const MAX_AGE = 120;
-
     const validateAge = (birthDateString) => {
       if (!birthDateString) return false;
-
       const birthDate = new Date(birthDateString);
       const today = new Date();
-
       // Calcula la diferencia en milisegundos
       const ageInMilliseconds = today.getTime() - birthDate.getTime();
-      
       // Convierte milisegundos a años
       const ageInYears = ageInMilliseconds / (1000 * 60 * 60 * 24 * 365.25);
-
       return ageInYears >= MIN_AGE && ageInYears <= MAX_AGE;
     };
+
     const handleSaveChangesUser = async () => {
         if (!selectedItem || itemType !== 'usuario') return;
-
-        // ... (Bloque de validaciones)
         try {
             const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
             const soloNumeros = /^[0-9]+$/;
@@ -571,8 +485,11 @@ function GestionAdminPage() {
                     Swal.fire({ title:"Error", text: "El campo de telefono debe tener como maximo 10 caracteres.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff', });
                     return;
                 }
+                 if (!validateAge(selectedItem.fechaNacimiento)) {
+                    Swal.fire({title: "Error",text: `La fecha de nacimiento es invalida.`,icon: "error",background: '#052b27ff',color: '#ffdfdfff',confirmButtonColor: '#0b6860ff',});
+                    return;
+                }
             }
-            // ... (Fin de validaciones)
 
             const userRef = doc(db, 'usuarios', selectedItem.id);
             await updateDoc(userRef, {
@@ -586,7 +503,6 @@ function GestionAdminPage() {
                 rol: selectedItem.rol
             });
 
-            // Actualiza el estado local de usuarios
             setUsuarios(usuarios.map(a =>
                 a.id === selectedItem.id ? selectedItem : a
             ));
@@ -617,28 +533,21 @@ function GestionAdminPage() {
         });
     };
 
-    // ------------------------------------------------------------------
-    // --- MANEJADORES DE PIEZA ---
-    // ------------------------------------------------------------------
-    
-   const handleEditPieza = (flatPiezaItem) => {
-    const nombreCelular = flatPiezaItem.nombre || ''; 
-    const modelo = flatPiezaItem.modelo || '';     
+    // MANEJO DE PIEZAS
+    const handleEditPieza = (flatPiezaItem) => {
+        const nombreCelular = flatPiezaItem.nombre || ''; 
+        const modelo = flatPiezaItem.modelo || '';
+        const combinedQuery = `${nombreCelular} ${modelo}`.trim();
 
-    const combinedQuery = `${nombreCelular} ${modelo}`.trim();
+        if (combinedQuery) {
+            const queryTerm = encodeURIComponent(combinedQuery);
+            navigate(`/TablaCel?query=${queryTerm}`);
+        } else {
+            console.error("No se pudo generar la cadena de búsqueda combinada.");
+            return;
+        }
+    };
 
-    if (combinedQuery) {
-        
-        // Codificar la única cadena combinada
-        const queryTerm = encodeURIComponent(combinedQuery);
-
-        // 2. Navegar con UN SOLO parámetro de consulta: 'query'
-        navigate(`/TablaCel?query=${queryTerm}`);
-    } else {
-        console.error("No se pudo generar la cadena de búsqueda combinada.");
-        return;
-    }
-};
     const handleDeletePiezaReal = async (id) => {
         const result = await Swal.fire({
             title:"¿Estás Seguro?", 
@@ -655,9 +564,7 @@ function GestionAdminPage() {
 
         if (result.isConfirmed) {
             try {
-                // Notar que el ID que recibe es el parentId (el ID del documento principal)
                 await deleteDoc(doc(db, 'tablas', id)); 
-                // Filtramos el estado local para eliminar todas las filas con ese parentId
                 setPiezas(piezas.filter(p => p.parentId !== id));
                 Swal.fire({
                     title: 'Eliminado', 
@@ -681,13 +588,8 @@ function GestionAdminPage() {
         }
     };
     
-    // ------------------------------------------------------------------
-    // --- MANEJADORES DE ESTUDIO ---
-    // ------------------------------------------------------------------
-    
-    // El 'item' es un documento completo de la colección 'estudios'
+    // MANEJO DE ESTUDIOS
     const handleEditEstudio = (item) => {
-        // Clonamos el objeto para evitar mutaciones directas del estado.
         setSelectedItem({ ...item }); 
         setItemType('estudio');
         setShowModal(true);
@@ -709,7 +611,6 @@ function GestionAdminPage() {
 
         if (result.isConfirmed) {
             try {
-                // Primero recuperar el documento para saber si tiene storagePath
                 const estudioDocRef = doc(db, 'estudios', id);
                 const estudioSnap = await getDoc(estudioDocRef);
                 if (estudioSnap.exists()) {
@@ -743,53 +644,31 @@ function GestionAdminPage() {
             return;
         }
 
-        let downloadURL = selectedItem.url;    
-        // 1. Subida del PDF (Solo si es PDF y se seleccionó un nuevo archivo)
-        if (selectedItem.tipo === 'pdf' && tempFile) {
-        setUploading(true);
-        setUploadProgress(10);
+        let downloadURL = selectedItem.url;  
         try {
+            const estudioRef = doc(db, 'estudios', selectedItem.id);
+            const updatePayload = {
+                nombre: selectedItem.nombre,
+                descripcion: selectedItem.descripcion,
+                tipo: selectedItem.tipo || '',
+                url: downloadURL || '', 
+                fecha: selectedItem.fecha || ''
+            };        
+            await updateDoc(estudioRef, updatePayload);
 
-            setUploadProgress(50); 
-            setUploadProgress(90);
-        } catch (error) {
-            console.error("Error al subir PDF:", error);
-            setUploading(false);
-            setUploadProgress(0);
-            Swal.fire({ title: "Error de Subida", text: "No se pudo subir el nuevo PDF.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
-            return; // Detiene el proceso si falla la subida
-        }
-        }
-
-        try {
-          const estudioRef = doc(db, 'estudios', selectedItem.id);
-                
-         const updatePayload = {
-             nombre: selectedItem.nombre,
-             descripcion: selectedItem.descripcion,
-             tipo: selectedItem.tipo || '',
-             url: downloadURL || '', 
-             fecha: selectedItem.fecha || ''
-         };        
-         await updateDoc(estudioRef, updatePayload);
-
-         setEstudios(estudios.map(e =>
-            e.id === selectedItem.id 
-                 ? { ...e, ...updatePayload } // <-- ¡FIX CLAVE!
-            : e
-         ));
-         if (itemType === 'estudio') {
+            setEstudios(estudios.map(e =>
+                e.id === selectedItem.id 
+                    ? { ...e, ...updatePayload }
+                : e
+            ));
+            if (itemType === 'estudio') {
                 setSelectedItem(prev => ({ ...prev, ...updatePayload }));
             }
-            setUploadProgress(100);
-            setUploading(false);
             handleCloseModal();
 
             Swal.fire({ title:"Actualizado", text: "Los datos del estudio fueron actualizados.", icon: "success", background: '#052b27ff', color: '#ffffffff', confirmButtonColor: '#0b6860ff' });
         } catch (error) {
             console.error(error);
-            setUploading(false);
-            setUploadProgress(0);
             Swal.fire({ title:"Error", text: "No se pudo actualizar el estudio.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
         }
     };
@@ -799,19 +678,16 @@ function GestionAdminPage() {
         setSelectedItem((prev) => ({ ...prev, [name]: value }));
     };
 
-    // ------------------------------------------------------------------
-    // --- MANEJADORES DE COMPATIBILIDAD ---
-    // ------------------------------------------------------------------
+    // MANEJO DE SUGERENCIAS DE COMPATIBILIDAD
     const handleModalChangeCompatibilidad = (e) => {
         const { name, value } = e.target;
         setSelectedItem((prev) => ({ ...prev, [name]: value }));
     };
-    // El 'item' es un documento completo de la colección 'compatibilidad'
+
     const handleEditCompatibilidad = (item) => {
         setSelectedItem({ ...item }); 
         setItemType('compatibilidad');
-        setShowModal(true);
-        
+        setShowModal(true);  
     };
 
     const handleEliminarCompatibilidad = async (id) => {
@@ -830,9 +706,7 @@ function GestionAdminPage() {
 
         if (result.isConfirmed) {
             try {
-                // Asumiendo que la colección es 'sugerenciasPiezas'
                 await deleteDoc(doc(db, 'sugerenciasPiezas', id));
-                // Actualizamos ambos estados
                 setCompatibilidad(compatibilidad.filter(c => c.id !== id));
                 setDecoratedCompatibilidad(decoratedCompatibilidad.filter(c => c.id !== id));
                 Swal.fire('Eliminado', 'Registro de compatibilidad eliminado correctamente.', 'success');
@@ -843,11 +717,11 @@ function GestionAdminPage() {
         }
     };
     
-   const handleSaveChangesCompatibilidad = async () => {
+    const handleSaveChangesCompatibilidad = async () => {
         if (!selectedItem || itemType !== 'compatibilidad') return;
 
         const requiredFields = [
-               { name: 'estado', label: 'Estado', minLength: 1 },
+            { name: 'estado', label: 'Estado', minLength: 1 },
             { name: 'nombreCelular', label: 'Nombre Celular', minLength: 3 },
             { name: 'marca', label: 'Marca (Origen)', minLength: 2 },
             { name: 'modelo', label: 'Modelo (Origen)', minLength: 1 },
@@ -855,11 +729,12 @@ function GestionAdminPage() {
             { name: 'adaptableMarca', label: 'Marca (Adaptable)', minLength: 2 },
             { name: 'adaptableModelo', label: 'Modelo (Adaptable)', minLength: 1 },
         ];
+
         let missingFields = [];
+
         requiredFields.forEach(field => {
             const value = selectedItem[field.name] ? String(selectedItem[field.name]).trim() : '';
             
-            // Criterio de "vacío" o "seleccionar"
             if (!value || value === 'Seleccionar' || value === 'Otro' || value.length < field.minLength) {
                 missingFields.push(field.label);
             }
@@ -874,13 +749,11 @@ function GestionAdminPage() {
                 color: '#ffdfdfff', 
                 confirmButtonColor: '#0b6860ff', 
             });
-            return; // Detiene la ejecución si falta un campo
+            return;
         }
 
         try {
             const compatibilidadRef = doc(db, 'sugerenciasPiezas', selectedItem.id);
-            
-            // 💡 CAMBIO: Definir los campos que se van a actualizar (excluyendo userId, urlImage y fechaSugerencia)
             const updateData = {
                 adaptableMarca: selectedItem.adaptableMarca || '',
                 adaptableModelo: selectedItem.adaptableModelo || '',
@@ -893,12 +766,9 @@ function GestionAdminPage() {
             };
             
             await updateDoc(compatibilidadRef, updateData);
-
-            // Actualizar el estado local (decoratedCompatibilidad) para reflejar los cambios en la UI
             const updatedDecoratedItem = {
                 ...selectedItem,
-                ...updateData, // Asegura que los campos actualizados se incluyan
-                // Regenerar el displayText por si cambia el modelo/nombreCelular
+                ...updateData, 
                 displayText: `${selectedItem.nombreUsuario || selectedItem.userId} - ${updateData.nombreCelular || 'Celular Desconocido'} - ${updateData.modelo || 'Modelo Desconocido'}`,
             };
             
@@ -906,7 +776,6 @@ function GestionAdminPage() {
                 c.id === selectedItem.id ? updatedDecoratedItem : c
             ));
             
-            // Actualizar el estado crudo (compatibilidad)
             setCompatibilidad(prev => prev.map(c => 
                 c.id === selectedItem.id ? { ...c, ...updateData } : c
             ));
@@ -925,15 +794,8 @@ function GestionAdminPage() {
             Swal.fire('Error', 'No se pudo actualizar el registro de compatibilidad.', 'error');
         }
     };
-    
 
-
-
- // ------------------------------------------------------------------
-    // --- MANEJADORES DE NOTICIAS---
-    // ------------------------------------------------------------------
-
-
+    // MANEJO DE NOTICIAS
     const handleEliminarNoticia= async (id) => {
         const result = await Swal.fire({
             title:"¿Estás Seguro?", 
@@ -950,7 +812,6 @@ function GestionAdminPage() {
 
         if (result.isConfirmed) {
             try {
-                // Primero recuperar el documento para saber si tiene storagePath
                 const noticiaDocRef = doc(db, 'materialNoticias', id);
                 const noticiaSnap = await getDoc(noticiaDocRef);
                 if (noticiaSnap.exists()) {
@@ -976,7 +837,7 @@ function GestionAdminPage() {
         }
     };
 
-        const handleSaveChangesNoticias = async () => {
+    const handleSaveChangesNoticias = async () => {
         if (!selectedItem || itemType !== 'noticia') return;
 
         if (!selectedItem.nombre || !selectedItem.descripcion || !selectedItem.url) {
@@ -985,68 +846,33 @@ function GestionAdminPage() {
         }
 
         let downloadURL = selectedItem.url;    
-        // 1. Subida del PDF (Solo si es PDF y se seleccionó un nuevo archivo)
-        if (selectedItem.tipo === 'pdf' && tempFile) {
-        setUploading(true);
-        setUploadProgress(10);
-        try {
-            const formData = new FormData();
-            formData.append('archivo', tempFile); 
-            
-            if (selectedItem.url) {
-            formData.append('oldFileUrl', selectedItem.url);
-            }
-
-            const response = await fetch(NODE_SERVER_URL, {
-            method: 'POST',
-            body: formData,
-            });
-
-            setUploadProgress(50); 
-            const data = await response.json();    
-            if (!response.ok || !data.success || !data.url) {
-            throw new Error(data.message || "Error al subir el nuevo PDF.");
-            }
-            downloadURL = data.url; // Nueva URL del archivo subido
-            setUploadProgress(90);
-        } catch (error) {
-            console.error("Error al subir PDF:", error);
-            setUploading(false);
-            setUploadProgress(0);
-            Swal.fire({ title: "Error de Subida", text: "No se pudo subir el nuevo PDF.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
-            return; // Detiene el proceso si falla la subida
-        }
-        }
 
         try {
-          const noticiaRef = doc(db, 'materialNoticias', selectedItem.id);
+            const noticiaRef = doc(db, 'materialNoticias', selectedItem.id);
                 
-         const updatePayload = {
-             nombre: selectedItem.nombre,
-             descripcion: selectedItem.descripcion,
-             tipo: selectedItem.tipo || '',
-             url: downloadURL || '', 
-             fecha: selectedItem.fecha || ''
-         };        
-         await updateDoc(noticiaRef, updatePayload);
+            const updatePayload = {
+                nombre: selectedItem.nombre,
+                descripcion: selectedItem.descripcion,
+                tipo: selectedItem.tipo || '',
+                url: downloadURL || '', 
+                fecha: selectedItem.fecha || ''
+            };        
+            await updateDoc(noticiaRef, updatePayload);
 
-         setNoticia(noticia.map(e =>
-            e.id === selectedItem.id 
-                 ? { ...e, ...updatePayload } 
-            : e
-         ));
-         if (itemType === 'noticia') {
+            setNoticia(noticia.map(e =>
+                e.id === selectedItem.id 
+                    ? { ...e, ...updatePayload } 
+                : e
+            ));
+
+            if (itemType === 'noticia') {
                 setSelectedItem(prev => ({ ...prev, ...updatePayload }));
-            }
-            setUploadProgress(100);
-            setUploading(false);
+             }
             handleCloseModal();
 
             Swal.fire({ title:"Actualizado", text: "Los datos del estudio fueron actualizados.", icon: "success", background: '#052b27ff', color: '#ffffffff', confirmButtonColor: '#0b6860ff' });
         } catch (error) {
             console.error(error);
-            setUploading(false);
-            setUploadProgress(0);
             Swal.fire({ title:"Error", text: "No se pudo actualizar el estudio.", icon: "error", background: '#052b27ff', color: '#ffdfdfff', confirmButtonColor: '#0b6860ff' });
         }
     };
@@ -1055,32 +881,25 @@ function GestionAdminPage() {
         const { name, value } = e.target;
         setSelectedItem((prev) => ({ ...prev, [name]: value }));
     };
+
      const handleEditNoticia = (item) => {
-        // Clonamos el objeto para evitar mutaciones directas del estado.
         setSelectedItem({ ...item }); 
         setItemType('noticia');
         setShowModal(true);
     };
-    // ------------------------------------------------------------------
-    // --- RENDERIZADO DEL MODAL ---
-    // ------------------------------------------------------------------
 
+    // Renderizacion del modal dependiendo de la tabla
     const renderModalBody = () => {
         if (!selectedItem) return null;
         const pieceOptions = piezasNombre;
         const isRegisteredPiece = pieceOptions.some(p => p === selectedItem.pieza);
-    
-        const isCustomPiece = selectedItem.pieza && 
-                            selectedItem.pieza !== 'Seleccionar' && 
-                            selectedItem.pieza !== 'Otro' &&
-                            !isRegisteredPiece;
 
+        const isCustomPiece = selectedItem.pieza && selectedItem.pieza !== 'Seleccionar' && selectedItem.pieza !== 'Otro' && !isRegisteredPiece;
         const selectPieceValue = isCustomPiece ? 'Otro' : (selectedItem.pieza || 'Seleccionar');
 
         if (itemType === 'usuario') {
             return (
                 <Form>
-                    {/* Nombre Completo */}
                     <Form.Group className="mb-2">
                         <Form.Label>Nombres Completo</Form.Label>
                         <Form.Control
@@ -1090,7 +909,6 @@ function GestionAdminPage() {
                             onChange={handleModalChangeUser}
                         />
                     </Form.Group>
-                    {/* Teléfono */}
                     <Form.Group className="mb-2">
                         <Form.Label>Teléfono</Form.Label>
                         <Form.Control
@@ -1100,7 +918,6 @@ function GestionAdminPage() {
                             onChange={handleModalChangeUser}
                         />
                     </Form.Group>
-                    {/* Email */}
                     <Form.Group className="mb-2">
                         <Form.Label>Email</Form.Label>
                         <Form.Control
@@ -1111,7 +928,6 @@ function GestionAdminPage() {
                             disabled 
                         />
                     </Form.Group>
-                    {/* Fecha Nacimiento y Edad */}
                     <div className="d-flex justify-content-between">
                         <Form.Group className="mb-2 w-50 pe-2">
                             <Form.Label>Fecha de Nacimiento</Form.Label>
@@ -1132,7 +948,6 @@ function GestionAdminPage() {
                             />
                         </Form.Group>
                     </div>
-                    {/* Sexo */}
                     <Form.Group className="mb-2">
                         <Form.Label>Sexo</Form.Label>
                         <Form.Select
@@ -1146,7 +961,6 @@ function GestionAdminPage() {
                             <option value="Indeciso">Prefiero no decirlo</option>
                         </Form.Select>
                     </Form.Group>
-                    {/* Estado */}
                     <Form.Group className="mb-2">
                         <Form.Label>Estado</Form.Label>
                         <Form.Select
@@ -1159,7 +973,6 @@ function GestionAdminPage() {
                             <option>Inactivo</option>
                         </Form.Select>
                     </Form.Group>
-                    {/* Rol */}
                     <Form.Group className="mb-2">
                         <Form.Label>Rol</Form.Label>
                         <Form.Select
@@ -1176,7 +989,7 @@ function GestionAdminPage() {
                 </Form>
             );
         } else if (itemType === 'estudio') {
-             return (
+            return (
                 <Form>
                     <Form.Group className="mb-2">
                         <Form.Label>Nombre</Form.Label>
@@ -1199,39 +1012,37 @@ function GestionAdminPage() {
                     </Form.Group>
                     <Form.Group className="mb-2">
                         <Form.Label>Tipo</Form.Label>
-                        <Form.Select name="tipo" value={selectedItem.tipo || 'video'} onChange={handleModalChangeEstudio} disabled={uploading} >
+                        <Form.Select name="tipo" value={selectedItem.tipo || 'video'} onChange={handleModalChangeEstudio} >
                             <option value="video">Video</option>
                             <option value="pdf">PDF</option>
                         </Form.Select>
                     </Form.Group>
                     {selectedItem.tipo === 'video' ? (
-                    <Form.Group className="mb-2">
-                        <Form.Label>Enlace del Video (URL)</Form.Label>
-                        <Form.Control 
-                        value={selectedItem.url || ''} 
-                        onChange={(e) => setSelectedItem(s => ({ ...s, url: e.target.value }))} 
-                        disabled={uploading}
-                        />
-                        {selectedItem.url && (
-                            <a className='login-invited-btn' href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
-                        )}
-                    </Form.Group>
-                    ) : (
-                    <>
                         <Form.Group className="mb-2">
-                        <Form.Label>Enlace del PDF (URL) </Form.Label>
-                        <Form.Control type="text" name="url" value={selectedItem.url || ''} onChange={(e) => setSelectedItem(s => ({ ...s, url: e.target.value }))} />
-                        {/* Mostrar enlace directo si existe */}
-                        {selectedItem.url && (
-                            <a className='login-invited-btn' href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
-                        )}
+                            <Form.Label>Enlace del Video (URL)</Form.Label>
+                            <Form.Control 
+                            value={selectedItem.url || ''} 
+                            onChange={(e) => setSelectedItem(s => ({ ...s, url: e.target.value }))} 
+                            />
+                            {selectedItem.url && (
+                                <a className='login-invited-btn' href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
+                            )}
                         </Form.Group>
-                    </>
+                        ) : (
+                        <>
+                            <Form.Group className="mb-2">
+                            <Form.Label>Enlace del PDF (URL) </Form.Label>
+                            <Form.Control type="text" name="url" value={selectedItem.url || ''} onChange={(e) => setSelectedItem(s => ({ ...s, url: e.target.value }))} />
+                            {selectedItem.url && (
+                                <a className='login-invited-btn' href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
+                            )}
+                            </Form.Group>
+                        </>
                     )}
                 </Form>
             );
         }else if (itemType === 'noticia') {
-             return (
+            return (
                 <Form>
                     <Form.Group className="mb-2">
                         <Form.Label>Nombre</Form.Label>
@@ -1254,119 +1065,97 @@ function GestionAdminPage() {
                     </Form.Group>
                     <Form.Group className="mb-2">
                         <Form.Label>Tipo</Form.Label>
-                        <Form.Select name="tipo" value={selectedItem.tipo || 'video'} onChange={handleModalChangeNoticia} disabled={uploading} >
+                        <Form.Select name="tipo" value={selectedItem.tipo || 'video'} onChange={handleModalChangeNoticia} >
                             <option value="video">Video</option>
                             <option value="pdf">PDF</option>
                         </Form.Select>
                     </Form.Group>
                     {selectedItem.tipo === 'video' ? (
-                    <Form.Group className="mb-2">
-                        <Form.Label>Enlace del Video (URL)</Form.Label>
-                        <Form.Control 
-                        value={selectedItem.url || ''} 
-                        onChange={(e) => setSelectedItem(s => ({ ...s, url: e.target.value }))} 
-                        disabled={uploading}
-                        />
-                        {selectedItem.url && (
-                            <a className='login-invited-btn' href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
-                        )}
-                    </Form.Group>
-                    ) : (
-                    <>
                         <Form.Group className="mb-2">
-                        <Form.Label>Enlace del PDF (URL) </Form.Label>
-                        <Form.Control type="text" name="url" value={selectedItem.url || ''} onChange={(e) => setSelectedItem(s => ({ ...s, url: e.target.value }))} />
-                        {/* Mostrar enlace directo si existe */}
-                        {selectedItem.url && (
-                            <a className='login-invited-btn' href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
-                        )}
+                            <Form.Label>Enlace del Video (URL)</Form.Label>
+                            <Form.Control 
+                            value={selectedItem.url || ''} 
+                            onChange={(e) => setSelectedItem(s => ({ ...s, url: e.target.value }))} 
+                            />
+                            {selectedItem.url && (
+                                <a className='login-invited-btn' href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
+                            )}
                         </Form.Group>
-                    </>
+                        ) : (
+                        <>
+                            <Form.Group className="mb-2">
+                            <Form.Label>Enlace del PDF (URL) </Form.Label>
+                            <Form.Control type="text" name="url" value={selectedItem.url || ''} onChange={(e) => setSelectedItem(s => ({ ...s, url: e.target.value }))} />
+                            {selectedItem.url && (
+                                <a className='login-invited-btn' href={selectedItem.url} target="_blank" rel="noreferrer">Ver recurso</a>
+                            )}
+                            </Form.Group>
+                        </>
                     )}
                 </Form>
             );
         }else if (itemType === 'compatibilidad') {
-         const formatFecha = (timestamp) => {
-        if (!timestamp) return 'N/A';
-        
-        let dateValue;
+            const formatFecha = (timestamp) => {
+                if (!timestamp) return 'N/A';
+                let dateValue;
 
-        if (typeof timestamp === 'string' && timestamp.startsWith('Timestamp(seconds=')) {
-            const match = timestamp.match(/seconds=(\d+)/); 
-            if (match && match[1]) {
-                const seconds = parseInt(match[1], 10);
-                dateValue = new Date(seconds * 1000); 
-            }
-        } else if (timestamp.seconds !== undefined) {
-             dateValue = new Date(timestamp.seconds * 1000);
-        } else {
-            const numericTimestamp = parseFloat(timestamp);
-            if (!isNaN(numericTimestamp) && numericTimestamp > 1000000000) { 
-                const ms = Math.floor(numericTimestamp * 1000);
-                dateValue = new Date(ms);
-            } else if (typeof timestamp === 'string') {
-                dateValue = new Date(timestamp);
-            } else {
-                 return String(timestamp);
-            }
-        }
+                if (typeof timestamp === 'string' && timestamp.startsWith('Timestamp(seconds=')) {
+                    const match = timestamp.match(/seconds=(\d+)/); 
+                    if (match && match[1]) {
+                        const seconds = parseInt(match[1], 10);
+                        dateValue = new Date(seconds * 1000); 
+                    }
+                } else if (timestamp.seconds !== undefined) {
+                    dateValue = new Date(timestamp.seconds * 1000);
+                } else {
+                    const numericTimestamp = parseFloat(timestamp);
+                    if (!isNaN(numericTimestamp) && numericTimestamp > 1000000000) { 
+                        const ms = Math.floor(numericTimestamp * 1000);
+                        dateValue = new Date(ms);
+                    } else if (typeof timestamp === 'string') {
+                        dateValue = new Date(timestamp);
+                    } else {
+                        return String(timestamp);
+                    }
+                }
 
-        // 4. Validación y Formato
-        if (dateValue && !isNaN(dateValue.getTime())) {
-            
-            // CAMBIO CRÍTICO AQUÍ: Definir opciones para el formato DD/MM/AAAA H:MM
-            const dateOptions = {
-                day: '2-digit',      // DD
-                month: '2-digit',    // MM
-                year: 'numeric',     // AAAA
-                hour: 'numeric',     // H
-                minute: '2-digit',   // MM
-                hour12: true     
+                if (dateValue && !isNaN(dateValue.getTime())) {
+                    const dateOptions = {
+                        day: '2-digit',      // DD
+                        month: '2-digit',    // MM
+                        year: 'numeric',     // AAAA
+                        hour: 'numeric',     // H
+                        minute: '2-digit',   // MM
+                        hour12: true     
+                    };
+                    return dateValue.toLocaleDateString('es-ES', dateOptions); 
+                }
+
+                return String(timestamp); 
             };
-            return dateValue.toLocaleDateString('es-ES', dateOptions); 
-        }
-
-        return String(timestamp); 
-    };
     
-    const fechaFormateada = formatFecha(selectedItem.fechaSugerencia);
+            const fechaFormateada = formatFecha(selectedItem.fechaSugerencia);
+            const marcaOptions = marcaNames; 
+            
+            //  Verificar si la marca cargada está registrada
+            const isRegisteredMarca = marcaOptions.some(m => m === selectedItem.marca);
+            const isCustomMarca = selectedItem.marca && selectedItem.marca !== 'Seleccionar' && selectedItem.marca !== 'Otro' && !isRegisteredMarca;
+            // Determinar el valor que debe tener el SELECT
+            const selectMarcaValue = isCustomMarca ? 'Otro' : (selectedItem.marca || 'Seleccionar');
+            const isRegisteredAdaptableMarca = marcaOptions.some(m => m === selectedItem.adaptableMarca);
 
-        const marcaOptions = marcaNames; // o el estado que uses para las marcas
-        
-        // 1. Verificar si la marca cargada está registrada
-        const isRegisteredMarca = marcaOptions.some(m => m === selectedItem.marca);
-        
-        // 2. Determinar si es una marca personalizada/no registrada
-        const isCustomMarca = selectedItem.marca && 
-                              selectedItem.marca !== 'Seleccionar' && 
-                              selectedItem.marca !== 'Otro' &&
-                              !isRegisteredMarca;
+            const isCustomAdaptableMarca = selectedItem.adaptableMarca && selectedItem.adaptableMarca !== 'Seleccionar' && selectedItem.adaptableMarca !== 'Otro' && !isRegisteredAdaptableMarca;
+            // Determinar el valor que debe tener el SELECT de Marca Adaptable
+            const selectAdaptableMarcaValue = isCustomAdaptableMarca ? 'Otro' : (selectedItem.adaptableMarca || 'Seleccionar');
 
-        // 3. Determinar el valor que debe tener el SELECT
-        const selectMarcaValue = isCustomMarca ? 'Otro' : (selectedItem.marca || 'Seleccionar');
-
-        const isRegisteredAdaptableMarca = marcaOptions.some(m => m === selectedItem.adaptableMarca);
-
-        // 2. Determinar si es una marca adaptable personalizada/no registrada
-        const isCustomAdaptableMarca = selectedItem.adaptableMarca && 
-                            selectedItem.adaptableMarca !== 'Seleccionar' && 
-                            selectedItem.adaptableMarca !== 'Otro' &&
-                            !isRegisteredAdaptableMarca;
-
-        // 3. Determinar el valor que debe tener el SELECT de Marca Adaptable
-        const selectAdaptableMarcaValue = isCustomAdaptableMarca 
-            ? 'Otro' 
-            : (selectedItem.adaptableMarca || 'Seleccionar');
             return (
                 <Form>
-                    {/* Campos de Solo Lectura */}
                     <h6 className="mt-3 mb-2">Detalles de la Sugerencia</h6>
                     <div className="d-flex justify-content-between mb-3">
                         <Form.Group className="mb-2">
                             <Form.Label>Sugerencia Por:</Form.Label>
                             <Form.Control 
                                 type="text" 
-                                // Muestra el nombre resuelto o el ID
                                 value={selectedItem.nombreUsuario || selectedItem.userId || ''} 
                                 disabled 
                             />
@@ -1381,7 +1170,6 @@ function GestionAdminPage() {
                         </Form.Group>
                         
                     </div>
-                    {/* Comentarios */}
                     <Form.Group className="mb-2">
                         <Form.Label>Comentarios</Form.Label>
                         <Form.Control
@@ -1393,11 +1181,8 @@ function GestionAdminPage() {
                             disabled
                         />
                     </Form.Group>
-
                     <hr/>
                     <h6 className="mt-3 mb-2">Datos Editables de la pieza sugerida</h6>
-                    
-                    {/* Estado */}
                     <Form.Group className="mb-2">
                         <Form.Label>Estado</Form.Label>
                         <Form.Select
@@ -1411,8 +1196,6 @@ function GestionAdminPage() {
                             <option value="en_revision">En Revisión</option>
                         </Form.Select>
                     </Form.Group>
-
-                    {/* Nombre Celular y Marca (Original) */}
                     <div className="d-flex justify-content-between">
                         <Form.Group className="mb-2 w-50 pe-2">
                             <Form.Label>Nombre Celular </Form.Label>
@@ -1424,38 +1207,32 @@ function GestionAdminPage() {
                             />
                         </Form.Group>
                         <Form.Group className="mb-2 w-50 ps-2">
-                        <Form.Label>Marca </Form.Label>
-                        <Form.Select
-                            name="marca" // Importante mantener 'marca'
-                            value={selectMarcaValue} // Usamos el valor calculado
-                            onChange={handleModalChangeCompatibilidad}
-                        >
-                            <option value="Seleccionar">Seleccionar</option>
-                            {/* Renderizar opciones desde la BD (uniqueMarcaNames) */}
-                            {marcaOptions.map((marcaName, index) => (
-                                <option key={index} value={marcaName}>
-                                    {marcaName}
-                                </option>
-                            ))}
-                            <option value="Otro">Otro</option>
-                        </Form.Select>
-
-                        {/* Campo de texto condicional para "Otro" o marca no registrada */}
-                        {(selectMarcaValue === 'Otro' || isCustomMarca) && (
-                            <Form.Control
-                                className="mt-2"
-                                type="text"
-                                name="marca" // Importante: mantiene el nombre para actualizar el mismo campo
-                                // Mostrar el valor real o vacío si recién se selecciona "Otro"
-                                value={selectedItem.marca === 'Otro' ? '' : selectedItem.marca || ''}
-                                placeholder="Escriba la marca aqui"
+                            <Form.Label>Marca </Form.Label>
+                            <Form.Select
+                                name="marca" 
+                                value={selectMarcaValue} 
                                 onChange={handleModalChangeCompatibilidad}
-                            />
-                        )}
-                    </Form.Group>
+                            >
+                                <option value="Seleccionar">Seleccionar</option>
+                                {marcaOptions.map((marcaName, index) => (
+                                    <option key={index} value={marcaName}>
+                                        {marcaName}
+                                    </option>
+                                ))}
+                                <option value="Otro">Otro</option>
+                            </Form.Select>
+                            {(selectMarcaValue === 'Otro' || isCustomMarca) && (
+                                <Form.Control
+                                    className="mt-2"
+                                    type="text"
+                                    name="marca"
+                                    value={selectedItem.marca === 'Otro' ? '' : selectedItem.marca || ''}
+                                    placeholder="Escriba la marca aqui"
+                                    onChange={handleModalChangeCompatibilidad}
+                                />
+                            )}
+                        </Form.Group>
                     </div>
-                    
-                    {/* Modelo y Pieza (Original) */}
                     <div className="d-flex justify-content-between">
                         <Form.Group className="mb-2 w-50 pe-2">
                             <Form.Label>Modelo </Form.Label>
@@ -1467,50 +1244,43 @@ function GestionAdminPage() {
                             />
                         </Form.Group>
                         <Form.Group className="mb-2 w-50 ps-2">
-                        <Form.Label>Pieza</Form.Label>
-                        <Form.Select
-                            name="pieza"
-                            value={selectPieceValue} // Usamos el valor calculado
-                            onChange={handleModalChangeCompatibilidad}
-                        >
-                            <option value="Seleccionar">Seleccionar</option>
-                            {/* Renderizar opciones desde la BD (usando pieceOptions) */}
-                            {pieceOptions.map((pieceName, index) => (
-                                <option key={index} value={pieceName}>
-                                    {pieceName}
-                                </option>
-                            ))}
-                            <option value="Otro">Otro</option>
-                        </Form.Select>
-
-                        {/* Campo de texto condicional para "Otro" o pieza no registrada */}
-                        {(selectPieceValue === 'Otro' || isCustomPiece) && (
-                            <Form.Control
-                                className="mt-2"
-                                type="text"
-                                name="pieza" 
-                                value={selectedItem.pieza === 'Otro' ? '' : selectedItem.pieza || ''}
-                                placeholder="Escriba la pieza aqui"
+                            <Form.Label>Pieza</Form.Label>
+                            <Form.Select
+                                name="pieza"
+                                value={selectPieceValue} 
                                 onChange={handleModalChangeCompatibilidad}
-                            />
-                        )}
-                    </Form.Group>
+                            >
+                                <option value="Seleccionar">Seleccionar</option>
+                                {pieceOptions.map((pieceName, index) => (
+                                    <option key={index} value={pieceName}>
+                                        {pieceName}
+                                    </option>
+                                ))}
+                                <option value="Otro">Otro</option>
+                            </Form.Select>
+                            {(selectPieceValue === 'Otro' || isCustomPiece) && (
+                                <Form.Control
+                                    className="mt-2"
+                                    type="text"
+                                    name="pieza" 
+                                    value={selectedItem.pieza === 'Otro' ? '' : selectedItem.pieza || ''}
+                                    placeholder="Escriba la pieza aqui"
+                                    onChange={handleModalChangeCompatibilidad}
+                                />
+                            )}
+                        </Form.Group>
                     </div>
-                    
                     <hr/>
                     <h6 className="mt-3 mb-2" >Compatible con:</h6>
-
-                    {/* Adaptable Marca/Modelo */}
                     <div className="d-flex justify-content-between">
                         <Form.Group className="mb-2 w-50 pe-2">
                             <Form.Label>Marca</Form.Label>
                             <Form.Select
-                                name="adaptableMarca" // Importante: actualiza el campo correcto
+                                name="adaptableMarca" 
                                 value={selectAdaptableMarcaValue}
                                 onChange={handleModalChangeCompatibilidad}
                             >
                                 <option value="Seleccionar">Seleccionar</option>
-                                {/* Renderizar opciones desde la BD (uniqueMarcaNames) */}
                                 {marcaOptions.map((marcaName, index) => (
                                     <option key={index} value={marcaName}>
                                         {marcaName}
@@ -1518,14 +1288,11 @@ function GestionAdminPage() {
                                 ))}
                                 <option value="Otro">Otro </option>
                             </Form.Select>
-
-                            {/* Campo de texto condicional para "Otro" o marca no registrada */}
                             {(selectAdaptableMarcaValue === 'Otro' || isCustomAdaptableMarca) && (
                                 <Form.Control
                                     className="mt-2"
                                     type="text"
-                                    name="adaptableMarca" // ¡Actualiza el campo adaptableMarca!
-                                    // Mostrar el valor real o vacío si recién se selecciona "Otro"
+                                    name="adaptableMarca" 
                                     value={selectedItem.adaptableMarca === 'Otro' ? '' : selectedItem.adaptableMarca || ''}
                                     placeholder="Escriba la marca aqui"
                                     onChange={handleModalChangeCompatibilidad}
@@ -1542,8 +1309,6 @@ function GestionAdminPage() {
                             />
                         </Form.Group>
                     </div>
-
-                    
                 </Form>
             );
         }
@@ -1555,7 +1320,7 @@ function GestionAdminPage() {
                        itemType === 'estudio' ? handleSaveChangesEstudio :
                        itemType === 'noticia' ? handleSaveChangesNoticias :
                        itemType === 'compatibilidad' ? handleSaveChangesCompatibilidad :
-                       () => alert('Función de guardado no definida');
+                       '';
                        
     // Asignación dinámica del título del modal
     const modalTitle = itemType === 'usuario' ? 'Editar Usuario': 
@@ -1563,8 +1328,6 @@ function GestionAdminPage() {
                        itemType === 'compatibilidad' ? 'Editar Registro de Compatibilidad' :
                        itemType === 'noticia' ? 'Editar Noticias' :
                        'Editar Registro';
-
-
     return (
         <>
             <NavBar/>
@@ -1573,10 +1336,8 @@ function GestionAdminPage() {
                     <div className="header-admin">
                         <h1>Sistema de Gestión Administrador</h1>
                     </div>
-                    
                     <div className="dashboard-grid">
-                        
-                        {/* 1. SECCIÓN USUARIOS */}
+                        {/* SECCIÓN USUARIOS */}
                         <DataCard
                             title="Usuarios"
                             icon={IconoUsuario}
@@ -1591,7 +1352,7 @@ function GestionAdminPage() {
                             showNewButton={true}
                         />
                         
-                        {/* 2. SECCIÓN PIEZAS  */}
+                        {/* SECCIÓN PIEZAS */}
                         <DataCard
                             title="Celulares y Partes"
                             icon={IconoPieza}
@@ -1606,7 +1367,7 @@ function GestionAdminPage() {
                             showNewButton={true}
                         />
                         
-                        {/* 3. SECCIÓN M. ESTUDIO  */}
+                        {/* SECCIÓN M.ESTUDIO */}
                         <DataCard
                             title="M. Estudio"
                             icon={IconoLibro}
@@ -1621,24 +1382,23 @@ function GestionAdminPage() {
                             showNewButton={true}
                         />
 
-                        
                         <div className="grid-full-width">
-                        {/* 4. SECCIÓN COMPATIBILIDAD  */}
-                        <DataCard
-                            title="Sugerencias de Compatibilidad"
-                            icon={IconoPieza} 
-                            data={decoratedCompatibilidad} 
-                            searchQuery={searchQueryCompatibilidad}
-                            setSearchQuery={setSearchQueryCompatibilidad}
-                            collectionName="compatibilidad"
-                            handleEdit={handleEditCompatibilidad} 
-                            handleDelete={handleEliminarCompatibilidad} 
-                            link={'/gestionSugerencias'}
-                            showNewButton={false}
-                        />
+                            {/* SECCIÓN COMPATIBILIDAD */}
+                            <DataCard
+                                title="Sugerencias de Compatibilidad"
+                                icon={IconoPieza} 
+                                data={decoratedCompatibilidad} 
+                                searchQuery={searchQueryCompatibilidad}
+                                setSearchQuery={setSearchQueryCompatibilidad}
+                                collectionName="compatibilidad"
+                                handleEdit={handleEditCompatibilidad} 
+                                handleDelete={handleEliminarCompatibilidad} 
+                                link={'/gestionSugerencias'}
+                                showNewButton={false}
+                            />
                         </div>
-                        {/* 5. NOTICIAS */}
-                         <DataCard
+                        {/* SECCIÓN NOTICIAS */}
+                        <DataCard
                             title="Noticias"
                             icon={IconoGrabadora}
                             data={noticia} 
@@ -1655,7 +1415,6 @@ function GestionAdminPage() {
                 </div>
             </main>
             <Footer/>
-
             {/* Modal de Edición Universal */}
             <Modal show={showModal} onHide={handleCloseModal} centered>
                 <Modal.Header closeButton>
@@ -1665,10 +1424,10 @@ function GestionAdminPage() {
                     {renderModalBody()}
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleCloseModal} disabled={uploading}>
+                    <Button variant="secondary" onClick={handleCloseModal} >
                         Cerrar
                     </Button>
-                    <Button variant="primary" onClick={handleSave} disabled={uploading}>
+                    <Button variant="primary" onClick={handleSave} >
                         Guardar Cambios
                     </Button>
                 </Modal.Footer>

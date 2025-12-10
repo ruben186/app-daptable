@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, where} from 'firebase/firestore';
 import { db } from '../../firebase';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
-import { Card, Button } from 'react-bootstrap';
 import { useNavigate, useLocation } from 'react-router-dom';
-
 
 const EstudiosVideosPage = () => {
   const [videos, setVideos] = useState([]);
@@ -35,45 +33,24 @@ const EstudiosVideosPage = () => {
 
   useEffect(() => {
     const ps = new URLSearchParams(location.search);
-    const currentSearchTerm = ps.get('q')?.toLowerCase() || ''; // Definición local para el useEffect
+    const currentSearchTerm = ps.get('q')?.toLowerCase() || '';
 
-     if (currentSearchTerm && videos.length > 0) {
-       // Filtrar por nombre o descripción
-       const results = videos.filter(video => 
-         video.nombre?.toLowerCase().includes(currentSearchTerm) || 
-         video.descripcion?.toLowerCase().includes(currentSearchTerm)
-       );
-       setFilteredVideos(results);
-     } else {
-       // Si no hay término de búsqueda, mostrar todos los videos cargados
-       setFilteredVideos(videos);
-     }
-
-   }, [location.search, videos]); 
-   // Definición del término de búsqueda para el renderizado (mensajes)
-   const ps = new URLSearchParams(location.search);
-   const searchTerm = ps.get('q') || '';
-
-  const renderPreview = (url) => {
-    if (!url) return null;
-    try {
-      if (/youtube\.com|youtu\.be/.test(url)) {
-        let embed = url;
-        if (url.includes('watch?v=')) embed = url.replace('watch?v=', 'embed/');
-        embed = embed.replace('youtu.be/', 'www.youtube.com/embed/');
-        return (
-          <div className="ratio ratio-16x9 mb-2">
-            <iframe src={embed} title="video" allowFullScreen />
-          </div>
-        );
-      }
-      return (
-        <video controls className="w-100 mb-2">
-          <source src={url} />
-        </video>
+    if (currentSearchTerm && videos.length > 0) {
+      // Filtrar por nombre o descripción
+      const results = videos.filter(video => 
+        video.nombre?.toLowerCase().includes(currentSearchTerm) || 
+        video.descripcion?.toLowerCase().includes(currentSearchTerm)
       );
-    } catch (e) { return null; }
-  };
+      setFilteredVideos(results);
+    } else {
+      // Si no hay término de búsqueda, mostrar todos los videos cargados
+      setFilteredVideos(videos);
+    }
+
+  }, [location.search, videos]); 
+  // Definición del término de búsqueda para el renderizado
+  const ps = new URLSearchParams(location.search);
+  const searchTerm = ps.get('q') || '';
 
   const goToDetalle = (item) => {
     if (!item || !item.id) return;
@@ -81,13 +58,12 @@ const EstudiosVideosPage = () => {
   };
 
   const DataCard = ({ item }) => {
-    const fecha = item.fecha?.toDate ? new Date(item.fecha.toDate()).toLocaleString() : (item.fecha ? String(item.fecha) : '');
-    // Extraer posible thumbnail de YouTube (si es youtube) para mostrar en el área superior
+    // Extraer posible thumbnail si es de youtube para mostrar en el área superior
     let thumbnail = null;
     try {
-      const m = item.url && item.url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_\-]+)/);
+      const m = item.url && item.url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_]+)/);
       if (m && m[1]) thumbnail = `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg`;
-    } catch (e) { /* ignore */ }
+    } catch (e) {}
 
     return (
       <div className="custom-datacard" onClick={() => goToDetalle(item)} style={{ cursor: 'pointer' }}>
@@ -99,6 +75,7 @@ const EstudiosVideosPage = () => {
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }} />
+        
         <div className="datacard-bottom" style={{
           backgroundColor: '#064e49',
           padding: '22px',
@@ -132,7 +109,6 @@ const EstudiosVideosPage = () => {
       <Footer />
     </>
   );
-
 };
 
 export default EstudiosVideosPage;

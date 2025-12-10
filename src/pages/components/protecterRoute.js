@@ -27,8 +27,8 @@ function ProtectedRoute({ children, allowedRoles = [] }) {
               title: 'Acceso denegado',
               text: 'No tienes permisos para acceder a esta ruta.',
               timer: 2500,
-              background: '#052b27ff', // Color de fondo personalizado
-              color: '#ffdfdfff', // Color del texto personalizado
+              background: '#052b27ff',
+              color: '#ffdfdfff',
               showConfirmButton: false,
             });
             setRedirect(<Navigate to="/dashboard" replace />);
@@ -48,8 +48,8 @@ function ProtectedRoute({ children, allowedRoles = [] }) {
           title: 'Acceso restringido',
           text: 'Debes iniciar sesión para acceder a esta página.',
           timer: 2000, 
-          background: '#0c635aff', // Color de fondo personalizado       
-          color: '#ffdfdfff', // Color del texto personalizado
+          background: '#0c635aff',      
+          color: '#ffdfdfff',
           showConfirmButton: false,
         });
       } else {

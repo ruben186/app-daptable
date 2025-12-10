@@ -9,7 +9,6 @@
     margin-left: 10px;
     position: relative;
     left: 970px;
-    
 }
 .search-input-group2 .form-control.search-buscar {
     background: #22887F;
@@ -29,6 +28,7 @@
     background: #22887F;
     box-shadow: none;
 }
+
 .search-input-group2 .btn-icon-buscar {
     position: relative;
     top: 5px;

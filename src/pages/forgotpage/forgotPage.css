@@ -1,10 +1,3 @@
-:root{
-    --container-max-width: 552px;
-    --form-max-width: 520px;
-    --card-max-width: 520px;
-}
-
-/* Base colors and page bg */
 body, .bg-page {
     background: linear-gradient(135deg, #070D11, #040606);
     min-height: 100vh;
@@ -14,7 +7,6 @@ body, .bg-page {
 
 .form-email::placeholder { color: #115f59; }
 
-/* Back button top-left */
 .btn-outline-secondary {
     position: absolute;
     left: 24px;
@@ -29,18 +21,16 @@ body, .bg-page {
 }
 .btn-outline-secondary:hover{ background-color: #09665E; }
 
-/* Card */
 .form-card {
     width: 100%;
-    max-width: var(--card-max-width);
-    background: #05211F; /* verde oscuro translúcido */
+    max-width: 520px;
+    background: #05211F;
     padding: 48px 40px;
     border-radius: 100px;
     text-align: center;
     margin: 24px auto;
     box-sizing: border-box;
 }
-
 .form-card h3 {
     font-size: 26px;
     color: #42F1DD;
@@ -80,35 +70,33 @@ body, .bg-page {
 }
 .btn-primary:hover { background: #2b867f; color: #fff; }
 
-/* Layout helpers similar to login page */
 .form-wrapper {
     width: 100%;
-    max-width: var(--container-max-width);
+    max-width: 552px;
     margin: 0 auto;
     padding: 0 16px;
     box-sizing: border-box;
 }
 
-/* Media queries to match login responsiveness */
+/* Responsive */
 @media (max-width: 768px) {
-    :root{ --container-max-width: 720px; --form-max-width: 95%; }
+    .form-wrapper {max-width: 720px;}
     .form-card{ padding: 36px 28px; border-radius: 22px; }
     .btn-outline-secondary{ left: 16px; top: 14px; font-size: 17px; }
 }
 
 @media (max-width: 420px) {
-    :root{ --container-max-width: 100%; --form-max-width: 100%; --card-max-width: 360px; }
-    .form-card{ padding: 24px 18px; border-radius: 16px; }
+    .form-wrapper {max-width: 100%;}
+    .form-card{ max-width: 360px; padding: 24px 18px; border-radius: 16px; }
     .form-card h3{ font-size: 20px; }
     .btn-outline-secondary{ left: 12px; top: 10px; font-size: 16px; padding: 6px 8px; }
     .d-grid .btn-primary{ width: 100%; font-size: 1rem; padding: 10px 18px; }
 }
 
-/* Extra small devices (iPhone SE and similar) */
 @media (max-width: 360px) {
-    :root{ --card-max-width: 340px; }
     .form-wrapper { padding: 0 8px; }
     .form-card {
+        max-width: 340px;
         padding: 14px 10px;
         border-radius: 12px;
         margin: 8px;

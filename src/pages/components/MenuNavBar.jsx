@@ -12,7 +12,7 @@ import logoZTE from '../../assets/logos/zteLogo.png';
 
 const MarcaItem = ({ logoSrc, brand, navigate, setActiveBrand, setOpen }) => (
   <button 
-    className="personas-drawer-item brand-item"
+    className="menu-drawer-item brand-item"
     onClick={() => {
       navigate(`/xiaomi?brand=${brand}`);
       setActiveBrand(brand); // Actualiza el estado en el NavBar principal
@@ -38,7 +38,7 @@ function ExpandableGroup({ title, id, children, drawerOpen }) {
   return (
     <div id={`group-${id}`}>
       <button
-        className={`personas-drawer-item ${expanded ? 'open' : ''}`}
+        className={`menu-drawer-item ${expanded ? 'open' : ''}`}
         aria-expanded={expanded}
         aria-controls={`content-${id}`}
         onClick={() => setExpanded((s) => !s)}
@@ -64,7 +64,6 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef(null);
   const { userRole, isRoleLoading } = useUserRole();
-  const isAuthenticatedUser = userRole && userRole !== 'invitado';
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -88,7 +87,7 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
   return (
     <div ref={wrapperRef}>
       <button
-        className="personas-toggle"
+        className="menu-toggle"
         aria-expanded={open}
         aria-haspopup="menu"
         onClick={() => setOpen((s) => !s)}
@@ -101,10 +100,10 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
         />
       </button>
 
-      <div className={`personas-overlay ${open ? 'visible' : ''}`} onClick={() => setOpen(false)} />
+      <div className={`menu-overlay ${open ? 'visible' : ''}`} onClick={() => setOpen(false)} />
 
-      <aside className={`personas-drawer ${open ? 'open' : ''}`} role="menu">
-        <div className="personas-drawer-header">
+      <aside className={`menu-drawer ${open ? 'open' : ''}`} role="menu">
+        <div className="menu-drawer-header">
           <img 
           src={menuIcon} 
           alt="ImgMenu" 
@@ -115,15 +114,30 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
           />
         </div>
 
-        <div className="personas-drawer-list">
+        <div className="menu-drawer-list">
           {isRoleLoading ? (
             <div className='welcome-text' style={{marginTop: '22px'}}>
               Cargando Opciones...
             </div>
           ) : (
-          <>
+          <> 
+            <button 
+              className="menu-drawer-item" 
+              onClick={() => { navigate('/dashboard');}}
+            >
+              Inicio
+            </button>
+
             {showBrandsInDrawer && (
               <>
+                {(userRole === 'invitado') && (
+                  <button 
+                    className="menu-drawer-item" 
+                    onClick={() => { navigate('/');}}
+                  >
+                    Iniciar Sesión
+                  </button>
+                )}
                 <ExpandableGroup title="Marcas" id="marcas" drawerOpen={open}>
                   <MarcaItem logoSrc={logoxiami} brand="xiaomi" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
                   <MarcaItem logoSrc={logosamgsumg} brand="samsung" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
@@ -137,31 +151,24 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
               </>
             )}
 
-            <button 
-              className="personas-drawer-item" 
-              onClick={() => { navigate('/dashboard');}}
-            >
-              Inicio
-            </button>
-          
             {(userRole === 'admin' || userRole === 'usuario') && (
               <>
-                <button className="personas-drawer-item" onClick={() => { navigate('/OpinionPage'); setOpen(false); }}>
+                <button className="menu-drawer-item" onClick={() => { navigate('/OpinionPage'); setOpen(false); }}>
                   Nos interesa tu opinión
                 </button>
               </>
             )}
 
-            <button className="personas-drawer-item" onClick={() => { navigate('/NoticiaPage'); setOpen(false); }}>
+            <button className="menu-drawer-item" onClick={() => { navigate('/NoticiaPage'); setOpen(false); }}>
               Noticias
             </button>
         
             {/*Aprende Expandable*/}
             <ExpandableGroup title="Aprende" id="aprende" drawerOpen={open}>
-              <button className="personas-drawer-item"  onClick={() => { navigate('/aprende/pdfs'); setOpen(false); }}>
+              <button className="menu-drawer-item"  onClick={() => { navigate('/aprende/pdfs'); setOpen(false); }}>
                 Paso a paso (PDF)
               </button>
-              <button className="personas-drawer-item"   onClick={() => { navigate('/aprende/videos'); setOpen(false); }}>
+              <button className="menu-drawer-item"   onClick={() => { navigate('/aprende/videos'); setOpen(false); }}>
                 Shorts (Videos)
               </button>
             </ExpandableGroup>
@@ -169,8 +176,8 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
             {/* Ayúdanos Expandable */}
             {(userRole === 'admin' || userRole === 'usuario') &&(
               <>
-                <ExpandableGroup title="Ayúdanos" id="ayudanos" className="personas-drawer-item" drawerOpen={open}>
-                  <button className="personas-drawer-item" onClick={() => { navigate('/sugerirPieza'); setOpen(false); }}>
+                <ExpandableGroup title="Ayúdanos" id="ayudanos" className="menu-drawer-item" drawerOpen={open}>
+                  <button className="menu-drawer-item" onClick={() => { navigate('/sugerirPieza'); setOpen(false); }}>
                     Aumentar base de datos
                   </button>
                 </ExpandableGroup>
@@ -181,10 +188,10 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
             {/* Botones de Admin */}
             {userRole === 'admin' && (
               <>
-                <button className="personas-drawer-item" onClick={() => { navigate('/gestionAdmin'); setOpen(false); }}>
+                <button className="menu-drawer-item" onClick={() => { navigate('/gestionAdmin'); setOpen(false); }}>
                   Gestión de Administrador
                 </button>
-                <button className="personas-drawer-item" onClick={() => { navigate('/EstadisticaPage'); setOpen(false); }}>
+                <button className="menu-drawer-item" onClick={() => { navigate('/EstadisticaPage'); setOpen(false); }}>
                   Indiadores
                 </button>
               </>

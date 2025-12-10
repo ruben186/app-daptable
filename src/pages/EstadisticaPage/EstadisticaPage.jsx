@@ -1,10 +1,7 @@
-import React from 'react';
 import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
-import { useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { Container, ProgressBar } from 'react-bootstrap';
-// En EstadisticaPage.jsx
 import { fetchTopVistasGlobal } from '../../firebase/statsService';
 import { handleCompatibilityCheck, getLogoUrlByMarca } from '../components/compatibilidades';
 import { logActivity } from '../../firebase/historialService';
@@ -19,12 +16,11 @@ import IconoauricularV from '../../assets/Iconos/auricularV.png';
 import IconoPiezaA from '../../assets/Iconos/IconoPiezaA.png'; 
 import './EstadisticaPage.css';
 import { db } from '../../firebase';
-// import Swal from 'sweetalert2'; 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../../firebase'; // Asegúrate de tener la ruta correcta a 'auth'
+import { auth } from '../../firebase';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
-// Lista de piezas relevantes para el conteo de vistas
+
 const PIEZA_ICONOS = {
     'PANTALLA': IconoPantallaV,
     'BATERIA': IconoBateriaV,
@@ -37,21 +33,19 @@ const PIEZA_ICONOS = {
     'AURICULAR': IconoauricularV,
     'VISOR': IconovisorV,
     'MAS': IconoPiezaA,
-    'OTRO': IconoPiezaA,
+    'OTRO': IconoPiezaA
 };
 
 const EstadisticasPage = () => {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
-    // Nuevo estado para manejar errores específicos de la colección 'historial'
-    const [historialError, setHistorialError] = useState(null); 
-     const [user] = useAuthState(auth);
-      const [topVistas, setTopVistas] = useState([]); 
-      const [loadingVistas, setLoadingVistas] = useState(true);
-      const [selectedActivityId, setSelectedActivityId] = useState(null);
-      const [modelos, setModelos] = useState([]);
+    const [user] = useAuthState(auth);
+    const [topVistas, setTopVistas] = useState([]); 
+    const [loadingVistas, setLoadingVistas] = useState(true);
+    const [selectedActivityId, setSelectedActivityId] = useState(null);
+    const [modelos, setModelos] = useState([]);
 
-    // Función para calcular el porcentaje
+    // Calcular el porcentaje
     const calculatePercentage = (count, total) => {
         if (total === 0) return '0%';
         return ((count / total) * 100).toFixed(1) + '%';
@@ -59,42 +53,35 @@ const EstadisticasPage = () => {
     const getNumericPercentage = (percentString) => {
         return parseFloat(percentString.replace('%', ''));
     };
+
     useEffect(() => {
-            const loadTopVistas = async () => {
-                setLoadingVistas(true);
-                const top = await fetchTopVistasGlobal(5);
-                setTopVistas(top);
-                setLoadingVistas(false);
-            };
+        const loadTopVistas = async () => {
+            setLoadingVistas(true);
+            const top = await fetchTopVistasGlobal(5);
+            setTopVistas(top);
+            setLoadingVistas(false);
+        };
     
-            const fetchModelos = async () => {
-              try {
-                  const snap = await getDocs(collection(db, 'tablas'));
-                  const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                  setModelos(data);
-              } catch (e) {
-                  console.error('No se pudieron cargar modelos (tablas):', e);
-              }
-            };
-    
-            fetchModelos();
-            loadTopVistas();
-        }, [user]);
+        const fetchModelos = async () => {
+            try {
+                const snap = await getDocs(collection(db, 'tablas'));
+                const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                setModelos(data);
+            } catch (e) {
+                console.error('No se pudieron cargar modelos (tablas):', e);
+            }
+        };
+
+        fetchModelos();
+        loadTopVistas();
+    }, [user]);
 
     useEffect(() => {
         const fetchStatistics = async () => {
             setLoading(true);
-            setHistorialError(null);
-            
-            // --- 1. Inicializar contadores y variables ---
-            
-            // Datos de Votos de Experiencia (EXPERIENCIA)
             let experienciaVotos = { EXCELENTE: 0, BUENA: 0, MALA: 0, total: 0 };
-            
-            // Datos de Vistas de Piezas (HISTORIAL)
             let piezasPopulares = [];
-            
-            // --- 2. Fetching Votos de Experiencia (Colección 'experiencia') ---
+    
             try {
                 const experienciaCollectionRef = collection(db, "experiencia");
                 const snapshot = await getDocs(experienciaCollectionRef);
@@ -107,11 +94,7 @@ const EstadisticasPage = () => {
                 });
             } catch (err) {
                 console.error("Error al cargar datos de experiencia:", err);
-                // Si esta colección falla, al menos quedan los contadores en 0.
             }
-                
-
-            // --- 4. Establecer el Estado Final ---
             setStats({
                 piezasPopulares: piezasPopulares,
                 experienciaVotos: experienciaVotos,
@@ -123,7 +106,6 @@ const EstadisticasPage = () => {
         fetchStatistics();
     }, []);
 
-    // --- RENDERING ---
     if (loading) {
         return (
             <>
@@ -136,36 +118,28 @@ const EstadisticasPage = () => {
         );
     }
     
-        const handleActivityClick = (id) => {
-            // Establece el ID de la actividad como seleccionada. 
-            // Si haces clic en una actividad que ya está seleccionada, puedes deseleccionarla:
-            setSelectedActivityId(id);
-        };
+    //Seleccion de la pieza
+    const handleActivityClick = (id) => {
+        setSelectedActivityId(id);
+    };
     
-        const handleHistoryClick = (historialItem) => {
-            // En tu historial debes tener guardada la Marca, el Modelo y la Pieza
-            const { Marca, Modelo, Pieza } = historialItem;
-    
-            // 1. Encontrar el objeto completo del modelo en la lista de `modelos`
-            const userActual = modelos.find(m => 
-                (m.modelo || '').toString().trim() === Modelo || (m.nombre || '').toString().trim() === Modelo
-                // O busca por ID, si lo guardas en el historial
-            );
-    
-            if (!userActual) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Modelo no encontrado',
-                    text: `No se pudo encontrar la información completa del modelo: ${Modelo}.`
-                });
-                return;
-            }
-            // 2. Llamar a la función de utilidad
-            handleCompatibilityCheck(Pieza, userActual, modelos, logActivity, user);
-        };
+    const handleHistoryClick = (historialItem) => {
+        const {Modelo, Pieza } = historialItem;
+        const userActual = modelos.find(m => 
+            (m.modelo || '').toString().trim() === Modelo || (m.nombre || '').toString().trim() === Modelo
+        );
 
-    
-    // Los cálculos para votos siempre se hacen porque experienciaVotos siempre tiene datos (cero o reales)
+        if (!userActual) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Modelo no encontrado',
+                text: `No se pudo encontrar la información completa del modelo: ${Modelo}.`
+            });
+            return;
+        }
+        handleCompatibilityCheck(Pieza, userActual, modelos, logActivity, user);
+    };
+
     const totalVotes = stats.experienciaVotos.total;
     const malaPercent = calculatePercentage(stats.experienciaVotos.MALA, totalVotes);
     const buenaPercent = calculatePercentage(stats.experienciaVotos.BUENA, totalVotes);
@@ -176,12 +150,11 @@ const EstadisticasPage = () => {
             <NavBar />
             <div className='bg-gradient2'>
                 <div className="estadisticas-container">
-                    
                     <h1 style={{ color: '#00d49f', marginBottom: '40px', fontSize: '2em' }}>
                         📈 Indicadores y Estadísticas
                     </h1>
 
-                    {/* --- SECCIÓN 1: PIEZA MÁS VISTA (Historial) --- */}
+                    {/* PIEZAS MÁS VISTAS */}
                     <Container className="my-5 container-topVistas">
                         <h2 className="text-center mb-4 pt-4">
                             Las Piezas Más Consultadas Globalmente
@@ -212,10 +185,10 @@ const EstadisticasPage = () => {
                                         >
                                             <div className="actividad-item-superior vistas-superior">
                                                 <img 
-                                                src={piezaIcono} 
-                                                loading="lazy"
-                                                alt={pieza.Pieza || 'Pieza'} 
-                                                className="icono-pieza-historial icono-vistas" 
+                                                    src={piezaIcono} 
+                                                    loading="lazy"
+                                                    alt={pieza.Pieza || 'Pieza'} 
+                                                    className="icono-pieza-historial icono-vistas" 
                                                 />
                                             </div>
                                             
@@ -224,15 +197,14 @@ const EstadisticasPage = () => {
                                                 <br />
                                                 <span className="top-pieza-nombre">Pieza: {pieza.Pieza || 'N/A'}</span>
                                                 <br />
-                                                
                                                 <div className="detalle-pieza-marca"> 
                                                     <span>Marca:</span>
                                                     {marcaLogoUrl && (
                                                         <img 
-                                                        src={marcaLogoUrl} 
-                                                        loading="lazy"
-                                                        alt={pieza.Marca || 'Marca'}
-                                                        className="logo-marca-historial" 
+                                                            src={marcaLogoUrl} 
+                                                            loading="lazy"
+                                                            alt={pieza.Marca || 'Marca'}
+                                                            className="logo-marca-historial" 
                                                         />
                                                     )}
                                                     <span>{pieza.Marca || 'Marca Desconocida'}</span>
@@ -246,11 +218,11 @@ const EstadisticasPage = () => {
                                 )}
                             </div>
                         )}
-                        </Container>
+                    </Container>
 
                     <hr style={{ borderTop: '1px solid #123e3d', margin: '40px 0' }} />
 
-                    {/* --- SECCIÓN 2: EXPERIENCIA DE USUARIO MÁS VOTADA (Experiencia) --- */}
+                    {/* EXPERIENCIA DE USUARIO*/}
                     <div className="stats-section">
                         <h2>⭐ Experiencia de Usuario Votada</h2>
                         <p style={{ color: '#c7d2d2', marginBottom: '20px' }}>
@@ -263,32 +235,27 @@ const EstadisticasPage = () => {
                                     Excelente ({stats.experienciaVotos.EXCELENTE})
                                 </div>
                                 <div className="progress-bar-wrapper">
-                                {/* USO DE PROGRESS BAR DE BOOTSTRAP: EXCELENTE */}
-                                <ProgressBar 
-                                    now={getNumericPercentage(excelentePercent)} 
-                                    label={excelentePercent} 
-                                    variant="success" 
-                                    // Asegura que se vea bien en tu tema
-                                    className="excellent-bar bar-carga" 
-                                />
+                                    <ProgressBar 
+                                        now={getNumericPercentage(excelentePercent)} 
+                                        label={excelentePercent} 
+                                        variant="success" 
+                                        className="excellent-bar bar-carga" 
+                                    />
                                 </div>
                             </div>
-
                             {/* Buena */}
                             <div className="vote-bar-item">
-                                 <div className="vote-label" style={{ color: '#c7d2d2' }}>
-                                  Buena ({stats.experienciaVotos.BUENA})
-                                 </div>
-                                 <div className="progress-bar-wrapper">
-                                    {/* USO DE PROGRESS BAR DE BOOTSTRAP: BUENA */}
+                                <div className="vote-label" style={{ color: '#c7d2d2' }}>
+                                    Buena ({stats.experienciaVotos.BUENA})
+                                </div>
+                                <div className="progress-bar-wrapper">
                                     <ProgressBar 
                                         now={getNumericPercentage(buenaPercent)} 
                                         label={buenaPercent} 
-                                        // Usar una variante secundaria o de información para un color neutro/claro
                                         variant="info" 
                                         className="good-bar bar-carga"
                                     />
-                                 </div>
+                                </div>
                             </div>                  
                             {/* Mala */}
                             <div className="vote-bar-item">
@@ -296,23 +263,19 @@ const EstadisticasPage = () => {
                                     Mala ({stats.experienciaVotos.MALA})
                                 </div>
                                 <div className="progress-bar-wrapper">
-                                     {/* USO DE PROGRESS BAR DE BOOTSTRAP: MALA */}
-                                     <ProgressBar 
+                                    <ProgressBar 
                                         now={getNumericPercentage(malaPercent)} 
                                         label={malaPercent} 
                                         variant="danger" 
                                         className="bad-bar bar-carga"
-                                     />
+                                    />
                                 </div>
                             </div>
                         </div>
                     </div>
-
-
                 </div>
-               
             </div>
-             <Footer />
+            <Footer />
         </>
     );
 };
