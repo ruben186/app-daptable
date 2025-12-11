@@ -327,13 +327,15 @@
 }
 /* Items hijos de los grupos */
 .menu-drawer-list div[role="region"] > .menu-drawer-item {
-  padding-left: 36px; 
   background: #115C56;
   color: #3BD5C4;
   margin: 0;
 }
 .menu-drawer-list div[role="region"] > .menu-drawer-item:hover {
   background: #12a793; color: #0E4D48; transform: translateX(6px);
+}
+.menu-marca{
+  padding-left: 36px; 
 }
 
 .menu-drawer-item.brand-item {
@@ -535,7 +537,7 @@
 }
 @media (max-width: 1400px) {
   .menu-toggle {right: 90px;}
-  .menu-drawer { width: 20%; left: -20%; }
+  .menu-drawer { width: 30%; left: -30%; }
   .menu-drawer.open { left: 0; }
   .menu-drawer-header{padding: 11.5px 12px;}
   .menu-drawer-item {
@@ -667,6 +669,7 @@
     font-size: 1rem;
     padding: 12px 14px;
   }
+  .menu-marca{padding-left: 36px;}
   .carousel-inner {
     min-height: 50px;
     height: 175px;     

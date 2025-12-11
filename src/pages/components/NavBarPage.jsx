@@ -33,7 +33,6 @@ function NavBar() {
   // Obtener rol desde Firestore
   useEffect(() => {
     const handleResize = () => {
-      // Actualiza el estado del breakpoint
       setIsLargeScreen(window.innerWidth >= 992);
     };
 

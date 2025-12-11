@@ -139,14 +139,14 @@ function MenuNavbar({ navigate, setActiveBrand, showBrandsInDrawer }) {
                   </button>
                 )}
                 <ExpandableGroup title="Marcas" id="marcas" drawerOpen={open}>
-                  <MarcaItem logoSrc={logoxiami} brand="xiaomi" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
-                  <MarcaItem logoSrc={logosamgsumg} brand="samsung" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
-                  <MarcaItem logoSrc={logohuawei} brand="huawei" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
-                  <MarcaItem logoSrc={logomotorola} brand="motorola" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
-                  <MarcaItem logoSrc={logoOppo} brand="oppo" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
-                  <MarcaItem logoSrc={logoRealme} brand="realme" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
-                  <MarcaItem logoSrc={logoVivo} brand="vivo" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
-                  <MarcaItem logoSrc={logoZTE} brand="zte" navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                  <MarcaItem logoSrc={logoxiami} brand="xiaomi" className='menu-marca' navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                  <MarcaItem logoSrc={logosamgsumg} brand="samsung" className='menu-marca' navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                  <MarcaItem logoSrc={logohuawei} brand="huawei" className='menu-marca' navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                  <MarcaItem logoSrc={logomotorola} brand="motorola" className='menu-marca' navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                  <MarcaItem logoSrc={logoOppo} brand="oppo" className='menu-marca' navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                  <MarcaItem logoSrc={logoRealme} brand="realme" className='menu-marca' navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                  <MarcaItem logoSrc={logoVivo} brand="vivo" className='menu-marca' navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
+                  <MarcaItem logoSrc={logoZTE} brand="zte" className='menu-marca' navigate={navigate} setActiveBrand={setActiveBrand} setOpen={setOpen} />
                 </ExpandableGroup>
               </>
             )}

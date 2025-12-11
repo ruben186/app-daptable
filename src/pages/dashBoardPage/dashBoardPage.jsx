@@ -27,6 +27,8 @@ const getYoutubeThumbnail = (url) => {
 function DashboardPage() {
   const [featuredItems, setFeaturedItems] = useState([]);
   const navigate = useNavigate();
+  const [resSlideMin, setResSlideMin] = useState(window.innerWidth >= 400)
+  const [resSlideMed, setResSlideMed] = useState(window.innerWidth >= 1000)
       
   useEffect(() => {
     const fetchItems = async () => {
@@ -61,7 +63,15 @@ function DashboardPage() {
     };
     fetchItems();
   }, []); 
+  useEffect(() => {
+    const handleResize = () => {
+      setResSlideMin(window.innerWidth >= 400);
+      setResSlideMed(window.innerWidth >= 1000);
+    };
 
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   // Componente de Flecha Anterior
   const PrevArrow = ({ onClick }) => (
     <div 
@@ -83,16 +93,25 @@ function DashboardPage() {
       <FaChevronRight className="arrow-icon right" />
     </div>
   );
+  const TamañoSlide = () => {
+    if(!resSlideMin){
+      return 1;
+    }
+    if(!resSlideMed){
+      return 2;
+    }
+    return 3;
+  }
 
   // Configuracion del carrusel
   const sliderSettings = {
     dots: true,
     infinite: featuredItems.length > 3, 
     speed: 500,
-    slidesToShow: 3, 
+    slidesToShow: TamañoSlide(), 
     slidesToScroll: 1,
     autoplay: true, 
-    autoplaySpeed: 5000,
+    autoplaySpeed: 3000,
     centerMode: true,
     centerPadding: '0px',
     prevArrow: <PrevArrow />,
@@ -115,26 +134,9 @@ function DashboardPage() {
           textAlign: 'center'
         }}
       >
-        <ul style={{ margin: "0px" }}> {dots} </ul>
+        <ul style={{ margin: "0px", paddingLeft: "0px"}}> {dots} </ul>
       </div>
-    ),
-    
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 2, 
-          slidesToScroll: 1,
-        }
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1
-        }
-      }
-    ]
+    )
   };
 
   const goToDetalle = (item) => {
