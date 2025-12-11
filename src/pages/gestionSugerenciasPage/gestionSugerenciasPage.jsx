@@ -48,13 +48,8 @@ const formatFecha = (timestamp) => {
     return String(timestamp);
 };
 
-// ====================================================
-// MODAL DE REVISIÓN Y EDICIÓN DE SUGERENCIAS
-// ====================================================
-
 const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasNombre, marcaNames }) => {
     const [formData, setFormData] = useState({});
-    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (sugerencia) {
@@ -85,8 +80,8 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
     };
     
     // Función para manejar el guardado de los cambios (edición)
-        const handleGuardarCambios = async (e) => {
-            const requiredFields = [
+    const handleGuardarCambios = async (e) => {
+        const requiredFields = [
             { name: 'estado', label: 'Estado', minLength: 1 },
             { name: 'nombreCelular', label: 'Nombre Celular', minLength: 3 },
             { name: 'marcaOriginal', label: 'Marca (Origen)', minLength: 2 },
@@ -107,7 +102,7 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
             }
         });
 
-        // 3. Detener si hay campos faltantes/inválidos
+        // Detener si hay campos faltantes/inválidos
         if (missingFields.length > 0) {
             Swal.fire({
                 icon: 'warning',
@@ -115,7 +110,7 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
                 text: `Por favor, llenar todos los campos necesarios`, 
                 background: '#052b27ff', 
                 color: '#ffdfdfff', 
-                confirmButtonColor: '#0b6860ff',
+                confirmButtonColor: '#0b6860ff'
             });
             
             return; // Detiene la ejecución
@@ -124,9 +119,9 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
             await updateDoc(doc(db, 'sugerenciasPiezas', formData.id), {
                 nombreCelular: formData.nombreCelular,
                 pieza: formData.pieza,
-                marca: formData.marcaOriginal, // Se guarda en 'marca' en la DB
+                marca: formData.marcaOriginal,
                 modelo: formData.modeloOriginal, 
-                adaptableMarca: formData.marcaAdaptable, // Se guarda en 'adaptableMarca' en la DB
+                adaptableMarca: formData.marcaAdaptable, 
                 adaptableModelo: formData.modeloAdaptable,
                 estado: formData.estado, 
                 fechaEdicion: new Date(), 
@@ -137,8 +132,9 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
                 icon: 'success',
                 background: '#052b27ff',
                 color: '#ffff',
-                confirmButtonColor: '#07433E',
+                confirmButtonColor: '#07433E'
             });
+
             handleClose();
             refreshTable(); 
         } catch (error) {
@@ -147,45 +143,24 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
         } 
     };
     
-    // Función para obtener la clase de estilo del estado
-   
-
     if (!sugerencia) return null;
-
-    // =========================================================
-    // LÓGICA DE RENDERING DEL CUERPO DEL MODAL (ESTILO NUEVO)
-    // =========================================================
-
     // Lógica para Pieza Original (para select y input condicional)
     const pieceOptions = piezasNombre || [];
     const isRegisteredPiece = pieceOptions.some(p => p === formData.pieza);
-    const isCustomPiece = formData.pieza && 
-                            formData.pieza !== 'Seleccionar' && 
-                            formData.pieza !== 'Otro' &&
-                            !isRegisteredPiece;
+    const isCustomPiece = formData.pieza && formData.pieza !== 'Seleccionar' && formData.pieza !== 'Otro' && !isRegisteredPiece;
     const selectPieceValue = isCustomPiece ? 'Otro' : (formData.pieza || 'Seleccionar');
 
     // Lógica para Marca Original (para select y input condicional)
     const marcaOptions = marcaNames || []; 
     const isRegisteredMarca = marcaOptions.some(m => m === formData.marcaOriginal);
-    const isCustomMarca = formData.marcaOriginal && 
-                            formData.marcaOriginal !== 'Seleccionar' && 
-                            formData.marcaOriginal !== 'Otro' &&
-                            !isRegisteredMarca;
+    const isCustomMarca = formData.marcaOriginal && formData.marcaOriginal !== 'Seleccionar' && formData.marcaOriginal !== 'Otro' && !isRegisteredMarca;
     const selectMarcaValue = isCustomMarca ? 'Otro' : (formData.marcaOriginal || 'Seleccionar');
 
     // Lógica para Marca Adaptable (para select y input condicional)
     const isRegisteredAdaptableMarca = marcaOptions.some(m => m === formData.marcaAdaptable);
-    const isCustomAdaptableMarca = formData.marcaAdaptable && 
-                            formData.marcaAdaptable !== 'Seleccionar' && 
-                            formData.marcaAdaptable !== 'Otro' &&
-                            !isRegisteredAdaptableMarca;
-    const selectAdaptableMarcaValue = isCustomAdaptableMarca 
-        ? 'Otro' 
-        : (formData.marcaAdaptable || 'Seleccionar');
-        
+    const isCustomAdaptableMarca = formData.marcaAdaptable && formData.marcaAdaptable !== 'Seleccionar' && formData.marcaAdaptable !== 'Otro' && !isRegisteredAdaptableMarca;
+    const selectAdaptableMarcaValue = isCustomAdaptableMarca ? 'Otro' : (formData.marcaAdaptable || 'Seleccionar');
     const fechaFormateada = formatFecha(sugerencia.fechaSugerencia);
-
 
     const renderGestionSugerenciasModalBody = () => (
         <Form>
@@ -198,7 +173,6 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
                         type="text" 
                         value={formData.nombreUsuario || ''} 
                         disabled 
-                       
                     />
                 </Form.Group>
                 <Form.Group className="mb-2 w-50 ps-2">
@@ -207,7 +181,6 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
                         type="text" 
                         value={fechaFormateada} 
                         disabled
-                      
                     />
                 </Form.Group>
             </div>
@@ -257,10 +230,9 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
                 <Form.Group className="mb-2 w-50 ps-2">
                     <Form.Label>Marca</Form.Label>
                     <Form.Select
-                        name="marcaOriginal" // Nombre correcto del campo en formData
+                        name="marcaOriginal" 
                         value={selectMarcaValue} 
                         onChange={handleInputChange}
-                       
                     >
                         <option value="Seleccionar">Seleccionar</option>
                         {marcaOptions.map((marcaName, index) => (
@@ -275,7 +247,7 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
                         <Form.Control
                             className="mt-2"
                             type="text"
-                            name="marcaOriginal" // Nombre correcto del campo en formData
+                            name="marcaOriginal"
                             value={formData.marcaOriginal === 'Otro' ? '' : formData.marcaOriginal || ''}
                             placeholder="Escriba la marca aqui"
                             onChange={handleInputChange}
@@ -290,10 +262,9 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
                     <Form.Label >Modelo</Form.Label>
                     <Form.Control
                         type="text"
-                        name="modeloOriginal" // Nombre correcto del campo en formData
+                        name="modeloOriginal" 
                         value={formData.modeloOriginal || ''}
                         onChange={handleInputChange}
-                    
                     />
                 </Form.Group>
                 <Form.Group className="mb-2 w-50 ps-2">
@@ -326,7 +297,6 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
                 </Form.Group>
                 
             </div>
-            
             <hr/>
             <h6 className="mt-3 mb-2">Compatible con:</h6>
 
@@ -335,10 +305,9 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
                 <Form.Group className="mb-2 w-50 pe-2">
                     <Form.Label>Marca</Form.Label>
                     <Form.Select
-                        name="marcaAdaptable" // Nombre correcto del campo en formData
+                        name="marcaAdaptable" 
                         value={selectAdaptableMarcaValue}
                         onChange={handleInputChange}
-                        
                     >
                         <option value="Seleccionar">Seleccionar</option>
                         {marcaOptions.map((marcaName, index) => (
@@ -353,7 +322,7 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
                         <Form.Control
                             className="mt-2 "
                             type="text"
-                            name="marcaAdaptable" // Nombre correcto del campo en formData
+                            name="marcaAdaptable" 
                             value={formData.marcaAdaptable === 'Otro' ? '' : formData.marcaAdaptable || ''}
                             placeholder="Escriba la marca aqui"
                             onChange={handleInputChange}
@@ -364,18 +333,15 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
                     <Form.Label >Nombre y Modelo</Form.Label>
                     <Form.Control
                         type="text"
-                        name="modeloAdaptable" // Nombre correcto del campo en formData
+                        name="modeloAdaptable" 
                         value={formData.modeloAdaptable || ''}
                         onChange={handleInputChange}
                         
                     />
                 </Form.Group>
             </div>
-            
-            
         </Form>
     );
-
 
     return (
         <Modal show={show} onHide={handleClose}  centered>
@@ -403,17 +369,11 @@ const ModalSugerencias = ({ show, handleClose, sugerencia, refreshTable, piezasN
     );
 };
 
-
-// ====================================================
-// COMPONENTE PRINCIPAL
-// ====================================================
-
 function GestionSugerenciasPage() {
     const navigate = useNavigate(); 
     const [sugerencias, setSugerencias] = useState([]);
     const [sugerenciasFiltradas, setSugerenciasFiltradas] = useState([]); 
     const [searchTerm, setSearchTerm] = useState(''); 
-    const [loading, setLoading] = useState(true); 
     const [piezasNombre, setPiezasNombre] = useState([]);
     const [marcaNames, setMarcaNames] = useState([]);
 
@@ -426,88 +386,79 @@ function GestionSugerenciasPage() {
         setSelectedSugerencia(null);
     };
 
-    // ----------------------------------------------------
-    // CARGA DE DATOS (CON BÚSQUEDA CRUZADA DE USUARIOS)
-    // ----------------------------------------------------
     const fetchSugerencias = async () => {
-          setLoading(true);
-          try {
-              // 1. Obtener Sugerencias (Colección: 'sugerenciasPiezas')
-              const suggestionsSnapshot = await getDocs(collection(db, 'sugerenciasPiezas')); 
-              let suggestionsData = suggestionsSnapshot.docs.map(doc => ({
-                  id: doc.id,
-                  ...doc.data(),
-                  userId: doc.data().userId || null, 
-                  nombreUsuario: doc.data().nombreUsuario || 'Anónimo', 
-                  emailUsuario: doc.data().emailUsuario || 'N/A',
-                  estado: doc.data().estado || 'Pendiente', 
-                  fechaSugerencia: doc.data().fechaSugerencia || null,
-                  marca: doc.data().marca || '', // Marca Original
-                  modelo: doc.data().modelo || '',
-                  adaptableMarca: doc.data().adaptableMarca || '', // Marca Adaptable
-                  adaptableModelo: doc.data().adaptableModelo || '',
-                  pieza: doc.data().pieza || '',
-                  comentarios: doc.data().comentarios || 'Sin comentarios.'
-              }));
+        try {
+            // Obtener Sugerencias
+            const suggestionsSnapshot = await getDocs(collection(db, 'sugerenciasPiezas')); 
+            let suggestionsData = suggestionsSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+                userId: doc.data().userId || null, 
+                nombreUsuario: doc.data().nombreUsuario || 'Anónimo', 
+                emailUsuario: doc.data().emailUsuario || 'N/A',
+                estado: doc.data().estado || 'Pendiente', 
+                fechaSugerencia: doc.data().fechaSugerencia || null,
+                marca: doc.data().marca || '', 
+                modelo: doc.data().modelo || '',
+                adaptableMarca: doc.data().adaptableMarca || '', 
+                adaptableModelo: doc.data().adaptableModelo || '',
+                pieza: doc.data().pieza || '',
+                comentarios: doc.data().comentarios || 'Sin comentarios.'
+            }));
 
-              // 2. Recolectar IDs de Usuarios únicos
-              const userIds = [...new Set(suggestionsData.map(sug => sug.userId).filter(id => id))];
-              const usersMap = {}; 
+            // Recolectar IDs de Usuarios únicos
+            const userIds = [...new Set(suggestionsData.map(sug => sug.userId).filter(id => id))];
+            const usersMap = {}; 
 
-              // 3. Buscar Datos de Usuarios usando los IDs recopilados
-              if (userIds.length > 0) {
-                  const usersQuery = query(collection(db, 'usuarios'), where(documentId(), 'in', userIds));
-                  const usersSnapshot = await getDocs(usersQuery);
-                  
-                  usersSnapshot.docs.forEach(userDoc => {
-                      const userData = userDoc.data();
-                      usersMap[userDoc.id] = {
-                          nombre: userData.nombreCompleto || userData.nombre || 'Usuario Desconocido',
-                          correo: userData.email || userData.correo || 'correo_no_disponible@app.com',
-                      };
-                  });
-              }
-              
-              // 4. Fusionar Datos de Usuario en Sugerencias
-              const enrichedData = suggestionsData.map(sug => {
-                  const userData = usersMap[sug.userId];
-                  if (userData) {
-                      return {
-                          ...sug,
-                          nombreUsuario: userData.nombre,
-                          emailUsuario: userData.correo,
-                      };
-                  }
-                  return sug;
-              });
+            // Buscar Datos de Usuarios usando los IDs recopilados
+            if (userIds.length > 0) {
+                const usersQuery = query(collection(db, 'usuarios'), where(documentId(), 'in', userIds));
+                const usersSnapshot = await getDocs(usersQuery);
+                
+                usersSnapshot.docs.forEach(userDoc => {
+                    const userData = userDoc.data();
+                    usersMap[userDoc.id] = {
+                        nombre: userData.nombreCompleto || userData.nombre || 'Usuario Desconocido',
+                        correo: userData.email || userData.correo || 'correo_no_disponible@app.com',
+                    };
+                });
+            }
+    
+            // Fusionar Datos de Usuario en Sugerencias
+            const enrichedData = suggestionsData.map(sug => {
+                const userData = usersMap[sug.userId];
+                if (userData) {
+                    return {
+                        ...sug,
+                        nombreUsuario: userData.nombre,
+                        emailUsuario: userData.correo,
+                    };
+                }
+                return sug;
+            });
 
-              // 5. Ordenar y establecer estado
-              const sortedData = enrichedData.sort((a, b) => {
-                  if (a.estado === 'Pendiente' && b.estado !== 'Pendiente') return -1;
-                  if (a.estado !== 'Pendiente' && b.estado === 'Pendiente') return 1;
-                  
-                  const dateA = a.fechaSugerencia && a.fechaSugerencia.seconds ? new Date(a.fechaSugerencia.seconds * 1000) : new Date(0);
-                  const dateB = b.fechaSugerencia && b.fechaSugerencia.seconds ? new Date(b.fechaSugerencia.seconds * 1000) : new Date(0);
-                  return dateB - dateA; 
-              });
+            //  Ordenar y establecer estado
+            const sortedData = enrichedData.sort((a, b) => {
+                if (a.estado === 'Pendiente' && b.estado !== 'Pendiente') return -1;
+                if (a.estado !== 'Pendiente' && b.estado === 'Pendiente') return 1;
+                
+                const dateA = a.fechaSugerencia && a.fechaSugerencia.seconds ? new Date(a.fechaSugerencia.seconds * 1000) : new Date(0);
+                const dateB = b.fechaSugerencia && b.fechaSugerencia.seconds ? new Date(b.fechaSugerencia.seconds * 1000) : new Date(0);
+                return dateB - dateA; 
+            });
 
-              setSugerencias(sortedData);
-              setSugerenciasFiltradas(sortedData); 
-          } catch (error) {
-              console.error("Error al cargar sugerencias:", error);
-              Swal.fire('Error', 'No se pudieron cargar las sugerencias. Verifique la conexión a Firebase.', 'error');
-          } finally {
-              setLoading(false);
-          }
+            setSugerencias(sortedData);
+            setSugerenciasFiltradas(sortedData); 
+        } catch (error) {
+            console.error("Error al cargar sugerencias:", error);
+            Swal.fire('Error', 'No se pudieron cargar las sugerencias. Verifique la conexión a Firebase.', 'error');
+        }
     };
     
     useEffect(() => {
         fetchSugerencias();
     }, []);
 
-    // ----------------------------------------------------
-    // LÓGICA DE BÚSQUEDA
-    // ----------------------------------------------------
     useEffect(() => {
         const results = sugerencias.filter(sug => 
             sug.marca?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -526,42 +477,39 @@ function GestionSugerenciasPage() {
         setSearchTerm(e.target.value);
     };
 
-     useEffect(() => {
+    useEffect(() => {
         const fetchPiezas = async () => {
-            setLoading(true);
             try {
                 const querySnapshot = await getDocs(collection(db, 'tablas')); 
                 
                 const rawPiezas = querySnapshot.docs
-                    .map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    }));
+                .map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
                 
-                // Nuevo paso: Aplanar la estructura de datos
                 const flatPiezas = rawPiezas.flatMap(pieza => {
                     // Si 'campos' es un array válido y tiene elementos
                     if (Array.isArray(pieza.campos) && pieza.campos.length > 0) {
                         return pieza.campos.map((campoItem, index) => ({
-                            // 1. Datos de nivel superior
-                            id: `${pieza.id}-${index}`, // ID ÚNICO para la fila: ID_Documento-Indice_Array
-                            parentId: pieza.id, // Referencia al ID del documento de Firestore
+                            // Datos de nivel superior
+                            id: `${pieza.id}-${index}`, 
+                            parentId: pieza.id, 
                             nombre: pieza.nombre || '',
                             marca: pieza.marca || '',
                             modelo: pieza.modelo || '',
                             
-                            // 2. Datos anidados del array 'campos'
+                            // Datos anidados del array 'campos'
                             campo: campoItem.campo || '',
                             codigo: campoItem.codigo || '',
                             codigoCompatibilidad: campoItem.codigoCompatibilidad || '',
                             
-                            // 3. Índice original para el manejo de la edición
+                            // Índice original para el manejo de la edición
                             campoIndex: index 
                         }));
                     }
                     
-                    // Si la pieza no tiene campos, aún la incluimos (si es necesario) o la ignoramos.
-                    // Aquí la incluiremos como una sola fila 'vacía'.
+                    // Si la pieza no tiene campos, aún la incluimos o la ignoramos.
                     return [{
                         id: `${pieza.id}-0`, 
                         parentId: pieza.id,
@@ -579,16 +527,10 @@ function GestionSugerenciasPage() {
                 setMarcaNames(uniqueMarcaNames);
             } catch (error) {
                 console.error("Error al cargar piezas (tablas):", error);
-            } finally {
-                setLoading(false);
             }
         };
         fetchPiezas();
     }, []);
-    
-    // ----------------------------------------------------
-    // HANDLERS DE ACCIONES
-    // ----------------------------------------------------
 
     // Muestra el modal de revisión
     const handleRevisar = (sug) => {
@@ -596,63 +538,58 @@ function GestionSugerenciasPage() {
         setShowModal(true);
     };
 
-
     const handleEliminar = async (id) => {
-          const result = await Swal.fire({
-              title:"¿Eliminar Sugerencia?", 
-              text: "¡Esta acción eliminará la sugerencia permanentemente!", 
-              icon: "warning",
-              showCancelButton: true,
-              background: '#052b27ff', 
-              color: '#ffdfdfff', 
-              confirmButtonColor: '#c55123ff', 
-              cancelButtonColor: '#07433E', 
-              confirmButtonText: 'Sí, eliminar',
-              cancelButtonText: 'Cancelar'
-          });
+        const result = await Swal.fire({
+            title:"¿Eliminar Sugerencia?", 
+            text: "¡Esta acción eliminará la sugerencia permanentemente!", 
+            icon: "warning",
+            showCancelButton: true,
+            background: '#052b27ff', 
+            color: '#ffdfdfff', 
+            confirmButtonColor: '#c55123ff', 
+            cancelButtonColor: '#07433E', 
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
 
-          if (result.isConfirmed) {
-              try {
-                  await deleteDoc(doc(db, 'sugerenciasPiezas', id)); 
-                  fetchSugerencias(); 
-                  Swal.fire({
-                      title: 'Eliminado', 
-                      text: 'Sugerencia eliminada correctamente.', 
-                      icon: 'success',
-                      background: '#052b27ff', 
-                      color: '#ffdfdfff', 
-                      confirmButtonColor: '#0b6860ff'
-                  });
-              } catch (error) {
-                  console.error(error);
-                  Swal.fire({
-                      title:"Error", 
-                      text: "No se pudo eliminar el registro.", 
-                      icon: "error",
-                      background: '#052b27ff', 
-                      color: '#ffdfdfff', 
-                      confirmButtonColor: '#0b6860ff',
-                  });
-              }
-          }
+        if (result.isConfirmed) {
+            try {
+                await deleteDoc(doc(db, 'sugerenciasPiezas', id)); 
+                fetchSugerencias(); 
+                Swal.fire({
+                    title: 'Eliminado', 
+                    text: 'Sugerencia eliminada correctamente.', 
+                    icon: 'success',
+                    background: '#052b27ff', 
+                    color: '#ffdfdfff', 
+                    confirmButtonColor: '#0b6860ff'
+                });
+            } catch (error) {
+                console.error(error);
+                Swal.fire({
+                    title:"Error", 
+                    text: "No se pudo eliminar el registro.", 
+                    icon: "error",
+                    background: '#052b27ff', 
+                    color: '#ffdfdfff', 
+                    confirmButtonColor: '#0b6860ff'
+                });
+            }
+        }
     };
-    
-    // ----------------------------------------------------
-    // FUNCIONES DE ESTILO Y UTILERÍA
-    // ----------------------------------------------------
 
     const getEstadoClase = (estado) => {
-          switch ((estado || 'Pendiente').toLowerCase()) {
-              case 'aceptado':
-                  return 'bg-success1'; 
-              case 'rechazado':
-                  return 'bg-danger1'; 
-              case 'en revisión':
-                  return 'bg-info1'; 
-              case 'pendiente':
-              default:
-                  return 'bg-warning1'; 
-          }
+        switch ((estado || 'Pendiente').toLowerCase()) {
+            case 'aceptado':
+                return 'bg-success1'; 
+            case 'rechazado':
+                return 'bg-danger1'; 
+            case 'en revisión':
+                return 'bg-info1'; 
+            case 'pendiente':
+            default:
+                return 'bg-warning1'; 
+        }
     };
     
     return (
@@ -717,39 +654,31 @@ function GestionSugerenciasPage() {
                                     <tbody>
                                         {sugerenciasFiltradas.map(sug => (
                                             <tr key={sug.id}>
-                                                
-                                                {/* 1. Sugerente (Nombre / Correo) */}
                                                 <td>
                                                     <p className='mb-0 fw-bold'>{sug.nombreUsuario}</p>
                                                     <span className='small' style={{color: '#257e73'}}>{sug.emailUsuario}</span>
                                                 </td>
 
-                                                {/* 2. Pieza Sugerida */}
                                                 <td className='fw-bold'>{sug.pieza || 'Desconocida'}</td>
 
-                                                {/* 3. ORIGINAL  */}
                                                 <td>
                                                     <span className='badge bg-dark me-1'>ORIGEN</span><br/>
                                                     {sug.nombreCelular || 'N/A'} - {sug.modelo || 'N/A'}
                                                 </td>
 
-                                                {/* 4. ADAPTABLE  */}
                                                 <td>
                                                     <span className='badge bg-info text-dark me-1'>DESTINO</span><br/>
                                                      {sug.adaptableModelo || 'N/A'} - {sug.adaptableMarca || 'N/A'}
                                                 </td>
 
-                                                {/* 5. Fecha Envío */}
                                                 <td className='small'>{formatFecha(sug.fechaSugerencia) || '-'}</td>
 
-                                                {/* 6. Estado */}
                                                 <td>
                                                     <span className={`badge estado-badge ${getEstadoClase(sug.estado)}`}>
                                                         {sug.estado || 'Pendiente'}
                                                     </span>
                                                 </td>
 
-                                                {/* 7. Acciones */}
                                                 <td>
                                                     <Button
                                                         size="sm"
@@ -795,7 +724,6 @@ function GestionSugerenciasPage() {
                 handleClose={handleCloseModal} 
                 sugerencia={selectedSugerencia} 
                 refreshTable={fetchSugerencias} 
-                // Pasamos las listas de referencia al modal
                 piezasNombre={piezasNombre}
                 marcaNames={marcaNames}
             />

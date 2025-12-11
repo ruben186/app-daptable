@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
 import { collection, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { Navbar, Nav, Container, NavDropdown, Table, Button, Form, Modal, Image, InputGroup } from 'react-bootstrap';
-import { FaEdit, FaTrash, FaUserCircle, FaPlus, FaSearch } from 'react-icons/fa';
+import { Container, Table, Button, Form, Modal, InputGroup } from 'react-bootstrap';
+import { FaPlus} from 'react-icons/fa';
 import Swal from 'sweetalert2';
-import { auth, db } from '../../firebase';
-import { signOut } from 'firebase/auth';
+import { db } from '../../firebase';
 import './gestionUsuarioPage.css';
-import logo from '../../assets/logos/logoapp-daptable.jpeg';
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
 import IconoBuscar from '../../assets/Iconos/iconoLupa.png';
@@ -16,12 +14,12 @@ import IconoEliminar from '../../assets/Iconos/iconoEliminar.png';
 import IconoUsuario from '../../assets/Iconos/usuario2.png';
 
 function GestionUsuariosPage() {
-    const navigate = useNavigate(); // Añadir useNavigate
+    const navigate = useNavigate(); 
     const [usuarios, setUsuarios] = useState([]);
-    const [usuariosFiltrados, setUsuariosFiltrados] = useState([]); // Nuevo estado para usuarios filtrados
+    const [usuariosFiltrados, setUsuariosFiltrados] = useState([]); 
     const [showModal, setShowModal] = useState(false);
     const [selectedAux, setSelectedAux] = useState(null);
-    const [searchTerm, setSearchTerm] = useState(''); // Nuevo estado para la búsqueda
+    const [searchTerm, setSearchTerm] = useState(''); 
 
     useEffect(() => {
        const fetchUsuarios = async () => {
@@ -67,9 +65,9 @@ function GestionUsuariosPage() {
              text: "¡No podrás recuperar este registro!", 
              icon: "warning",
              showCancelButton: true,
-             background: '#052b27ff', // Color de fondo personalizado
-             color: '#ffdfdfff', // Color del texto personalizado
-             confirmButtonColor: '#07433E', // Color del botón de confirmación
+             background: '#052b27ff', 
+             color: '#ffdfdfff', 
+             confirmButtonColor: '#07433E', 
              cancelButtonColor: 'rgba(197, 81, 35, 1)',
              confirmButtonText: 'Sí, eliminar',
              cancelButtonText: 'Cancelar'
@@ -83,8 +81,8 @@ function GestionUsuariosPage() {
                     title: 'Eliminado', 
                     text: 'Registro eliminado correctamente.', 
                     icon: 'success',
-                    background: '#052b27ff', // Color de fondo personalizado
-                    color: '#ffdfdfff', // Color del texto personalizado
+                    background: '#052b27ff', 
+                    color: '#ffdfdfff', 
                     confirmButtonColor: '#0b6860ff'
                 });
             } catch (error) {
@@ -93,9 +91,9 @@ function GestionUsuariosPage() {
                     title:"Error", 
                     text: "No se puedo eliminar el registro.", 
                     icon: "error",
-                    background: '#052b27ff', // Color de fondo personalizado
-                    color: '#ffdfdfff', // Color del texto personalizado
-                    confirmButtonColor: '#0b6860ff',
+                    background: '#052b27ff', 
+                    color: '#ffdfdfff',
+                    confirmButtonColor: '#0b6860ff'
                 });
             }
          }
@@ -138,9 +136,9 @@ function GestionUsuariosPage() {
                      title:"Campos incompletos", 
                      text: "Todos los campos deben ser llenados.", 
                      icon: "error",
-                     background: '#052b27ff', // Color de fondo personalizado
-                     color: '#ffdfdfff', // Color del texto personalizado
-                     confirmButtonColor: '#0b6860ff',
+                     background: '#052b27ff', 
+                     color: '#ffdfdfff', 
+                     confirmButtonColor: '#0b6860ff'
                  });
                  return;
              }else{
@@ -149,9 +147,9 @@ function GestionUsuariosPage() {
                      title:"Error", 
                      text: "El campo de su nombre completo solo debe contener letras.", 
                      icon: "error",
-                     background: '#052b27ff', // Color de fondo personalizado
-                     color: '#ffdfdfff', // Color del texto personalizado
-                     confirmButtonColor: '#0b6860ff',
+                     background: '#052b27ff', 
+                     color: '#ffdfdfff', 
+                     confirmButtonColor: '#0b6860ff'
                      });
                      return;
                  }
@@ -162,30 +160,30 @@ function GestionUsuariosPage() {
                             icon: "error",
                             background: '#052b27ff',
                             color: '#ffdfdfff',
-                            confirmButtonColor: '#0b6860ff',
+                            confirmButtonColor: '#0b6860ff'
                         });
                         return;
                     }
                  if (!soloNumeros.test(selectedAux.telefono)) {
                      Swal.fire({
-                     title:"Error", 
-                     text: "El campo de telefono solo debe contener numeros.", 
-                     icon: "error",
-                     background: '#052b27ff', // Color de fondo personalizado
-                     color: '#ffdfdfff', // Color del texto personalizado
-                     confirmButtonColor: '#0b6860ff',
+                        title:"Error", 
+                        text: "El campo de telefono solo debe contener numeros.", 
+                        icon: "error",
+                        background: '#052b27ff',
+                        color: '#ffdfdfff', 
+                        confirmButtonColor: '#0b6860ff'
                      });
                      return;
                  }
 
                  if(selectedAux.telefono.length > 10){
                      Swal.fire({
-                     title:"Error", 
-                     text: "El campo de telefono debe tener como maximo 10 caracteres.", 
-                     icon: "error",
-                     background: '#052b27ff', // Color de fondo personalizado
-                     color: '#ffdfdfff', // Color del texto personalizado
-                     confirmButtonColor: '#0b6860ff',
+                        title:"Error", 
+                        text: "El campo de telefono debe tener como maximo 10 caracteres.", 
+                        icon: "error",
+                        background: '#052b27ff',
+                        color: '#ffdfdfff', 
+                        confirmButtonColor: '#0b6860ff'
                      });
                      return;
                  }
@@ -219,7 +217,7 @@ function GestionUsuariosPage() {
                 icon: 'success',
                 background: '#052b27ff',
                 color: '#ffff',
-                confirmButtonColor: '#07433E',
+                confirmButtonColor: '#07433E'
             });
          } catch (error) {
              console.error(error);
@@ -240,9 +238,6 @@ function GestionUsuariosPage() {
              return updated;
          });
     };
-    
-    // Foto de usuario (si está logueado)
-    const user = auth.currentUser;
 
     const getEstadoClase = (estado) => {
          switch ((estado || 'Pendiente').toLowerCase()) {
@@ -286,14 +281,14 @@ function GestionUsuariosPage() {
     return (
         <>
             <NavBar/>
-            <main className="main-content-dashboard bg-gradient2">
+            <main className="bg-gradient2">
                 
                 <Container className="mt-5 ">
                     <div className="table-container">
                             <div className="header-tabla">
                                 {/* Título e Ícono */}
                                 <div className="nombre-tabla">
-                                    <img src={IconoUsuario} width="44px" height="44px" />
+                                    <img src={IconoUsuario} alt='' width="44px" height="44px" />
                                     <h2>
                                         Usuarios
                                     </h2>
@@ -326,6 +321,7 @@ function GestionUsuariosPage() {
                                 <img 
                                     width="28px"
                                     height="28px"
+                                    alt=''
                                     src={IconoBuscar}
                                     className='btn-icon-buscar'
                                 />

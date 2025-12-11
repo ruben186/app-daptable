@@ -5,11 +5,6 @@ import RegisterPage from './pages/registerpage/registerPage';
 import ForgotPasswordPage from './pages/forgotpage/forgotPage';
 import NotFoundPage from  './pages/components/notFoundPage';
 
-// Rutas para hooks
-import UseStatePlay from './pages/playground/UseStatePlay';
-import UseEffectPlay from './pages/playground/UseEffectPlay';
-import UseRefPlay from './pages/playground/UseRefPlay';
-
 // Protege rutas con autenticación Firebase
 import ProtectedRoute from './pages/components/protecterRoute';
 import DashboardPage from './pages/dashBoardPage/dashBoardPage';
@@ -42,15 +37,11 @@ function App() {
         {/* Rutas públicas */}
         <Route path="/" element={<LoginPage />} />
         
-        <Route path="/gestionMaEstudio" element={
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <GestionMaEstudioPage/>
-          </ProtectedRoute>
-        } />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
-        
+
+       
 
         {/* Rutas protegidas con Firebase Auth */}
         <Route path="/dashboard" element={
@@ -59,14 +50,25 @@ function App() {
           </ProtectedRoute>
         } />
 
-
         <Route path="/xiaomi" element={
           <ProtectedRoute allowedRoles={['admin', 'invitado', 'usuario']}>
             <Xiaomi/>
           </ProtectedRoute>
         } />
 
-         <Route path="/NoticiaPage" element={
+        <Route path="/btnMasXiaomi" element={
+          <ProtectedRoute allowedRoles={['admin', 'invitado', 'usuario']}>
+            <BtnMasXiaomi/>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/gestionMaEstudio" element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <GestionMaEstudioPage/>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/NoticiaPage" element={
           <ProtectedRoute allowedRoles={['admin', 'invitado', 'usuario']}>
             <NoticiaPage/>
           </ProtectedRoute>
@@ -78,27 +80,17 @@ function App() {
           </ProtectedRoute>
         } />
 
-
-        
-        <Route path="/btnMasXiaomi" element={
-          <ProtectedRoute allowedRoles={['admin', 'invitado', 'usuario']}>
-            <BtnMasXiaomi/>
-          </ProtectedRoute>
-        } />
-        
-
         <Route path="/gestionUsuarios" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <GestionUsuariosPage/>
           </ProtectedRoute>
         } />
 
-         <Route path="/gestionPiezas" element={
+        <Route path="/gestionPiezas" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <GestionPiezasPage/>
           </ProtectedRoute>
         } />
-
 
         <Route path="/TablaCel" element={
           <ProtectedRoute allowedRoles={['admin']}>
@@ -130,25 +122,25 @@ function App() {
           </ProtectedRoute>
         } />
 
-          <Route path="/EstadisticaPage" element={
+        <Route path="/EstadisticaPage" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <EstadisticaPage />
           </ProtectedRoute>
         } />
 
-         <Route path="/nuevoUsuario" element={
+        <Route path="/nuevoUsuario" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <RegNuevoUsuario/>
           </ProtectedRoute>
         } />
 
-         <Route path="/sugerirPieza" element={
+        <Route path="/sugerirPieza" element={
           <ProtectedRoute allowedRoles={['admin', 'usuario']}>
             <SugerirPieza/>
           </ProtectedRoute>
         } />
 
-         <Route path="/gestionSugerencias" element={
+        <Route path="/gestionSugerencias" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <GestionSugerenciasPage/>
           </ProtectedRoute>
@@ -178,18 +170,9 @@ function App() {
           </ProtectedRoute>
         } />
 
-
-       
-
-
-
         {/* Ruta genérica para páginas no encontradas */}
         <Route path="*" element={<NotFoundPage />} />
 
-        {/* Rutas para prácticas de hooks */}
-        <Route path="/usestate" element={<UseStatePlay />} />
-        <Route path="/useeffect" element={<UseEffectPlay />} />
-        <Route path="/useref" element={<UseRefPlay />} />
       </Routes>
     </BrowserRouter>
   );

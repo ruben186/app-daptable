@@ -14,63 +14,57 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-
   const findUserByPhoneInFirestore = async (phoneNumber) => {
-        // Asegúrate de que 'usuarios' es el nombre de tu colección
-        const usersRef = collection(db, 'usuarios');
-        
-        // Crea una consulta para buscar documentos donde el campo 'telefono' coincida
-        // con el número de teléfono limpio.
-        const q = query(usersRef, where('telefono', '==', phoneNumber));
-        const querySnapshot = await getDocs(q);
+    const usersRef = collection(db, 'usuarios');
+    const q = query(usersRef, where('telefono', '==', phoneNumber));
+    const querySnapshot = await getDocs(q);
 
-        if (!querySnapshot.empty) {
-            // Si encuentra un usuario, devuelve los datos (incluyendo el email de Auth)
-            return querySnapshot.docs[0].data();
-        }
-        return null;
-    };
+    if (!querySnapshot.empty) {
+      // Si encuentra un usuario, devuelve los datos
+      return querySnapshot.docs[0].data();
+    }
+    return null;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email || !password) {
-       Swal.fire({
-          title:"Campos vacíos", 
-          text: "Por favor llena todos los campos.", 
-          icon: "warning",
-          background: '#052b27ff', // Color de fondo personalizado
-          color: '#ffdfdfff', // Color del texto personalizado
-          confirmButtonColor: '#0b6860ff',
-        });
+      Swal.fire({
+        title:"Campos vacíos", 
+        text: "Por favor llena todos los campos.", 
+        icon: "warning",
+        background: '#052b27ff', 
+        color: '#ffdfdfff',
+        confirmButtonColor: '#0b6860ff'
+      });
       return;
     }
-     if (password.length < 6) {
-                return Swal.fire({
-                  title:"Error", 
-                  text: "Contraseña mínima de 6 caracteres", 
-                  icon: "warning",
-                  background: '#052b27ff', // Color de fondo personalizado
-                  color: '#ffdfdfff', // Color del texto personalizado
-                  confirmButtonColor: '#0b6860ff',
-                });
-            }
+
+    if (password.length < 6) {
+      return Swal.fire({
+        title:"Error", 
+        text: "Contraseña mínima de 6 caracteres", 
+        icon: "warning",
+        background: '#052b27ff',
+        color: '#ffdfdfff',
+        confirmButtonColor: '#0b6860ff'
+      });
+    }
 
     let userIdentifier = email.trim();
-    let authEmail = userIdentifier; // Usamos el valor original por defecto
+    let authEmail = userIdentifier; 
     let isPhoneNumber = false;
 
-    // Si la entrada NO contiene el símbolo '@', la tratamos como un número de teléfono.
-  if (!userIdentifier.includes('@')) {
-            isPhoneNumber = true;
-            userIdentifier = userIdentifier.replace(/[^0-9]/g, '');
-            authEmail = userIdentifier; 
-        }
+    if (!userIdentifier.includes('@')) {
+      isPhoneNumber = true;
+      userIdentifier = userIdentifier.replace(/[^0-9]/g, '');
+      authEmail = userIdentifier; 
+    }
+
     try {
-    const userCredential = await signInWithEmailAndPassword(auth, authEmail, password);
+      const userCredential = await signInWithEmailAndPassword(auth, authEmail, password);
       const user = userCredential.user;
-
-
       const userDocRef = doc(db, 'usuarios', user.uid);
       const userSnap = await getDoc(userDocRef);
 
@@ -81,107 +75,91 @@ function LoginPage() {
             title:"Acceso denegado", 
             text: "Tu cuenta está inactiva. Contacta al administrador.", 
             icon: "error",
-            background: '#052b27ff', // Color de fondo personalizado
-            color: '#ffdfdfff', // Color del texto personalizado
-            confirmButtonColor: '#0b6860ff',
+            background: '#052b27ff',
+            color: '#ffdfdfff',
+            confirmButtonColor: '#0b6860ff'
           });
           return;
         }
       }
-
       Swal.fire({
         title: "¡Bienvenido!",
         text: `Sesión iniciada como ${user.email}`,
         icon: "success",
-        background: '#052b27ff', // Color de fondo personalizado
-        color: '#ffff', // Color del texto personalizado
+        background: '#052b27ff',
+        color: '#ffff', 
         timer: 2000,
         showConfirmButton: false
       }).then(() => {
         window.location.href = "/dashboard";
       });
-
     } catch (error) {
-      // Si el error es de credenciales incorrectas (Auth/email-not-found, wrong-password, etc.)
-      if (isPhoneNumber) {
-          
-          const userData = await findUserByPhoneInFirestore(userIdentifier);
-          
-          if (userData && userData.email) {
-              // Si encontramos el usuario por teléfono en Firestore, 
-              // extraemos el email asociado (el email real de Auth)
-              const realAuthEmail = userData.email; 
-              
-              try {
-                  const userCredential = await signInWithEmailAndPassword(auth, realAuthEmail, password);
-                  
-                  const user = userCredential.user;
-                  
-
-                  const userDocRef = doc(db, 'usuarios', user.uid);
-                  const userSnap = await getDoc(userDocRef);
-                  
-                  if (userSnap.exists()) {
-                      const data = userSnap.data();
-                      if (data.estado === "Inactivo") {
-                          Swal.fire({
-                          title:"Acceso denegado", 
-                          text: "Tu cuenta está inactiva. Contacta al administrador.", 
-                          icon: "error",
-                          background: '#052b27ff', // Color de fondo personalizado
-                          color: '#ffdfdfff', // Color del texto personalizado
-                          confirmButtonColor: '#0b6860ff',
-                        });
-                        return;
-                      }
-                  }
-
+      if (isPhoneNumber) { 
+        const userData = await findUserByPhoneInFirestore(userIdentifier);
+        
+        if (userData && userData.email) {
+          // Si se encuentra el usuario por teléfono en Firestore, se extrae el email asociado
+          const realAuthEmail = userData.email; 
+          try {
+            const userCredential = await signInWithEmailAndPassword(auth, realAuthEmail, password);
+            const user = userCredential.user;
+            const userDocRef = doc(db, 'usuarios', user.uid);
+            const userSnap = await getDoc(userDocRef);
+            
+            if (userSnap.exists()) {
+              const data = userSnap.data();
+              if (data.estado === "Inactivo") {
                   Swal.fire({
-                      title: "¡Bienvenido!",
-                      text: `Sesión iniciada como ${user.email}`,
-                      icon: "success",
-                      background: '#052b27ff',
-                      color: '#ffff',
-                      timer: 2000,
-                      showConfirmButton: false
-                  }).then(() => {
-                      window.location.href = "/dashboard";
-                  });
-                  return; 
-
-              } catch (innerError) {
-                  // Si falla el Intento 2 (contraseña incorrecta para el email encontrado)
-                  console.error("Error en Intento 2 (Email real):", innerError);
-
+                  title:"Acceso denegado", 
+                  text: "Tu cuenta está inactiva. Contacta al administrador.", 
+                  icon: "error",
+                  background: '#052b27ff',
+                  color: '#ffdfdfff', 
+                  confirmButtonColor: '#0b6860ff'
+                });
+                return;
               }
+            }
+            Swal.fire({
+              title: "¡Bienvenido!",
+              text: `Sesión iniciada como ${user.email}`,
+              icon: "success",
+              background: '#052b27ff',
+              color: '#ffff',
+              timer: 2000,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.href = "/dashboard";
+            });
+            return; 
+
+          } catch (innerError) {
+            console.error("Error en Intento 2 (Email real):", innerError);
           }
+        }
       }
-      
       console.error("Error final:", error);
       Swal.fire({
-          title:"Error", 
-          text: "Credenciales incorrectas o usuario no existe.", 
-          icon: "error",
-          background: '#052b27ff',
-          color: '#ffdfdfff',
-          confirmButtonColor: '#0b6860ff',
+        title:"Error", 
+        text: "Credenciales incorrectas o usuario no existe.", 
+        icon: "error",
+        background: '#052b27ff',
+        color: '#ffdfdfff',
+        confirmButtonColor: '#0b6860ff'
       });
     }
   };
-
 
   const handleGoogleLogin = async () => {
     try {
       const googleResult = await signInWithPopup(auth, googleProvider);
       const user = googleResult.user;
-  
       const signInMethods = await fetchSignInMethodsForEmail(auth, user.email);
-  
-      // 1. Verificar si el usuario ya está en la colección 'usuarios'
+      // Verificar si el usuario ya está en la colección 'usuarios'
       const userDocRef = doc(db, 'usuarios', user.uid);
       const userSnap = await getDoc(userDocRef);
   
-      // 2. Si no existe, lo creamos como AUXILIAR por defecto
+      // Si no existe, Se crea uno nuevo
       if (!userSnap.exists()) {
         await setDoc(userDocRef, {
           nombreCompleto: user.displayName || '',
@@ -195,7 +173,7 @@ function LoginPage() {
         });
       }
   
-      // 3. Si el usuario ya tenía email+contraseña, pedir contraseña y vincular
+      // Si el usuario ya tenía email+contraseña, pedir contraseña y vincular
       if (signInMethods.includes('password')) {
         const password = await solicitarPassword();
         if (!password) {
@@ -211,8 +189,8 @@ function LoginPage() {
         title: "¡Bienvenido!",
         text: `Sesión iniciada con Google: ${user.email}`,
         icon: "success",
-        background: '#052b27ff', // Color de fondo personalizado
-        color: '#ffff', // Color del texto personalizado
+        background: '#052b27ff', 
+        color: '#ffff',
         timer: 2000,
         showConfirmButton: false
       }).then(() => {
@@ -225,9 +203,9 @@ function LoginPage() {
         title:"Error", 
         text: "No se pudo iniciar sesión con Google.", 
         icon: "error",
-        background: '#052b27ff', // Color de fondo personalizado
-        color: '#ffdfdfff', // Color del texto personalizado
-        confirmButtonColor: '#0b6860ff',
+        background: '#052b27ff', 
+        color: '#ffdfdfff', 
+        confirmButtonColor: '#0b6860ff'
       });
     }
   };
@@ -251,50 +229,46 @@ function LoginPage() {
 
   const handleGuestLogin = async () => {
     try {
-        const userCredential = await signInAnonymously(auth);
-        const user = userCredential.user;
-        
-        // Opcional: Crear un documento de invitado en Firestore si es la primera vez.
-        // Esto es útil para darle un rol de 'invitado' y gestionarlo.
-        const userDocRef = doc(db, 'usuarios', user.uid);
-        const userSnap = await getDoc(userDocRef);
-        
-        if (!userSnap.exists()) {
-             await setDoc(userDocRef, {
-                nombreCompleto: 'Invitado',
-                email: 'anonimo@appdaptable.com',
-                telefono: '', 
-                rol: 'invitado', 
-                estado: 'Activo',
-                fechaCreacion: new Date(),
-             });
-        }
-        
-        // Notificación de éxito
-        Swal.fire({
-            title: "¡Bienvenido Invitado!",
-            text: "Has iniciado sin cuenta.",
-            icon: "info",
-            background: '#052b27ff',
-            color: '#ffff',
-            timer: 2000,
-            showConfirmButton: false
-        }).then(() => {
-            window.location.href = "/dashboard";
+      const userCredential = await signInAnonymously(auth);
+      const user = userCredential.user;
+      const userDocRef = doc(db, 'usuarios', user.uid);
+      const userSnap = await getDoc(userDocRef);
+      
+      if (!userSnap.exists()) {
+        await setDoc(userDocRef, {
+          nombreCompleto: 'Invitado',
+          email: 'anonimo@appdaptable.com',
+          telefono: '', 
+          rol: 'invitado', 
+          estado: 'Activo',
+          fechaCreacion: new Date(),
         });
+      }
+        
+      Swal.fire({
+        title: "¡Bienvenido Invitado!",
+        text: "Has iniciado sin cuenta.",
+        icon: "info",
+        background: '#052b27ff',
+        color: '#ffff',
+        timer: 2000,
+        showConfirmButton: false
+      }).then(() => {
+        window.location.href = "/dashboard";
+      });
 
     } catch (error) {
-        console.error("Error al iniciar sesión anónimamente:", error);
-        Swal.fire({
-            title:"Error", 
-            text: "No se pudo iniciar como invitado.", 
-            icon: "error",
-            background: '#052b27ff',
-            color: '#ffdfdfff',
-            confirmButtonColor: '#0b6860ff',
-        });
+      console.error("Error al iniciar sesión anónimamente:", error);
+      Swal.fire({
+        title:"Error", 
+        text: "No se pudo iniciar como invitado.", 
+        icon: "error",
+        background: '#052b27ff',
+        color: '#ffdfdfff',
+        confirmButtonColor: '#0b6860ff'
+      });
     }
-};
+  };
 
   return (
     <div className="login-bg">

@@ -1,28 +1,12 @@
-CSS
 
-/* Paleta de Colores:
-    - #42F1DD: Azul/Aqua Neón (Acento)
-    - #000000 / #0b3835: Negro / Dark Teal (Fondo principal / Contenido)
-    - #0A4C48: Darker Teal (Fondo de celdas de tabla)
-*/
-
-/* 1. Estilo de Contenedor General */
-.main-content-dashboard {
-    /* El fondo de la página entera debe ser muy oscuro */
-    min-height: 100vh;
-    padding: 0;
-}
-
-/* 2. El Contenedor Principal con Borde de Neón (El cuerpo del dashboard) */
 .neon-container {
-    border: 4px solid #42F1DD; /* El llamativo borde exterior azul neón */
-    background-color: #0b3835; /* Fondo interior del contenedor */
+    border: 4px solid #42F1DD; 
+    background-color: #0b3835; 
     padding: 0;
     margin-top: 20px;
     margin-bottom: 20px;
 }
 
-/* 3. Estilos del Encabezado (Volver y Contador) */
 .neon-header {
     background-color: #0b3835;
     color: #42F1DD;
@@ -46,8 +30,6 @@ CSS
     color: #ffffff !important;
 }
 
-
-/* 4. Estilos de la Barra de Acciones (Nuevo y Búsqueda) */
 .action-bar {
     display: flex;
     padding: 20px;
@@ -56,7 +38,6 @@ CSS
     background-color: #0b3835;
 }
 .btn-nuevo {
-    /* Botón "Nuevo" - Fondo de Dark Teal con borde de Neón */
     background-color:#147068 !important; 
     color: #42F1DD !important;
     border:none !important;
@@ -72,7 +53,6 @@ CSS
     background-color: #12534d !important;
 }
 
-/* Grupo de Búsqueda */
 .search-input-group {
     flex-grow: 1;
     display: flex;
@@ -107,15 +87,11 @@ CSS
     right: 5px;
 }
 
-
-
-/* 5. Estilos de la Tabla (Cuadrícula Neón) */
 .table-container {
     max-width: 100%;
     overflow-x: auto;
 }
 .tabla-auxiliares {
-    /* Fondo para todas las celdas, incluyendo el thead y el tbody */
     background-color: #0A4C48 !important;
     color: #42F1DD; 
     border-collapse: separate;
@@ -125,7 +101,6 @@ CSS
     width: 100%;
 }
 
-/* Encabezados y Celdas */
 .tabla-auxiliares thead th, 
 .tabla-auxiliares tbody td {
     background-color: #11413D; 
@@ -137,15 +112,12 @@ CSS
     height: 60px; 
 }
 
-/* Celdas de datos con color de texto blanco */
 .tabla-auxiliares tbody td {
     background-color: #155953;
     border: 4px solid #269689;
     color: white;
 }
-.tabla-auxiliares thead th {
-    font-weight: bold;
-}
+.tabla-auxiliares thead th {font-weight: bold;}
 
 .tabla-auxiliares tbody td button {
     background-color: transparent !important;
@@ -153,9 +125,8 @@ CSS
     padding: 0 5px;
     transition: color 0.3s ease;
 }
-.tabla-auxiliares tbody td button:hover {
-    color: white !important; 
-}
+
+.tabla-auxiliares tbody td button:hover {color: white !important; }
 .tabla-auxiliares .btn-warning {
     margin:0px !important;
     padding: 0 3px !important;
@@ -178,7 +149,6 @@ CSS
     transform: scale(110%);
 }
 
-/* 6. Estilos del Modal (Mantenidos y ajustados) */
 .modal-content .modal-header {
     background-color: #154844;
     color: #42F1DD;
@@ -320,15 +290,9 @@ div:where(.swal2-container).swal2-backdrop-show, div:where(.swal2-container).swa
 }
 .btn-volver:hover { background-color: rgb(21, 36, 119)}
 
-.bg-danger1{
-    background-color: rgb(94, 9, 9);
-}
-.bg-success1{
-    background-color: rgb(66, 133, 0);
-}
-.bg-warning1{
-    background-color:darkgoldenrod !important;
-}
+.bg-danger1{background-color: rgb(94, 9, 9);}
+.bg-success1{background-color: rgb(66, 133, 0);}
+.bg-warning1{background-color:darkgoldenrod !important;}
 
 .exportar-btn{
     margin: 0;

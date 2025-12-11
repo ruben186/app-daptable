@@ -30,7 +30,7 @@ function NavBar() {
   // Determinar foto de usuario
   const userPhoto = user?.photoURL || userDefault;
   
-  // Obtener rol desde Firestore
+  //Detectar cambio de tamaño de la ventana
   useEffect(() => {
     const handleResize = () => {
       setIsLargeScreen(window.innerWidth >= 992);
@@ -65,7 +65,6 @@ function NavBar() {
       return; // Detiene la ejecución
     }
 
-    
     // Marcas conocidas y aliases
     const brandAliases = {
       xiaomi: ['xiaomi', 'redmi'],

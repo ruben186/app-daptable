@@ -1,29 +1,18 @@
-import React from 'react';
 import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
-import { useNavigate, useLocation } from 'react-router-dom';
-import Swal from 'sweetalert2';
+import { useLocation } from 'react-router-dom';
 import { Container, Button } from 'react-bootstrap';
-// import Swal from 'sweetalert2'; 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../../firebase'; // Asegúrate de tener la ruta correcta a 'auth'
+import { auth } from '../../firebase'; 
 import { logActivity } from '../../firebase/historialService';
 import { 
     handleCompatibilityCheck,
-    normalizePieceName, 
     getPiezaInfoFromModel 
 } from '../components/compatibilidades';
-import { db } from '../../firebase'; // Asegúrate de que la ruta sea correcta
+import { db } from '../../firebase'; 
 import './xiaomi.css'; 
 import NavBar from '../components/NavBarPage';
 import Footer from '../components/FooterPage';
-
-// Importación de Iconos logos de marcas en verde
-import IconologoXiamiV from '../../assets/logos/logoxiaomiverde2.png';
-import IconologoSamsungV from '../../assets/logos/logosamsumgV.png';
-import IconologoHuaweiV from '../../assets/logos/logohuaweiV.png';
-import IconologoMotorolaV from '../../assets/logos/logomotorolaV.png';
-
 //importaciones de iconos imagenes 
 import IconoPantallaV from '../../assets/Iconos/iconoPantallaVerde.png';
 import IconoPantallaR from '../../assets/Iconos/iconoPantallaRojo.png';
@@ -43,8 +32,6 @@ import IconovisorR from '../../assets/Iconos/visorR.png';
 import IconoauricularV from '../../assets/Iconos/auricularV.png'; 
 import IconoauricularR from '../../assets/Iconos/auricularR.png'; 
 
-// --- LISTA DE RESPALDO (GARANTIZA LA VISIBILIDAD DE LAS 10 CARDS) ---
-// Si Firebase no devuelve datos, esta lista se usa para que las tarjetas siempre estén visibles.
 const DEFAULT_PARTES = [
     { id: 'def1', name: "puerto de carga" },
     { id: 'def2', name: "Bateria" },
@@ -58,7 +45,6 @@ const DEFAULT_PARTES = [
 ];
 
 function BtnMasXiaomi() {
-    const navigate = useNavigate();
     const [user] = useAuthState(auth);
 
     // Estados
@@ -195,7 +181,6 @@ function BtnMasXiaomi() {
     const getIconForPart = (nombreParte) => {
         const nombre = (nombreParte || '').toString().toLowerCase();
         const compatibles = findCompatibilitiesForPart(nombreParte);
-
         const has = compatibles && compatibles.length > 0;
 
         // Mapea el tipo de pieza a iconos verde/rojo
@@ -211,71 +196,10 @@ function BtnMasXiaomi() {
         return has ? IconoPiezaA : IconoPiezaA;
     };
 
-    const handlePartClick = (parte) => {
-        const nombre = (parte.nombre || parte.name || '').toString().trim();
-
-        // Si se abrió la página indicando un modelo seleccionado por navegación, tratamos de usar ese modelo
-        if (selectedModelEntry) {
-            const piezaInfoActual = getPiezaInfoFromModel(selectedModelEntry, nombre);
-            const codigoCompatibilidad = piezaInfoActual?.codigoCompatibilidad;
-            const normalizeCode = (c) => (c === undefined || c === null) ? '' : String(c).trim().toLowerCase();
-
-            if (!codigoCompatibilidad || normalizeCode(codigoCompatibilidad) === '') {
-                Swal.fire({ icon: 'info', title: 'Sin compatibilidades', text: `El modelo seleccionado (${selectedModelEntry.nombre || selectedModelEntry.modelo || ''}) no tiene código de compatibilidad registrado para "${nombre}".` });
-                return;
-            }
-
-            const normTarget = normalizeCode(codigoCompatibilidad);
-            // Buscar todos los modelos que tengan esa misma pieza con el mismo codigo (comparación exacta normalizada)
-            const modelosCompatibles = modelos.filter(m => {
-                const info = getPiezaInfoFromModel(m, nombre);
-                return normalizeCode(info?.codigoCompatibilidad) === normTarget;
-            });
-
-            const listaHTML = modelosCompatibles.length > 0
-                ? modelosCompatibles.map(m => `<li style="text-align:left;margin-bottom:6px;">📱 ${m.nombre || ''} - <strong>${m.modelo || ''}</strong></li>`).join('')
-                : '<li>No se encontraron modelos compatibles.</li>';
-
-            const headerHtml = `
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                    <img src="${IconologoXiamiV}" width="48" height="48" style="border-radius:6px;filter: drop-shadow(0 4px 8px rgba(199, 57, 57, 0.25));" alt="Logo Xiaomi" />
-                    <div style="line-height:1;">
-                        <div style="font-weight:600">${selectedModelEntry.nombre || ''}</div>
-                        <div style="font-size:0.95em;color:#cfe9e4">Modelo: <strong>${selectedModelEntry.modelo || ''}</strong></div>
-                    </div>
-                </div>
-            `;
-
-            Swal.fire({
-                title: `Compatibilidades para: ${nombre}`,
-                html: `${headerHtml}<div style="font-size: 0.95em;"><p style="margin-bottom: 10px;">El código <strong>${codigoCompatibilidad}</strong> es compatible con:</p><ul style="list-style: none; padding: 0; max-height: 260px; overflow-y: auto; border: 1px solid #eee; padding: 10px;">${listaHTML}</ul></div>`,
-                icon: 'success',
-                confirmButtonText: 'Cerrar',
-                width: 680
-            });
-            return;
-        }
-
-        // Fallback: mostrar todos los modelos que tengan una entrada para esa pieza (sin comparar códigos)
-        const compatibles = findCompatibilitiesForPart(nombre);
-        if (!compatibles || compatibles.length === 0) {
-            Swal.fire({ icon: 'info', title: 'Sin compatibilidades', text: `No se encontraron códigos de compatibilidad para "${nombre}" en la base de datos Xiaomi.` });
-            return;
-        }
-
-        const listaHTML = compatibles.map(c => `<li style="text-align:left;margin-bottom:6px;">📱 ${c.modeloNombre || ''} - <strong>${c.modeloCodigo || ''}</strong> — Código: <code>${c.codigo}</code></li>`).join('');
-        Swal.fire({
-            title: `Compatibilidades para: ${nombre}`,
-            html: `<div style="text-align:left"><ul style="list-style:none;padding:0;margin:0;max-height:240px;overflow:auto">${listaHTML}</ul></div>`,
-            icon: 'success',
-            confirmButtonText: 'Cerrar',
-            width: 600
-        });
-    };
-    // Función para manejar clic en iconos dinámicos (igual que en xiaomi.jsx)
+    // Función para manejar clic en iconos dinámicos
     const handleIconClick = (tipoPieza, userActual) => {
         console.log("handleIconClick ejecutado. Pieza:", tipoPieza, "Usuario:", userActual);
-        
+
         handleCompatibilityCheck(
             tipoPieza, 
             userActual, 
@@ -288,17 +212,14 @@ function BtnMasXiaomi() {
     return (
         <div className="page-wrapper"> 
             <NavBar /> 
-            
             <main className="main-content-dashboard bg-gradient2">
                 <Container className="mt-5 pb-5">
-                    
                     <h2 className="section-title text-center mb-4">
                         {selectedModelEntry 
                             ? `Partes disponibles ${selectedModelEntry.nombre || ''} (${selectedModelEntry.modelo || ''}):`
                             : 'Partes disponibles:'
                         }
                     </h2>
-
                     {loading ? (
                         <div className="text-center text-white loading-text">
                             <div className="spinner-border text-info me-2" role="status"></div>
@@ -311,9 +232,7 @@ function BtnMasXiaomi() {
                                 // Determinar la imagen que debe mostrarse para esta pieza.
                                 const nombreParte = parte.nombre || parte.name || '';
 
-                                // Si existe un modelo seleccionado, comprobar su campo correspondiente
                                 const piezaInfoSel = selectedModelEntry ? getPiezaInfoFromModel(selectedModelEntry, nombreParte) : null;
-
                                 // Helper rápido para obtener el icono "rojo" según el nombre de la pieza
                                 const getRedIcon = (n) => {
                                     const s = (n || '').toString().toLowerCase();
@@ -348,7 +267,6 @@ function BtnMasXiaomi() {
                                             console.log("Imagen presionada. Pieza:", nombreParte, "Modelo:", selectedModelEntry);
                                             handleIconClick(nombreParte, selectedModelEntry);
                                         }}
-
                                     >
                                         <div className="card-image-placeholder" style={{ position: 'relative' }}>
                                             <Button
@@ -357,17 +275,14 @@ function BtnMasXiaomi() {
 
                                             >
                                                 <img 
-                                                    // LÓGICA DE IMAGEN: usar `computedSrc` que respeta la falta de código de compatibilidad
                                                     src={computedSrc} 
                                                     alt={parte.nombre || "Repuesto"} 
                                                     loading="lazy"
                                                     className="part-icon"
-                                                    // Respaldo final: si la URL de Firebase falla (404), usa IconoPiezaA
                                                     onError={(e) => {
                                                         e.target.onerror = null; 
                                                         e.target.src = IconoPiezaA; 
-                                                    }}
-                                                    
+                                                    }} 
                                                 />
                                             </Button>
                                         </div>
@@ -380,10 +295,8 @@ function BtnMasXiaomi() {
                             })}
                         </div>
                     )}
-
                 </Container>
             </main>
-            
             <Footer /> 
         </div>
     );

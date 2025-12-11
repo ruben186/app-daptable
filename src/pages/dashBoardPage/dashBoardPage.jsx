@@ -27,7 +27,7 @@ const getYoutubeThumbnail = (url) => {
 function DashboardPage() {
   const [featuredItems, setFeaturedItems] = useState([]);
   const navigate = useNavigate();
-  const [resSlideMin, setResSlideMin] = useState(window.innerWidth >= 400)
+  const [resSlideMin, setResSlideMin] = useState(window.innerWidth >= 450)
   const [resSlideMed, setResSlideMed] = useState(window.innerWidth >= 1000)
       
   useEffect(() => {
@@ -63,15 +63,18 @@ function DashboardPage() {
     };
     fetchItems();
   }, []); 
+
+  //Detectar cambio de tamaño de la ventana
   useEffect(() => {
     const handleResize = () => {
-      setResSlideMin(window.innerWidth >= 400);
+      setResSlideMin(window.innerWidth >= 450);
       setResSlideMed(window.innerWidth >= 1000);
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
   // Componente de Flecha Anterior
   const PrevArrow = ({ onClick }) => (
     <div 

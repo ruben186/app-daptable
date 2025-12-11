@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Container, Table, Button } from 'react-bootstrap';
-import Swal from 'sweetalert2';
 import { db, auth } from '../../firebase';
 import './xiaomi.css';
 import NavBar from '../components/NavBarPage';
@@ -10,7 +9,6 @@ import Footer from '../components/FooterPage';
 import { logActivity } from '../../firebase/historialService';
 import { handleCompatibilityCheck, getPiezaInfoFromModel } from '../components/compatibilidades';
 import { useAuthState } from 'react-firebase-hooks/auth';
-
 // Importación de Iconos e Imágenes
 import IconoPantallaV from '../../assets/Iconos/iconoPantallaVerde.png';
 import IconoPantallaR from '../../assets/Iconos/iconoPantallaRojo.png';
@@ -19,26 +17,16 @@ import IconoBateriaV from '../../assets/Iconos/IconoBateriaV.png';
 import IconoFlexBotonesV from '../../assets/Iconos/flexBotonesV.png';
 import IconoFlexBotonesR from '../../assets/Iconos/flexBotonesR.png';
 import IconoPiezaA from '../../assets/Iconos/IconoPiezaA.png';
-
 // Importación de Iconos logos de marcas en verde
 import IconologoXiamiV from '../../assets/logos/logoxiaomiverde2.png';
 import IconologoSamsungV from '../../assets/logos/logosamsumgV.png';
 import IconologoHuaweiV from '../../assets/logos/logohuaweiV.png';
 import IconologoMotorolaV from '../../assets/logos/logomotorolaV.png';
 import IconologoOppoV from '../../assets/logos/logooppoV.png';
-
 //  Importación de Iconos logos de marcas 
-import IconologoXiami from '../../assets/logos/logoxiami.png';
-import IconologoSamsung from '../../assets/logos/logosamgsumg.png';
-import IconologoHuawei from '../../assets/logos/logohuawei.png';
-import IconologoMotorola from '../../assets/logos/logomotorola.png';
-import IconologoOppo from '../../assets/logos/OPPOLogo.png';
 import IconologoRealme from '../../assets/logos/Realme_logo.png';
 import IconologoVivo from '../../assets/logos/VivoLogo.png';
 import IconologoZte from '../../assets/logos/zteLogo.png';
-
-
-
 
 function Xiaomi() {
     const navigate = useNavigate();
@@ -50,7 +38,7 @@ function Xiaomi() {
     const [searchTerm, setSearchTerm] = useState('');
     const [user] = useAuthState(auth);
 
-    // 1. Carga inicial de datos (Solo Marcas Xiaomi/Redmi)
+    // Carga inicial de datos
     useEffect(() => {
         const fetchUsuarios = async () => {
             try {
@@ -70,13 +58,11 @@ function Xiaomi() {
         fetchUsuarios();
     }, []);
 
-    // 2. Filtrado combinado: por marca (query param) y por término de búsqueda
+    //  Filtrado combinado
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const brandParam = params.get('brand')?.toLowerCase();
         const qParam = params.get('q') || '';
-
-        // Si la URL contiene 'q' la usamos como fuente de verdad; si no, limpiamos el estado de búsqueda
         const hasQ = new URLSearchParams(location.search).has('q');
         if (hasQ) {
             if (qParam !== searchTerm) setSearchTerm(qParam);
@@ -85,10 +71,9 @@ function Xiaomi() {
         }
 
         const term = (hasQ ? qParam : '').toLowerCase();
-
         let results = usuarios.slice();
 
-        // Aliases para marcas (ajusta si tu BD usa nombres diferentes)
+        // Aliases para marcas
         const brandAliases = {
             samsung: ['samsung', 'samgsumg'],
             xiaomi: ['xiaomi', 'redmi'],
@@ -129,7 +114,7 @@ function Xiaomi() {
         setUsuariosFiltrados(results);
     }, [usuarios, location.search, searchTerm]);
 
-    // Logo dinámico según brand
+    // Logo dinámico
     const getLogoForBrand = () => {
         const params = new URLSearchParams(location.search);
         const brandParam = params.get('brand')?.toLowerCase();
@@ -142,23 +127,15 @@ function Xiaomi() {
             case 'vivo': return IconologoVivo;
             case 'zte': return IconologoZte ;
             case 'xiaomi':return IconologoXiamiV;
-            default:
-                return;
+            default: return;
         }
     };
 
-
-    
-    // Nota: la búsqueda desde el navbar actualiza la URL y `searchTerm` se sincroniza desde allí.
-
-    // 3. Función Auxiliar para obtener datos del Array 'campos'
-    // Busca el objeto dentro del array que corresponda a la pieza (ej: "PANTALLA")
-    // Esta función auxiliar la seguimos usando para encontrar la pieza dentro del array
     const getPiezaInfo = (user, nombrePiezaBD) => {
         return getPiezaInfoFromModel(user, nombrePiezaBD);
     };
 
-    // 4. Lógica para decidir qué Icono mostrar (Verde o Rojo)
+    // Lógica para decidir qué Icono mostrar (Verde o Rojo)
     const getIconoDinamico = (user, tipoPieza) => {
         let piezaInfo = null;
         let iconoVerde, iconoRojo;
@@ -171,35 +148,32 @@ function Xiaomi() {
                 iconoRojo = IconoPantallaR;
                 break;
             case 'bateria':
-                piezaInfo = getPiezaInfo(user, 'BATERIA'); // Asegúrate que en BD se llame 'BATERIA'
+                piezaInfo = getPiezaInfo(user, 'BATERIA'); 
                 iconoVerde = IconoBateriaV;
                 iconoRojo = IconoBateriaR;
                 break;
             case 'flexBotones':
-                // Aquí busca si contiene la palabra FLEX o es exactamente FLEX BOTONES, ajusta según tu BD
                 piezaInfo = getPiezaInfo(user, 'FLEX BOTONES') || getPiezaInfo(user, 'FLEX DE BOTONES');
                 iconoVerde = IconoFlexBotonesV;
                 iconoRojo = IconoFlexBotonesR;
                 break;
             default:
-                return null;
-                
+                return null;    
         }
 
         // Verificamos si existe info y si el código de compatibilidad no está vacío
         const tieneDatos = piezaInfo && piezaInfo.codigoCompatibilidad && piezaInfo.codigoCompatibilidad.trim() !== '';
-
         return tieneDatos ? iconoVerde : iconoRojo;
     };
 
     const handleIconClick = async (tipoPieza, userActual) => {
-        // 1. Definir qué pieza estamos buscando (Pantalla, Batería, etc.)
+        // Definir qué pieza estamos buscando (Pantalla, Batería, etc.)
         await handleCompatibilityCheck(
-        tipoPieza, 
-        userActual, 
-        usuarios, // La lista completa de modelos cargada en el estado 'usuarios'
-        logActivity, // La función importada para el historial
-        user // El objeto de autenticación del usuario
+            tipoPieza, 
+            userActual, 
+            usuarios, // La lista completa de modelos cargada en el estado 'usuarios'
+            logActivity, 
+            user
         );
     };
 
@@ -217,23 +191,6 @@ function Xiaomi() {
                                     Si un icono es <span style={{ color: 'red' }}>rojo</span> quiere decir que no hay información de Compatibilidad.
                                 </h5>
                             </div>
-
-                            {/* <InputGroup className="search-input-group" style={{ maxWidth: '300px' }}>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Buscar por nombre, modelo o código..."
-                                    value={searchTerm}
-                                    onChange={handleSearch}
-                                    className="search-buscar"
-                                />
-                                <img
-                                    width="28px"
-                                    height="28px"
-                                    src={IconoBuscar}
-                                    className='btn-icon-buscar'
-                                    alt="Icono buscar"
-                                />
-                            </InputGroup> */}
                         </div>
 
                         <Table striped bordered hover responsive className="tabla-auxiliares">
@@ -248,8 +205,6 @@ function Xiaomi() {
                                 </tr>
                             </thead>
                             <tbody>
-
-                                
                                 {usuariosFiltrados.map(aux => (
                                     <tr key={aux.id}>
                                         <td>{aux.nombre}</td>
@@ -293,28 +248,27 @@ function Xiaomi() {
                                                     loading="lazy"
                                                     alt="Estado Flex"
                                                     className="icon-hover-lift"
-                                                  
                                                 />
                                             </Button>
                                         </td>
 
                                         {/* Columna Más */}
-                                      <td style={{ textAlign: 'center' }}>
-                                          <Button
-                                              variant="link"
-                                              onClick={() => { navigate('/BtnMasXiaomi', { state: { nombre: aux.nombre, modelo: aux.modelo, brand: brandParam } }); }}
-                                              className="p-0 border-0 icon-hover-effect"
-                                          >
-                                              <img
-                                                  src={IconoPiezaA}
-                                                  width="34px"
-                                                  height="34px"
-                                                  loading="lazy"
-                                                  alt="Más detalles"
-                                                  className="icon-hover-lift"
-                                              />
-                                          </Button>
-                                      </td>
+                                        <td style={{ textAlign: 'center' }}>
+                                            <Button
+                                                variant="link"
+                                                onClick={() => { navigate('/BtnMasXiaomi', { state: { nombre: aux.nombre, modelo: aux.modelo, brand: brandParam } }); }}
+                                                className="p-0 border-0 icon-hover-effect"
+                                            >
+                                                <img
+                                                    src={IconoPiezaA}
+                                                    width="34px"
+                                                    height="34px"
+                                                    loading="lazy"
+                                                    alt="Más detalles"
+                                                    className="icon-hover-lift"
+                                                />
+                                            </Button>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>

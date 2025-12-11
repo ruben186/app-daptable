@@ -1,7 +1,6 @@
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
-// Asegúrate de que las rutas a tu auth y db sean correctas
 import { auth, db } from '../../firebase'; 
 
 export const useUserRole = () => {
@@ -16,14 +15,14 @@ export const useUserRole = () => {
                 const userSnap = await getDoc(userDocRef);
                 
                 if (userSnap.exists()) {
-                    // Normalizamos el rol a minúsculas, igual que en ProtectedRoute
+                    // Se normaliza el rol a minúsculas
                     const rol = userSnap.data().rol?.toLowerCase() || 'usuario'; 
                     setUserRole(rol);
                 } else {
-                    setUserRole('usuario'); // Rol por defecto si falta el documento
+                    setUserRole('usuario'); 
                 }
             } else {
-                setUserRole(null); // No hay usuario
+                setUserRole(null); 
             }
             setLoadingRole(false);
         };
@@ -31,9 +30,7 @@ export const useUserRole = () => {
         if (!loadingAuth) {
             fetchRole();
         }
-        // Dependencias: [user] para re-ejecutar si el usuario cambia, [loadingAuth] para esperar que Auth termine.
     }, [user, loadingAuth]);
 
-    // Retornamos el rol y el estado de carga
     return { userRole, isRoleLoading: loadingRole };
 };

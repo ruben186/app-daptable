@@ -150,7 +150,7 @@ const EstadisticasPage = () => {
             <NavBar />
             <div className='bg-gradient2'>
                 <div className="estadisticas-container">
-                    <h1 style={{ color: '#00d49f', marginBottom: '40px', fontSize: '2em' }}>
+                    <h1 style={{ color: '#00d49f', marginBottom: '40px'}}>
                         📈 Indicadores y Estadísticas
                     </h1>
 

@@ -1,5 +1,4 @@
 html {
-    /* Pulgar (primero) y Pista/Fondo (segundo) */
     scrollbar-color: #0d8d80 #0E4D48; 
     scrollbar-width: thin; 
 }
@@ -257,15 +256,15 @@ a:hover {
     left: 50%;
     transform: translateX(-50%);
     pointer-events: none;
-    white-space: nowrap; /* force single line */
+    white-space: nowrap; 
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 70%;
 }
 
 .login-google-btn{
-    position: relative; /* position context for icon/label */
-    padding-right: 46px; /* reserve space for icon + small margin */
+    position: relative;
+    padding-right: 46px; 
 }
 
 .login-google-icon {

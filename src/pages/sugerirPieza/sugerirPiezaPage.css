@@ -1,70 +1,57 @@
 .pieza-registro-container {
     display: flex;
     justify-content: center;
-
-    gap: 200px; /* Espacio entre las columnas */
-    max-width: 1500px; /* Ancho máximo similar al de la captura */
-    margin: 50px auto 20px auto; /* Centrar y dar espacio al botón 'Volver' */
+    gap: 200px; 
+    max-width: 1500px; 
+    margin: 50px auto 20px auto; 
 }
 
-/* Ajuste para que el formulario y el área de imagen se alineen */
 .col-formulario {
-    flex: 1; /* Ocupa el espacio de la izquierda (campos) */
-    max-width: 510px; /* Ancho para la columna de campos */
+    flex: 1;
+    max-width: 510px;
     padding: 20px 0;
 }
 
 .col-imagen-comentarios {
-    flex: 1; /* Ocupa el espacio de la derecha (imagen y textarea) */
-    max-width: 510px; /* Ancho para la columna de imagen/comentarios */
+    flex: 1; 
+    max-width: 510px; 
     display: flex;
     flex-direction: column;
-    gap: 20px; /* Espacio entre los elementos de la columna derecha */
+    gap: 20px;
     padding: 20px 0;
 }
 
-/* El texto secundario "Sugiere alguna informacion..." del ejemplo de React no está en la captura,
-   pero si existe, podemos darle un color más tenue: */
 .form-left p {
     color: rgba(66, 241, 221, 0.6);
     margin-bottom: 25px;
 }
 
-/* 2. Estilos específicos para los elementos de la derecha */
-
-/* Contenedor de la Imagen */
 .caja-imagen-placeholder {
     border: 10px solid #07433E;
-    border-radius: 4px; /* Debe coincidir con form-control2 */
+    border-radius: 4px; 
     height: 250px;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Usa un color de fondo ligeramente más oscuro para destacarlo del fondo principal */
     background-color: #020911; 
     cursor: pointer;
 }
 
 .caja-imagen-placeholder .icono-mas {
-    font-size: 6rem; /* Tamaño del signo '+' */
+    font-size: 6rem; 
     line-height: 1;
     color: #42F1DD;
     font-weight: 200;
 }
 
-/* Área de texto para comentarios (Usa la clase base .form-control2 y lo especializa) */
 .form-control2.textarea-comentarios {
-    /* Usamos el mismo estilo base, pero definimos la altura */
     height: 150px; 
-    resize: none; /* Evita que el usuario cambie el tamaño libremente */
+    resize: none; 
     padding-top: 10px;
 }
 
-/* Ajuste de márgenes para el botón Registrar si no está en .d-grid.gap-2 */
-.col-formulario .d-grid.gap-2 {
-    margin-top: 30px;
-}
+.col-formulario .d-grid.gap-2 {margin-top: 30px;}
 .adaptableMarca{
     background: #073532;
     border: none;
@@ -95,26 +82,24 @@
     opacity: 0.9;
 }
 .select-wrapper2.open .chev{
-    transform:  rotate(-135deg);  top: 40%;;
+    transform:  rotate(-135deg);  
+    top: 40%;;
 }
 .select-wrapper2 select.adaptableMarca{ padding-right: 40px; }
-
 
 .despliegue-otro{
     margin-top: 5px;
     background: #042220;
 }
-.container-sugerencias{
-    width: 100%;
+.container-sugerencias{width: 100%;}
 
-}
-
+/* Responsive */
 @media (max-width: 900px) {
     .pieza-registro-container {
-        flex-direction: column; /* Apila las columnas en móviles */
+        flex-direction: column;
         gap: 30px;
         padding: 0 24px;
-        margin-top: 40px; /* Más espacio para el botón Volver */
+        margin-top: 40px; 
     }
 
     .col-formulario,

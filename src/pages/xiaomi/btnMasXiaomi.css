@@ -1,21 +1,15 @@
-/* Fondo general */
 .mover-logo-xiaomi { margin-left: 20px; }
-
-/* Fondo general */
 .page-wrapper { background-color: #080f13; min-height: 100vh; display: flex; flex-direction: column; }
-
 .main-content-dashboard { flex: 1; }
 
-/* Título */
 .section-title {
-    color: #4ff0d6; /* Cyan Neon */
+    color: #4ff0d6;
     font-weight: 400;
     letter-spacing: 1px;
     text-shadow: 0 0 10px rgba(79, 240, 214, 0.2);
     text-align: center;
 }
 
-/* Grid Layout */
 .parts-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -25,15 +19,13 @@
     box-sizing: border-box;
 }
 
-/* Asegurar box-sizing consistente para evitar cálculos inesperados de tamaño */
 .parts-grid, .xiaomi-card, .card-image-placeholder, .card-image-placeholder img { box-sizing: border-box; }
 
-/* Tarjeta (Card) - EL CONTENEDOR VERDE OSCURO */
 .xiaomi-card {
-    background-color: #0b3537; /* Verde oscuro */
+    background-color: #0b3537; 
     border-radius: 12px;
     padding: 18px;
-    height: 360px; /* aumentado para dar más espacio a la imagen */
+    height: 360px; 
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -47,19 +39,18 @@
 
 .card-image-placeholder {
     width: 100%;
-    height: 300px; /* más espacio para las imágenes grandes */
-    background-color: #020911; /* Fondo negro */
+    height: 300px; 
+    background-color: #020911; 
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 6px; /* pequeño padding para separación */
+    padding: 6px;
     box-sizing: border-box;
     overflow: hidden;
     position: relative;
 }
 
-/* Botón que contiene la imagen dentro de la card: mantener centrado y sin desbordes */
 .card-image-placeholder .image-btn {
     display: flex;
     align-items: center;
@@ -73,7 +64,6 @@
     border-radius: 8px;
 }
 
-/* Aseguramos que la imagen nunca supere el placeholder y quede centrada */
 .part-icon {
     max-width: 100%;
     max-height: 100%;
@@ -87,7 +77,6 @@
 
 .card-label { color: #8abebf; font-size: 0.95rem; text-align: center; margin-top: 10px; font-weight: 500; }
 
-/* Centrar imágenes y asegurar que no desborden */
 .card-image-placeholder img, .card-image-placeholder .part-icon {
     display: block;
     margin: auto;
@@ -101,7 +90,6 @@
 .card-actions { display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; padding-top: 8px; margin-top: 8px; }
 .xiaomi-card .card-actions button, .xiaomi-card .card-actions .btn { display: inline-flex; align-items: center; justify-content: center; padding: 6px 10px; border-radius: 8px; }
 
-/* Efectos Hover y Active */
 .xiaomi-card:hover { transform: translateY(-6px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); background-color: #0e4042; }
 .xiaomi-card.active { background-color: #5bfbd6; border-color: #ffffff; box-shadow: 0 0 15px rgba(91, 251, 214, 0.5); transform: scale(1.02); }
 .xiaomi-card.active .card-label { color: #053d3f; font-weight: 700; }
@@ -109,7 +97,7 @@
 
 .loading-text { margin-top: 50px; font-size: 1.2rem; color: #8abebf; }
 
-/* Responsive adjustments: make cards smaller on narrow screens */
+/* Responsive*/
 @media (max-width: 1000px) {
     .parts-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:16px; }
     .xiaomi-card { height: 320px; padding:14px; }

@@ -1,17 +1,16 @@
 
 .top-vistas-grid {
-    display: flex; 
-    flex-wrap: nowrap;
+    display: grid; 
     gap: 20px;
     overflow-x: auto;
-    overflow-y: hidden;
     justify-content: center;
     margin-top: 30px;
     padding-bottom: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
 }
 
 .estadisticas-container{
-    max-width: 1000px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 50px 20px;
     background-color: #052e2a;
@@ -31,6 +30,7 @@
   background-color: #08645e;
   padding-bottom: 12px;
   border-radius: 20px;
+  width: 950px !important;
 }
 
 .icono-vistas{height: 70px;}
@@ -41,4 +41,35 @@
     font-size: 0.85rem;
     height: 50%;
 }
-.item-vistas{height: auto;}
+.stats-section{
+    max-width: 700px;
+    margin: auto;
+}
+.item-vistas{height: 200px; width: 170px;}
+
+@media (max-width: 540px) {
+    .top-vistas-grid{
+        grid-template-columns: repeat(auto-fit, minmax(150px, 0fr));
+    }
+    .estadisticas-container{
+        padding: 40px 5px;
+        font-size: 0.75rem;
+    }
+    .estadisticas-container h1{
+        font-size: 1.5rem;
+    }
+    .container-topVistas{
+        width: 360px !important;
+        margin: auto;
+    }
+    .container-topVistas h2{
+        font-size: 1.4rem;
+    }
+    .stats-section{
+        max-width: 300px;
+    }
+    .vistas-inferior {
+        font-size: 0.6rem;
+    }
+    .item-vistas{height: 170px; width: 150px;}
+}

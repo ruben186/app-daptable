@@ -1331,7 +1331,7 @@ function GestionAdminPage() {
     return (
         <>
             <NavBar/>
-            <main className="main-content-dashboard bg-gradient2">
+            <main className="bg-gradient2">
                 <div className="admin-container">
                     <div className="header-admin">
                         <h1>Sistema de Gestión Administrador</h1>
@@ -1382,6 +1382,21 @@ function GestionAdminPage() {
                             showNewButton={true}
                         />
 
+                        {/* SECCIÓN NOTICIAS */}
+                        <DataCard
+                            title="Noticias"
+                            icon={IconoGrabadora}
+                            data={noticia} 
+                            searchQuery={searchQueryNoticia}
+                            setSearchQuery={setSearchQueryNoticia}
+                            collectionName="noticiascel"
+                            handleEdit={handleEditNoticia} 
+                            handleDelete={handleEliminarNoticia} 
+                            link={'/gestionNoticias'}
+                            linkNuevo={'/nuevaNoticia'} 
+                            showNewButton={true}
+                        />
+
                         <div className="grid-full-width">
                             {/* SECCIÓN COMPATIBILIDAD */}
                             <DataCard
@@ -1397,20 +1412,6 @@ function GestionAdminPage() {
                                 showNewButton={false}
                             />
                         </div>
-                        {/* SECCIÓN NOTICIAS */}
-                        <DataCard
-                            title="Noticias"
-                            icon={IconoGrabadora}
-                            data={noticia} 
-                            searchQuery={searchQueryNoticia}
-                            setSearchQuery={setSearchQueryNoticia}
-                            collectionName="noticiascel"
-                            handleEdit={handleEditNoticia} 
-                            handleDelete={handleEliminarNoticia} 
-                            link={'/gestionNoticias'}
-                            linkNuevo={'/nuevaNoticia'} 
-                            showNewButton={true}
-                        />
                     </div>
                 </div>
             </main>

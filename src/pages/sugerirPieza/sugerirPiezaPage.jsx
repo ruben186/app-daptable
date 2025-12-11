@@ -8,16 +8,16 @@ import './sugerirPiezaPage.css';
 function SugerirPiezaPage() {
     const navigate = useNavigate();
 
-    // 1. ESTADOS DE CONTROL PARA DESPLEGABLES (CLASE 'open')
+    // ESTADOS DE CONTROL PARA DESPLEGABLES (CLASE 'open')
     const [piezaOpen, setPiezaOpen] = useState(false); 
     const [marcaOpen, setMarcaOpen] = useState(false);
     const [adaptableMarcaOpen, setAdaptableMarcaOpen] = useState(false);
 
-    // 2. ESTADOS DINÁMICOS OBTENIDOS DE FIREBASE
+    // ESTADOS DINÁMICOS OBTENIDOS DE FIREBASE
     const [marcasDisponibles, setMarcasDisponibles] = useState(['Otro']);
     const [piezasDisponibles, setPiezasDisponibles] = useState(['Otro']);
 
-    // 3. ESTADOS PARA LA LÓGICA DE DESPLIEGUE "OTRO"
+    // ESTADOS PARA LA LÓGICA DE DESPLIEGUE "OTRO"
    
     const [mostrarInputNuevaMarca, setMostrarInputNuevaMarca] = useState(false);
     const [nuevaMarcaInput, setNuevaMarcaInput] = useState('');
@@ -189,7 +189,7 @@ function SugerirPiezaPage() {
         const requiredFields = ['nombreCelular', 'marca', 'pieza', 'adaptableMarca', 'adaptableModelo'];
         let missingFields = [];
 
-        // 1. Verificar campos vacíos
+        // Verificar campos vacíos
         requiredFields.forEach(field => {
             if (!dataToValidate[field]) {
                 missingFields.push(field);
@@ -203,12 +203,12 @@ function SugerirPiezaPage() {
                 text: `Por favor, llenar todos los campos necesarios`,
                 background: '#052b27ff', 
                 color: '#ffdfdfff', 
-                confirmButtonColor: '#0b6860ff',
+                confirmButtonColor: '#0b6860ff'
             });
             return;
         }
 
-        // 2. Verificar usuario autenticado
+        // Verificar usuario autenticado
         const user = auth.currentUser;
         if (!user) {
             Swal.fire({
@@ -217,13 +217,13 @@ function SugerirPiezaPage() {
                 text: 'Debes iniciar sesión para enviar una sugerencia.',
                 background: '#052b27ff', 
                 color: '#ffdfdfff', 
-                confirmButtonColor: '#0b6860ff',
+                confirmButtonColor: '#0b6860ff'
             });
             return;
         }
         let urlImagen = '';
         try {
-            // 3. Preparar y enviar los datos a Firestore
+            // Preparar y enviar los datos a Firestore
             const suggestionData = {
                 ...formData,
                 marca: marcaFinal, 
@@ -237,14 +237,14 @@ function SugerirPiezaPage() {
             
             await addDoc(collection(db, 'sugerenciasPiezas'), suggestionData);
             
-            // 4. Mostrar SweetAlert de éxito y limpiar
+            // Mostrar SweetAlert de éxito y limpiar
             Swal.fire({
                 icon: 'success',
                 title: 'Pieza Sugerida',
                 text: 'Tu sugerencia ha sido enviada con éxito para revisión.',
                 background: '#052b27ff', 
                 color: '#ffffffff', 
-                confirmButtonColor: '#0b6860ff',
+                confirmButtonColor: '#0b6860ff'
             }).then(() => {
                 // Limpiar el formulario y estados
                 setFormData({
@@ -265,7 +265,7 @@ function SugerirPiezaPage() {
             });
 
         } catch (error) {
-            // 5. Manejo de errores de Firebase
+            //  Manejo de errores de Firebase
             console.error('Error al registrar la sugerencia en Firebase:', error);
             Swal.fire({
                 icon: 'error',
@@ -284,215 +284,211 @@ function SugerirPiezaPage() {
             </button>
             <div className="container-sugerencias">
                 <div className="pieza-registro-container">
-                
-                <form onSubmit={handleSubmit} className="col-formulario">
-                    
-                    <h3 className="mb-4" style={{textAlign: 'center'}}>Sugerir Pieza</h3>
-                
-                    {/* Nombre del celular */}
-                    <div className="mb-3">
-                        <label className="form-label">Nombre del celular:</label>
-                        <input 
-                            type="text" 
-                            className="form-control2" 
-                            name="nombreCelular" 
-                            value={formData.nombreCelular} 
-                            onChange={handleChange} 
-                            required 
-                        />
-                    </div>
-
-                    {/* Modelo (Opcional) */}
-                    <div className="mb-3">
-                        <label className="form-label">Modelo:</label>
-                        <input 
-                            type="text" 
-                            className="form-control2" 
-                            name="modelo" 
-                            value={formData.modelo} 
-                            onChange={handleChange}
-                            placeholder="(Opcional)" 
-                        />
-                    </div>
-
-                    {/* Marca INPUT DESPLEGABLE*/}
-                    <div className="mb-3">
-                        <label className="form-label">Marca:</label>
-                        <div className={`select-wrapper ${marcaOpen ? 'open' : ''}`}>
-                            <select
-                                className="form-control2"
-                                name="marca"
-                                value={formData.marca}
-                                onChange={handleSelectMarca} 
-                                onBlur={() => setMarcaOpen(false)}
-                                onClick={() => setMarcaOpen(prev => !prev)}
-                                required
-                            >
-                                <option value="">Seleccionar</option>
-                                {marcasDisponibles.map(m => (
-                                    <option key={m} value={m}>{m}</option>
-                                ))}
-                            </select>
-                            <span className="chev" aria-hidden="true" />
-                        </div>
-                        {/* INPUT DESPLEGABLE PARA NUEVA MARCA */}
-                        {mostrarInputNuevaMarca && (
-                            <div className="mb-3 input-desplegado">
-                                <input
-                                    type="text"
-                                    className="form-control2 despliegue-otro"
-                                    value={nuevaMarcaInput}
-                                    onChange={handleInputNuevaMarcaChange}
-                                    placeholder="Escribe la marca aquí"
-                                    required
-                                />
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Pieza (DINÁMICO CON INPUT DESPLEGABLE) */}
-                    <div className="mb-3">
-                        <label className="form-label">Pieza:</label>
-                        <div className={`select-wrapper ${piezaOpen ? 'open' : ''}`}>
-                            <select
-                                className="form-control2"
-                                name="pieza"
-                                value={formData.pieza}
-                                onChange={handleSelectPieza} 
-                                onBlur={() => setPiezaOpen(false)}
-                                onClick={() => setPiezaOpen(prev => !prev)}
-                                required
-                            >
-                                <option value="">Seleccionar</option>
-                                {piezasDisponibles.map(p => (
-                                    <option key={p} value={p}>{p}</option>
-                                ))}
-                            </select>
-                            <span className="chev" aria-hidden="true" />
-                        </div>
-                        {/* INPUT DESPLEGABLE PARA  PIEZA */}
-                        {mostrarInputNuevaPieza && (
-                            <div className="mb-3 input-desplegado">
-                                <input
-                                    type="text"
-                                    className="form-control2 despliegue-otro "
-                                    value={nuevaPiezaInput}
-                                    onChange={handleInputNuevaPiezaChange}
-                                    placeholder="Escribe la pieza aquí"
-                                    required
-                                />
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Adaptabilidad (SECCIÓN CON INPUT DESPLEGABLE DEBAJO DEL SELECT) */}
-                    <label className="form-label">Adaptable con:</label>
-                    <div className="" style={{display: 'flex', gap: '8px', alignItems: 'flex-start'}}>
+                    <form onSubmit={handleSubmit} className="col-formulario">
                         
-                        {/* CONTENEDOR FLEXIBLE PARA LA MARCA Y SU INPUT DESPLEGABLE */}
-                        <div style={{flex: 1, position: 'relative'}}>
-                            
-                            {/* SELECT ORIGINAL DE MARCA ADAPTABLE */}
-                            <div className={`select-wrapper2 ${adaptableMarcaOpen ? 'open' : ''}`}>
+                        <h3 className="mb-4" style={{textAlign: 'center'}}>Sugerir Pieza</h3>
+                    
+                        {/* Nombre del celular */}
+                        <div className="mb-3">
+                            <label className="form-label">Nombre del celular:</label>
+                            <input 
+                                type="text" 
+                                className="form-control2" 
+                                name="nombreCelular" 
+                                value={formData.nombreCelular} 
+                                onChange={handleChange} 
+                                required 
+                            />
+                        </div>
+
+                        {/* Modelo (Opcional) */}
+                        <div className="mb-3">
+                            <label className="form-label">Modelo:</label>
+                            <input 
+                                type="text" 
+                                className="form-control2" 
+                                name="modelo" 
+                                value={formData.modelo} 
+                                onChange={handleChange}
+                                placeholder="(Opcional)" 
+                            />
+                        </div>
+
+                        {/* Marca INPUT DESPLEGABLE*/}
+                        <div className="mb-3">
+                            <label className="form-label">Marca:</label>
+                            <div className={`select-wrapper ${marcaOpen ? 'open' : ''}`}>
                                 <select
-                                    className="adaptableMarca"
-                                    name="adaptableMarca"
-                                    value={formData.adaptableMarca}
-                                    onChange={handleSelectAdaptableMarca} 
-                                    onBlur={() => setAdaptableMarcaOpen(false)}
-                                    onClick={() => setAdaptableMarcaOpen(prev => !prev)}
+                                    className="form-control2"
+                                    name="marca"
+                                    value={formData.marca}
+                                    onChange={handleSelectMarca} 
+                                    onBlur={() => setMarcaOpen(false)}
+                                    onClick={() => setMarcaOpen(prev => !prev)}
                                     required
                                 >
-                                    <option value="">Seleccionar marca</option>
+                                    <option value="">Seleccionar</option>
                                     {marcasDisponibles.map(m => (
                                         <option key={m} value={m}>{m}</option>
                                     ))}
-
                                 </select>
                                 <span className="chev" aria-hidden="true" />
                             </div>
-                            
-                            {/* INPUT DESPLEGABLE PARA NUEVA MARCA ADAPTABLE */}
-                            {mostrarInputNuevaAdaptableMarca && (
-                                <div style={{ 
-                                    position: 'absolute', 
-                                    top: 'calc(100% + 5px)', 
-                                    left: 0, 
-                                    width: '100%', 
-                                    zIndex: 2,
-                                    marginTop: '5px' 
-                                }}>
+                            {/* INPUT DESPLEGABLE PARA NUEVA MARCA */}
+                            {mostrarInputNuevaMarca && (
+                                <div className="mb-3 input-desplegado">
                                     <input
                                         type="text"
-                                        className="form-control2"
-                                        value={nuevaAdaptableMarcaInput}
-                                        onChange={handleInputNuevaAdaptableMarcaChange} 
-                                        placeholder="Escribe la marca"
+                                        className="form-control2 despliegue-otro"
+                                        value={nuevaMarcaInput}
+                                        onChange={handleInputNuevaMarcaChange}
+                                        placeholder="Escribe la marca aquí"
                                         required
                                     />
                                 </div>
                             )}
                         </div>
-                        
-                        {/* Campo de Modelo*/}
-                        <input 
-                            type="text" 
-                            className="form-control2" 
-                            name="adaptableModelo" 
-                            value={formData.adaptableModelo} 
-                            onChange={handleChange} 
-                            required
-                            placeholder="Modelo o nombre" 
-                            style={{flex: 1}}
-                        />
-                    </div>
-                    
-                </form>
-                
-                <div className="col-imagen-comentarios">
-                    <label className="form-label">Añade una imagen (opcional):</label>
-                    {/* CAJA DE IMAGEN CON PREVIEW Y INPUT DE ARCHIVO */}
-                    <div className="caja-imagen-placeholder" onClick={() => document.getElementById('file-input').click()}>
-                        
-                        {imagenPreview ? (
-                            <img 
-                                src={imagenPreview} 
-                                alt="Vista previa de la imagen" 
-                                style={{ 
-                                    width: '100%', 
-                                    height: '100%', 
-                                    objectFit: 'cover' 
-                                }}
-                            />
-                        ) : (
-                            <span className="icono-mas">+</span>
-                        )}
 
-                        {/* INPUT DE ARCHIVO OCULTO */}
-                        <input
-                            type="file"
-                            id="file-input"
-                            style={{ display: 'none' }}
-                            accept="image/*"
-                            onChange={handleImageChange}
-                        />
+                        {/* Pieza (DINÁMICO CON INPUT DESPLEGABLE) */}
+                        <div className="mb-3">
+                            <label className="form-label">Pieza:</label>
+                            <div className={`select-wrapper ${piezaOpen ? 'open' : ''}`}>
+                                <select
+                                    className="form-control2"
+                                    name="pieza"
+                                    value={formData.pieza}
+                                    onChange={handleSelectPieza} 
+                                    onBlur={() => setPiezaOpen(false)}
+                                    onClick={() => setPiezaOpen(prev => !prev)}
+                                    required
+                                >
+                                    <option value="">Seleccionar</option>
+                                    {piezasDisponibles.map(p => (
+                                        <option key={p} value={p}>{p}</option>
+                                    ))}
+                                </select>
+                                <span className="chev" aria-hidden="true" />
+                            </div>
+                            {/* INPUT DESPLEGABLE PARA  PIEZA */}
+                            {mostrarInputNuevaPieza && (
+                                <div className="mb-3 input-desplegado">
+                                    <input
+                                        type="text"
+                                        className="form-control2 despliegue-otro "
+                                        value={nuevaPiezaInput}
+                                        onChange={handleInputNuevaPiezaChange}
+                                        placeholder="Escribe la pieza aquí"
+                                        required
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Adaptabilidad (SECCIÓN CON INPUT DESPLEGABLE DEBAJO DEL SELECT) */}
+                        <label className="form-label">Adaptable con:</label>
+                        <div className="" style={{display: 'flex', gap: '8px', alignItems: 'flex-start'}}>
+                            
+                            {/* CONTENEDOR FLEXIBLE PARA LA MARCA Y SU INPUT DESPLEGABLE */}
+                            <div style={{flex: 1, position: 'relative'}}>
+                                
+                                {/* SELECT ORIGINAL DE MARCA ADAPTABLE */}
+                                <div className={`select-wrapper2 ${adaptableMarcaOpen ? 'open' : ''}`}>
+                                    <select
+                                        className="adaptableMarca"
+                                        name="adaptableMarca"
+                                        value={formData.adaptableMarca}
+                                        onChange={handleSelectAdaptableMarca} 
+                                        onBlur={() => setAdaptableMarcaOpen(false)}
+                                        onClick={() => setAdaptableMarcaOpen(prev => !prev)}
+                                        required
+                                    >
+                                        <option value="">Seleccionar marca</option>
+                                        {marcasDisponibles.map(m => (
+                                            <option key={m} value={m}>{m}</option>
+                                        ))}
+
+                                    </select>
+                                    <span className="chev" aria-hidden="true" />
+                                </div>
+                                
+                                {/* INPUT DESPLEGABLE PARA NUEVA MARCA ADAPTABLE */}
+                                {mostrarInputNuevaAdaptableMarca && (
+                                    <div style={{ 
+                                        position: 'absolute', 
+                                        top: 'calc(100% + 5px)', 
+                                        left: 0, 
+                                        width: '100%', 
+                                        zIndex: 2,
+                                        marginTop: '5px' 
+                                    }}>
+                                        <input
+                                            type="text"
+                                            className="form-control2"
+                                            value={nuevaAdaptableMarcaInput}
+                                            onChange={handleInputNuevaAdaptableMarcaChange} 
+                                            placeholder="Escribe la marca"
+                                            required
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                            
+                            {/* Campo de Modelo*/}
+                            <input 
+                                type="text" 
+                                className="form-control2" 
+                                name="adaptableModelo" 
+                                value={formData.adaptableModelo} 
+                                onChange={handleChange} 
+                                required
+                                placeholder="Modelo o nombre" 
+                                style={{flex: 1}}
+                            />
+                        </div>
+                        
+                    </form>
+                
+                    <div className="col-imagen-comentarios">
+                        <label className="form-label">Añade una imagen (opcional):</label>
+                        {/* CAJA DE IMAGEN CON PREVIEW Y INPUT DE ARCHIVO */}
+                        <div className="caja-imagen-placeholder" onClick={() => document.getElementById('file-input').click()}>
+                            
+                            {imagenPreview ? (
+                                <img 
+                                    src={imagenPreview} 
+                                    alt="Vista previa de la imagen" 
+                                    style={{ 
+                                        width: '100%', 
+                                        height: '100%', 
+                                        objectFit: 'cover' 
+                                    }}
+                                />
+                            ) : (
+                                <span className="icono-mas">+</span>
+                            )}
+
+                            {/* INPUT DE ARCHIVO OCULTO */}
+                            <input
+                                type="file"
+                                id="file-input"
+                                style={{ display: 'none' }}
+                                accept="image/*"
+                                onChange={handleImageChange}
+                            />
+                        </div>
+                        <textarea
+                            className="form-control2 textarea-comentarios"
+                            name="comentarios"
+                            value={formData.comentarios}
+                            placeholder='¿Deseas escribir algo más?(Opcional)'
+                            onChange={handleChange}
+                        ></textarea>
                     </div>
-                    <textarea
-                        className="form-control2 textarea-comentarios"
-                        name="comentarios"
-                        value={formData.comentarios}
-                        placeholder='¿Deseas escribir algo más?(Opcional)'
-                        onChange={handleChange}
-                    ></textarea>
                 </div>
-                
-                </div>
-                
                 <div className="d-grid gap-2" style={{marginTop: '30px'}}>
                     <button type="submit" className="btn-primary" onClick={handleSubmit}>Enviar Sugerencia</button>
                 </div>
             </div>
-            
         </div>
     );
 }

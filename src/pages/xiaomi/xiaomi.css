@@ -1,65 +1,41 @@
-.texto-separado {
-   margin-left: 50px;
- }
+.texto-separado {margin-left: 50px;}
+.mover-logo-xiaomi { margin-left: 20px;}
 
- .mover-logo-xiaomi {
-   margin-left: 20px;
-   
- }
-
-/* Imagen del header: altura fija, ancho automático según proporción */
 .parts-header-logo,
 .mover-logo-xiaomi {
-    height: 54px; /* altura fija */
-    width: auto;  /* ancho depende de la imagen */
+    height: 54px; 
+    width: auto;  
     object-fit: contain;
     display: inline-block;
 }
 
- /* Efecto Hover para los Iconos de la Tabla */
 .icon-hover-effect {
     transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out;
-    border-radius: 50%; /* Opcional: si quieres que el área de clic sea redonda */
-    
+    border-radius: 50%; 
 }
 
 .icon-hover-effect:hover {
-    transform: scale(1.25); /* Aumenta el tamaño un 25% */
-    filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3)); /* Agrega una sombra suave */
+    transform: scale(1.25); 
+    filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3));
     cursor: pointer;
-    
-    z-index: 10; /* Se asegura que quede por encima de otros elementos */
+    z-index: 10;
 }
 
-/* Opcional: Un efecto suave al presionar */
-.icon-hover-effect:active {
-    transform: scale(0.95); /* Se encoge un poco al hacer clic */
-}
-/* Clase para el efecto de levitación */
-.icon-hover-lift {
-    /* Suaviza el movimiento para que no se vea tosco */
-    transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), filter 0.25s;
-}
+.icon-hover-effect:active {transform: scale(0.95);}
+.icon-hover-lift {transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), filter 0.25s;}
 
 .icon-hover-lift:hover {
-    /* 1. El icono sube 4 pixeles */
-     background-color: #4eb3aa; /* El color Verde Aguamarina */
+    background-color: #4eb3aa; 
     transform: translateY(-4px) scale(1.1);
-    
-    /* 2. Proyecta una sombra difuminada que respeta la transparencia del PNG */
     filter: drop-shadow(0 6px 4px rgba(0, 0, 0, 0.25));
-    
-    /* 3. Cambia el cursor para indicar clic */
     cursor: pointer;
 }
 
-/* Efecto al hacer clic (se hunde) */
 .icon-hover-lift:active {
     transform: translateY(0px) scale(0.95);
     filter: none;
 }
 
-/* Styles for parts grid and cards (BtnMasXiaomi) */
 .parts-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -91,7 +67,7 @@
 }
 
 .card-image-placeholder{
-    background: #031319; /* cuadro oscuro donde va la imagen */
+    background: #031319; 
     height: 120px;
     display: flex;
     align-items: center;
@@ -103,12 +79,9 @@
     max-height: 92%;
     object-fit: contain;
     display: block;
-
-    /* Asegura que la imagen esté centrada dentro del contenedor/button */
     margin: 0 auto;
 }
 
-/* Si la imagen está envuelta en un botón, centra el contenido del botón */
 .card-image-placeholder > button {
     display: flex;
     align-items: center;
@@ -120,15 +93,13 @@
     border: none;
 }
 
-/* Iconos de la tabla: mantener altura fija y ancho automático */
 .tabla-auxiliares img,
 .icono-tabla {
-    height: 34px; /* altura consistente para iconos de estado */
+    height: 34px;
     width: auto;
     object-fit: contain;
 }
 
-/* Pills / logos en el navbar: altura fija, ancho auto para respetar proporción */
 .pill .pill-icon,
 .pill-icon {
     height: 42px;
@@ -147,7 +118,6 @@
     border-top: 1px solid rgba(0,0,0,0.12);
 }
 
-/* Smaller action icons row (used in admin-part-card variant) */
 .admin-part-actions{
     display:flex;
     gap:8px;
@@ -155,7 +125,6 @@
     justify-content:center;
 }
 
-/* Grid used in admin panel variant (if present) */
 .admin-part-grid{
     display:grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -176,12 +145,7 @@
 .admin-part-image{flex:1;}
 .admin-part-label{padding:10px;text-align:center;color:#cffcf6;background:transparent}
 
-/* responsive tweaks */
-@media (max-width:600px){
-    .parts-grid, .admin-part-grid{grid-template-columns: repeat(2, 1fr);}
-}
 
-/* Visuals for missing pieces */
 .xiaomi-card.missing { border-color: rgba(220,40,40,0.25); }
 .xiaomi-card.missing .card-image-placeholder { background: linear-gradient(180deg,#2b0a0a,#0f0505); }
 .xiaomi-card.missing .card-label { background: linear-gradient(180deg, rgba(200,20,20,0.08) 0%, rgba(120,10,10,0.95) 100%); color: #ffecec; }
@@ -189,7 +153,6 @@
 .compat-badge { margin-top:8px; font-size:12px; color:#b7fff0; opacity:0.95; }
 .missing-text { margin-top:6px; font-size:12px; color:#ffd6d6; opacity:0.95; }
 
-/* Header for BtnMasXiaomi page */
 .parts-header{
     display:flex;
     align-items:center;
@@ -202,3 +165,8 @@
 .parts-header-title{color:#bfffe9;font-size:18px;font-weight:700}
 .parts-header-subtitle{color:#cbeee6;font-size:16px;margin-top:4px}
 .parts-header-subtitle .muted{color:#89d6c9;font-weight:600}
+
+/* responsive */
+@media (max-width:600px){
+    .parts-grid, .admin-part-grid{grid-template-columns: repeat(2, 1fr);}
+}

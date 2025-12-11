@@ -1,6 +1,3 @@
-
-
-/* 1. Estilos del Contenedor Principal */
 .gestion-noticias-page {
     width: 1500px;
     background-color: #052e2a;
@@ -9,7 +6,7 @@
 .bg-noticias{
   align-items: flex-start;
 }
-/* 2. Estilos de Encabezados y Separadores */
+
 .section-title {
     margin-bottom: 20px;
 }
@@ -18,14 +15,12 @@
     opacity: 0.5;
 }
 
-/* 3. Estilos de la Tarjeta de Noticias */
 .news-card {
     background-color: #0b5550  ;
     border: 1px solid #169788;
     border-radius: 8px;
     padding: 10px;
     transition: all 0.3s ease;
-    /* La transición de hover se mantiene en el JSX por la naturaleza del evento */
 }
 .card-body {
     padding: 10px !important;
@@ -52,7 +47,6 @@
     color: white !important;
 }
 
-/* 4. Estilos del Botón "Ver Fuente" */
 .card-link-btn {
     background-color: #008b8b !important;
     color: white !important;
@@ -66,8 +60,6 @@
     background-color: #003838 !important;
 }
 
-/* 5. Mensajes de Estado */
 .loading-text, .no-news-message {
-    
     text-align: center;
 }

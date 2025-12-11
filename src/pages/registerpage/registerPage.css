@@ -44,13 +44,11 @@
 
 .logo-box .logo2,
 .form-right .logo2 {
-    /* Tamaño del logo dentro del recuadro derecho */
     width: 316px;
     height: 316px;
     object-fit: contain;
 }
 
-/* Etiquetas de los campos */
 .form-label {
     color: #42F1DD;
     display: block;
@@ -58,7 +56,6 @@
     font-size: 0.95rem;
 }
 
-/* Estilo base de inputs/selects/textarea que usan .form-control */
 .form-control2 {
     background: #073532;
     border: none;
@@ -82,14 +79,12 @@
     box-shadow: 0 0 0 3px rgba(11, 189, 165, 0.473);
 }
 
-/* Inputs tipo date y selects comparten fondo/colores */
 input[type="date"], select, .form-control {
     background: #073532;
     color: #42F1DD;
     position: relative;
 }
 
-/* Select wrapper con indicador de estado abierto/cerrado */
 .select-wrapper { position: relative; display: inline-block; width: 100%; }
 .select-wrapper .chev {
     position: absolute;
@@ -109,7 +104,6 @@ input[type="date"], select, .form-control {
 }
 .select-wrapper select.form-control2 { padding-right: 40px; }
 
-/* Usar imagen personalizada para el icono del calendario en inputs date */
 input[type="date"]::-webkit-calendar-picker-indicator {
     filter: none; 
     opacity: 1;
@@ -128,7 +122,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     background-size: 20px 20px;
     border-radius: 5px;
     position: absolute;
-    right: 10px;   /* distancia desde el borde derecho */
+    right: 10px;   
     transition: all 0.3s ease;
 }
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
@@ -136,7 +130,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     background-color: #2d978b;
 }
 
-/* Checkboxes/radios */
 .form-check-label {
     color: #42F1DD;
 }
@@ -145,13 +138,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     border-color: #0d7f73;
 }
 
-/* Espaciado por campo */
 .mb-3 { margin-bottom: 16px !important; }
 
-/* Contenedores de botones */
 .d-grid.gap-2 { display: flex; gap: 12px; align-items: center; }
 
-/* Botón principal */
 .btn-primary {
    background: #09665E;
     border: none;
@@ -163,18 +153,15 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     font-size: 1.1rem;
     transition: all 0.3s ease;
 }
-.btn-primary:hover {   background: #2b867f;
-    color: #fff;}
+.btn-primary:hover {   background: #2b867f; color: #fff;}
 
-/* small tweaks */
 a.btn-outline-secondary:focus, .btn-primary:focus { box-shadow:0 0 0 4px rgba(11,189,165,0.12); outline:none; }
 
 select.form-control { appearance:none; -webkit-appearance:none; -moz-appearance:none; }
 
-/* fallback if logo is used directly as img inside form-card */
 .form-card > img.logo { width:120px; margin:0 auto 12px; }
 
-/* Responsive layout: stack columns and hide right logo on narrow screens */
+/* Responsive*/
 @media (max-width: 1400px) {
     .form-left .mb-4{margin-bottom: 0.7rem !important ;}
     .form-left .mb-3{margin-bottom: 0.4rem !important ;}
@@ -215,7 +202,7 @@ select.form-control { appearance:none; -webkit-appearance:none; -moz-appearance:
 }
 
 @media (max-width: 540px) {
-    .bg-gradient2 { padding: 20px 12px; }
+    .bg-gradient2 { padding: 20px 12px; padding-top: 50px;}
     .form-right { display: none; }
     .form-left { width: 100%; max-width: 360px; margin: 0 auto; }
     .logo-box { display: none; }
@@ -223,7 +210,7 @@ select.form-control { appearance:none; -webkit-appearance:none; -moz-appearance:
 }
 
 @media (max-width: 360px) {
-    .bg-gradient2 { padding: 12px 8px; }
+    .bg-gradient2 { padding: 12px 8px; padding-top: 55px;}
     .form-left { max-width: 340px; }
     .form-label { font-size: 0.92rem; }
     .form-control2 { padding: 8px 10px; }
